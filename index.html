@@ -1,0 +1,341 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quillmark</title>
+  <meta name="description" content="Quillmark writes your monthly investor update from live Stripe data, sends it from your own domain, and shows who opened it. Join the waitlist.">
+  <meta name="theme-color" content="#F5F1E8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0E1412" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="assets/logo/quillmark-mark-reverse-on-green.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Hanken+Grotesk:wght@400;500;600&family=Geist+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    try {
+      var t = localStorage.getItem("qm-theme");
+      if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="qm-mark" viewBox="0 0 32 32">
+      <circle cx="13" cy="13" r="8" fill="none" stroke="currentColor" stroke-width="2.5"/>
+      <path d="M18.8 18.8 L24.4 24.4" stroke="currentColor" stroke-width="2.5"/>
+      <rect x="23.6" y="23.6" width="4.4" height="4.4" rx="0.6" fill="currentColor"/>
+    </symbol>
+  </svg>
+
+  <header class="nav">
+    <div class="wrap nav__inner">
+      <a class="brand" href="#top" aria-label="Quillmark home">
+        <svg class="brand__mark" aria-hidden="true"><use href="#qm-mark"/></svg>
+        <span class="brand__word">Quillmark</span>
+      </a>
+      <nav class="nav__links" aria-label="Sections">
+        <a href="#how">How it works</a>
+        <a href="#plan">Plan</a>
+        <a href="#sample">Sample</a>
+        <a href="#faq">FAQ</a>
+      </nav>
+      <div class="nav__actions">
+        <button class="theme-toggle" type="button" aria-label="Switch color theme">
+          <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 3.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg>
+        </button>
+        <a class="btn btn--small" href="#waitlist">Join the waitlist</a>
+      </div>
+    </div>
+  </header>
+
+  <main id="main">
+    <!-- Hero -->
+    <section class="hero" id="top">
+      <div class="wrap hero__grid">
+        <div class="hero__copy reveal">
+          <p class="eyebrow">For subscription founders, pre-seed to Series A</p>
+          <h1 class="display">Your investor update, written from your&nbsp;Stripe numbers.</h1>
+          <p class="lede">Connect Stripe read-only and type five rough bullets. Quillmark writes the finished update, sends it from your own domain, and shows you which investors opened it.</p>
+          <ul class="hero__facts" aria-label="At a glance">
+            <li><span class="mono">$29</span> per month, planned</li>
+            <li>Read-only Stripe access</li>
+            <li>Sent from your domain</li>
+          </ul>
+        </div>
+
+        <div class="card form-card reveal" id="waitlist">
+          <div class="form-card__body" data-state="form">
+            <h2 class="form-card__title">Join the waitlist</h2>
+            <p class="form-card__note">We will email you once, when your invite is ready.</p>
+
+            <form class="form" novalidate>
+              <div class="field">
+                <label for="email">Work email</label>
+                <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254" placeholder="you@company.com">
+                <p class="field__error" id="email-error" hidden></p>
+              </div>
+
+              <div class="field">
+                <label for="company">Company name</label>
+                <input id="company" name="company" type="text" autocomplete="organization" required maxlength="120">
+                <p class="field__error" id="company-error" hidden></p>
+              </div>
+
+              <fieldset class="field">
+                <legend>Number of investors</legend>
+                <div class="segmented">
+                  <label><input type="radio" name="investor_count" value="1-10" required><span class="mono">1-10</span></label>
+                  <label><input type="radio" name="investor_count" value="11-30"><span class="mono">11-30</span></label>
+                  <label><input type="radio" name="investor_count" value="31-100"><span class="mono">31-100</span></label>
+                  <label><input type="radio" name="investor_count" value="100+"><span class="mono">100+</span></label>
+                </div>
+                <p class="field__error" id="investor_count-error" hidden></p>
+              </fieldset>
+
+              <fieldset class="field">
+                <legend>How you send updates today</legend>
+                <div class="choices">
+                  <label><input type="radio" name="current_method" value="visible" required><span>Visible</span></label>
+                  <label><input type="radio" name="current_method" value="plain_email"><span>Plain email</span></label>
+                  <label><input type="radio" name="current_method" value="other"><span>Other</span></label>
+                  <label><input type="radio" name="current_method" value="not_sending"><span>Not sending yet</span></label>
+                </div>
+                <p class="field__error" id="current_method-error" hidden></p>
+              </fieldset>
+
+              <div class="hp" aria-hidden="true">
+                <label for="website">Leave this empty</label>
+                <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+              </div>
+
+              <button class="btn btn--block" type="submit">
+                <span class="btn__label">Request an invite</span>
+              </button>
+              <p class="form__status" role="status" aria-live="polite"></p>
+            </form>
+          </div>
+
+          <div class="form-card__body success" data-state="success" hidden>
+            <svg class="success__mark" aria-hidden="true"><use href="#qm-mark"/></svg>
+            <h2 class="form-card__title" tabindex="-1">You are on the list.</h2>
+            <p class="success__text">Thank you. When your invite is ready, we will write to <span class="success__email"></span>. Until then, there is nothing else to do.</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- How it works -->
+    <section class="section" id="how" aria-labelledby="how-title">
+      <div class="wrap">
+        <header class="section__head reveal">
+          <p class="eyebrow">How it works</p>
+          <h2 class="h2" id="how-title">Three steps, once a month.</h2>
+        </header>
+        <ol class="steps">
+          <li class="step reveal">
+            <span class="step__num mono">01</span>
+            <h3 class="h3">Connect Stripe, read-only</h3>
+            <p>Quillmark reads your subscription data to pull MRR, growth, churn and customer counts for the month. It cannot change anything in your account.</p>
+          </li>
+          <li class="step reveal">
+            <span class="step__num mono">02</span>
+            <h3 class="h3">Type five rough bullets</h3>
+            <p>Wins, misses, hires, asks. Fragments are fine. You bring the story; the numbers are already filled in.</p>
+          </li>
+          <li class="step reveal">
+            <span class="step__num mono">03</span>
+            <h3 class="h3">Review, send, see who read it</h3>
+            <p>Quillmark writes the finished update. It goes out from your own domain, and you can see which investors opened it.</p>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- Plan -->
+    <section class="section section--raised" id="plan" aria-labelledby="plan-title">
+      <div class="wrap plan">
+        <header class="plan__head reveal">
+          <p class="eyebrow">The plan</p>
+          <h2 class="h2" id="plan-title">One plan, priced for the stage you are at.</h2>
+          <p class="muted">For founders who have outgrown free investor update tools and do not need a heavier platform.</p>
+        </header>
+        <div class="card price reveal">
+          <div class="price__top">
+            <p class="price__amount"><span class="mono">$29</span><span class="price__per">per month</span></p>
+            <p class="price__tag">Planned pricing</p>
+          </div>
+          <ul class="includes">
+            <li>
+              <span class="includes__dot" aria-hidden="true"></span>
+              <div>
+                <h3 class="h4">Automatic Stripe numbers</h3>
+                <p>MRR, growth, churn and customers, pulled live for the month. No spreadsheet to copy from.</p>
+              </div>
+            </li>
+            <li>
+              <span class="includes__dot" aria-hidden="true"></span>
+              <div>
+                <h3 class="h4">Sent from your own domain</h3>
+                <p>Updates arrive from your address at your company, not from a tool's mailing domain.</p>
+              </div>
+            </li>
+            <li>
+              <span class="includes__dot" aria-hidden="true"></span>
+              <div>
+                <h3 class="h4">Per-investor open tracking</h3>
+                <p>See which investors opened each update, so you know who to follow up with.</p>
+              </div>
+            </li>
+          </ul>
+          <a class="btn btn--block" href="#waitlist">Join the waitlist</a>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sample -->
+    <section class="section" id="sample" aria-labelledby="sample-title">
+      <div class="wrap">
+        <header class="section__head reveal">
+          <p class="eyebrow">A sample update</p>
+          <h2 class="h2" id="sample-title">From five rough bullets to a finished update.</h2>
+          <p class="muted">Illustrative only. The company, people and figures below are fictional.</p>
+        </header>
+
+        <div class="sample">
+          <div class="card sample__input reveal">
+            <p class="label">What the founder typed</p>
+            <ol class="rough">
+              <li>closed 2 annual plans, both from the referral program</li>
+              <li>churn up a bit, lost 1 agency account to budget cuts</li>
+              <li>shipped team workspaces, early users like it</li>
+              <li>hired senior eng, starts nov 3</li>
+              <li>ask: intros to ops leads at 20-200 person agencies</li>
+            </ol>
+          </div>
+
+          <article class="card letter reveal" aria-label="Sample investor update">
+            <header class="letter__meta">
+              <dl>
+                <div><dt>From</dt><dd>Maya Okafor &lt;maya@ledgerlane.example&gt;</dd></div>
+                <div><dt>To</dt><dd>Ledgerlane investors</dd></div>
+                <div><dt>Subject</dt><dd>Ledgerlane, September update</dd></div>
+              </dl>
+            </header>
+
+            <div class="letter__body">
+              <p>Hi all,</p>
+              <p>September was a steady month. Annual plans grew, churn ticked up slightly, and team workspaces shipped on schedule.</p>
+
+              <div class="metrics" role="table" aria-label="September metrics from Stripe">
+                <div class="metric" role="row">
+                  <span class="metric__label" role="rowheader">MRR</span>
+                  <span class="metric__value mono" role="cell">$48,200</span>
+                  <span class="metric__delta mono" role="cell">+6.1% MoM</span>
+                </div>
+                <div class="metric" role="row">
+                  <span class="metric__label" role="rowheader">Net new MRR</span>
+                  <span class="metric__value mono" role="cell">$2,780</span>
+                  <span class="metric__delta mono" role="cell">vs $2,140</span>
+                </div>
+                <div class="metric" role="row">
+                  <span class="metric__label" role="rowheader">Customers</span>
+                  <span class="metric__value mono" role="cell">412</span>
+                  <span class="metric__delta mono" role="cell">+19</span>
+                </div>
+                <div class="metric" role="row">
+                  <span class="metric__label" role="rowheader">Revenue churn</span>
+                  <span class="metric__value mono" role="cell">1.9%</span>
+                  <span class="metric__delta mono" role="cell">from 1.4%</span>
+                </div>
+              </div>
+              <p class="metrics__source"><span class="source-dot" aria-hidden="true"></span>Figures pulled from Stripe on Oct 1</p>
+
+              <h3 class="letter__h">Highlights</h3>
+              <ul>
+                <li>We closed two annual plans, both through the referral program, which is now our most efficient channel.</li>
+                <li>Team workspaces shipped. Early feedback from the first accounts using it is positive.</li>
+                <li>A senior engineer joins on November 3.</li>
+              </ul>
+
+              <h3 class="letter__h">Lowlights</h3>
+              <ul>
+                <li>Churn rose slightly after one agency account cancelled due to budget cuts.</li>
+              </ul>
+
+              <h3 class="letter__h">How you can help</h3>
+              <ul>
+                <li>Introductions to operations leads at agencies with 20 to 200 people.</li>
+              </ul>
+
+              <p>Thank you for the continued support.</p>
+              <p class="letter__sign">Maya</p>
+            </div>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- FAQ -->
+    <section class="section section--raised" id="faq" aria-labelledby="faq-title">
+      <div class="wrap faq">
+        <header class="faq__head reveal">
+          <p class="eyebrow">Questions</p>
+          <h2 class="h2" id="faq-title">Before you connect anything.</h2>
+        </header>
+        <div class="faq__list reveal">
+          <details>
+            <summary>Is Stripe access read-only?</summary>
+            <div class="faq__a">
+              <p>Yes. Quillmark requests read-only access to your Stripe account. It can read subscription, customer and invoice data to calculate your monthly numbers. It cannot create charges, issue refunds, edit customers or change any setting. You can revoke access from your Stripe dashboard at any time.</p>
+            </div>
+          </details>
+          <details>
+            <summary>Who owns my data?</summary>
+            <div class="faq__a">
+              <p>You do. Your Stripe figures, your bullets, your updates and your investor list belong to you. We use them only to write and send your updates. We do not sell your data or use it to train shared models, and you can export or delete everything when you leave.</p>
+            </div>
+          </details>
+          <details>
+            <summary>What will it cost?</summary>
+            <div class="faq__a">
+              <p>The planned price is $29 per month, which includes automatic Stripe numbers, sending from your own domain and per-investor open tracking. We will confirm pricing before anyone is charged.</p>
+            </div>
+          </details>
+          <details>
+            <summary>What happens after I join the waitlist?</summary>
+            <div class="faq__a">
+              <p>We invite founders in small groups so we can help each one set up properly. You will get a single email when your invite is ready. We will not add you to a newsletter.</p>
+            </div>
+          </details>
+        </div>
+      </div>
+    </section>
+
+    <!-- Final CTA -->
+    <section class="cta" aria-labelledby="cta-title">
+      <div class="wrap cta__inner reveal">
+        <svg class="cta__mark" aria-hidden="true"><use href="#qm-mark"/></svg>
+        <h2 class="display display--cta" id="cta-title">Next month's update, already half written.</h2>
+        <p class="cta__lede">Join the waitlist and we will let you know when Quillmark is ready for you.</p>
+        <a class="btn btn--reverse" href="#waitlist">Join the waitlist</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <div class="wrap footer__inner">
+      <a class="brand brand--small" href="#top" aria-label="Quillmark home">
+        <svg class="brand__mark" aria-hidden="true"><use href="#qm-mark"/></svg>
+        <span class="brand__word">Quillmark</span>
+      </a>
+      <p class="muted small">Quillmark is a working name. Not affiliated with Stripe.</p>
+    </div>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
