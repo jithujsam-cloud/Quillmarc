@@ -1,0 +1,346 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quillmark Brand Guidelines</title>
+  <meta name="description" content="The Quillmark identity: the idea, the mark, colour, type, voice, imagery, components and motion.">
+  <link rel="icon" href="/assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Hanken+Grotesk:wght@400;500;600&family=Geist+Mono:wght@400&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="/brand/tokens.css">
+  <link rel="stylesheet" href="/brand/brand.css">
+  <script>
+    try {
+      var t = localStorage.getItem("qm-theme");
+      if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="qm-mark" viewBox="0 0 32 32">
+      <circle cx="14" cy="14" r="9" fill="none" stroke="currentColor" stroke-width="2.6"/>
+      <path d="M17.6 17.6L23.9 23.9" stroke="currentColor" stroke-width="2.6"/>
+      <rect x="23.2" y="23.2" width="4.8" height="4.8" rx="0.5" fill="currentColor"/>
+    </symbol>
+  </svg>
+
+  <header class="top">
+    <a class="top__brand" href="/">
+      <svg aria-hidden="true"><use href="#qm-mark"/></svg><span>Quillmark</span>
+    </a>
+    <nav aria-label="Guidelines">
+      <a href="#idea">Idea</a><a href="#mark">Mark</a><a href="#colour">Colour</a><a href="#type">Type</a><a href="#voice">Voice</a><a href="#imagery">Imagery</a><a href="#components">Components</a><a href="#motion">Motion</a><a href="#files">Files</a>
+    </nav>
+    <button class="theme" type="button" aria-label="Switch between light and dark">
+      <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 3.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg>
+    </button>
+  </header>
+
+  <main>
+    <section class="cover">
+      <div class="cover__text">
+        <h1>Brand guidelines</h1>
+        <p class="lead">Quillmark writes a founder’s monthly investor update from live Stripe numbers. Everything about the brand should feel like that letter: calm, exact, well set, and finished.</p>
+        <p class="small">Version 1.0, October 2026. Quillmark is a working name.</p>
+      </div>
+      <figure class="cover__picture">
+        <img src="/assets/img/scholar-sharpening-his-quill.jpg" width="1769" height="1973" alt="Gerrit Dou’s painting of an old scholar sharpening a quill pen">
+      </figure>
+    </section>
+
+    <!-- Idea -->
+    <section id="idea" class="block">
+      <h2>The idea</h2>
+      <div class="cols">
+        <div class="prose">
+          <p class="statement">Founders have written to the people who backed them for as long as there have been backers. The monthly update is a letter, and Quillmark is the pen that already knows the numbers.</p>
+          <p>So the brand borrows from correspondence and bookkeeping, not from software. Paper grounds instead of white. A serif that reads like a well-printed letter. Figures set like a ledger. One deep green, the colour of a bound account book, used for the thing you should do next.</p>
+          <p>The test for any decision: would it look at home in a carefully printed letter from a founder to an investor? If it would look at home on a crypto dashboard instead, it is wrong.</p>
+        </div>
+        <dl class="pillars">
+          <div><dt>Calm</dt><dd>Low density, generous space, one thing per screen. Nothing shouts, blinks or competes.</dd></div>
+          <div><dt>Precise</dt><dd>Real numbers that add up, exact words, tabular figures. Never a vague claim or a rounded boast.</dd></div>
+          <div><dt>Premium</dt><dd>Restraint and finish: good type, true colour, careful spacing. No ornaments standing in for quality.</dd></div>
+          <div><dt>Editorial</dt><dd>Set like a publication. Headlines are sentences, sections are chapters, pictures are chosen, not decorative.</dd></div>
+        </dl>
+      </div>
+    </section>
+
+    <!-- Mark -->
+    <section id="mark" class="block">
+      <h2>The mark</h2>
+      <div class="cols">
+        <div class="prose">
+          <p>A ring with a short diagonal tail that crosses the stroke, ending in a small filled square. Read it as a Q whose tail ends in a full stop: the update, written and finished. It sits beside the wordmark, set in Newsreader Medium.</p>
+          <p>The mark and wordmark are drawn files. Never retype the wordmark in a font; use the supplied SVGs, where the letters are outlined.</p>
+        </div>
+        <figure class="construct" aria-label="Construction of the mark on a 32 unit grid">
+          <svg viewBox="-4 -4 40 40" class="construct__svg" aria-hidden="true">
+            <defs><pattern id="grid" width="2" height="2" patternUnits="userSpaceOnUse"><path d="M2 0H0V2" fill="none" stroke="var(--line)" stroke-width="0.08"/></pattern></defs>
+            <rect x="0" y="0" width="32" height="32" fill="url(#grid)"/>
+            <rect x="0" y="0" width="32" height="32" fill="none" stroke="var(--line)" stroke-width="0.12"/>
+            <circle cx="14" cy="14" r="9" fill="none" stroke="var(--ink)" stroke-width="2.6"/>
+            <path d="M17.6 17.6L23.9 23.9" stroke="var(--ink)" stroke-width="2.6"/>
+            <rect x="23.2" y="23.2" width="4.8" height="4.8" rx="0.5" fill="var(--ink)"/>
+            <circle cx="14" cy="14" r="0.45" fill="var(--brass)"/>
+            <path d="M14 14L23 14" stroke="var(--brass)" stroke-width="0.15" stroke-dasharray="0.6 0.4"/>
+          </svg>
+          <figcaption>
+            <span>Grid 32 units</span><span>Ring centre 14, 14, radius 9</span><span>Stroke 2.6</span><span>Tail 45°, from inside the ring</span><span>Full stop 4.8 square</span>
+          </figcaption>
+        </figure>
+      </div>
+
+      <div class="lockups">
+        <figure class="tile tile--paper"><img src="/assets/logo/quillmark-lockup-horizontal-ink.svg" alt="Horizontal lockup in ink" width="260"><figcaption>Horizontal, ink on paper. The default.</figcaption></figure>
+        <figure class="tile tile--green"><img src="/assets/logo/quillmark-lockup-horizontal-reverse.svg" alt="Horizontal lockup reversed on green" width="260"><figcaption>Reverse on brand green.</figcaption></figure>
+        <figure class="tile tile--night"><img src="/assets/logo/quillmark-lockup-stacked-reverse.svg" alt="Stacked lockup reversed on dark" width="170"><figcaption>Stacked, reverse on dark.</figcaption></figure>
+        <figure class="tile tile--paper"><img src="/assets/logo/quillmark-app-icon.svg" alt="App icon" width="120"><figcaption>App icon and avatars.</figcaption></figure>
+      </div>
+
+      <div class="rules3">
+        <div>
+          <h3>Clear space</h3>
+          <p>Keep empty space around the mark equal to the ring’s radius (9 of 32 units) on every side. Around a lockup, the same distance measured from the mark.</p>
+        </div>
+        <div>
+          <h3>Minimum size</h3>
+          <p>Mark alone: 16px. Horizontal lockup: 96px wide. Stacked lockup: 72px wide. Below that, use the mark alone.</p>
+        </div>
+        <div>
+          <h3>Colour</h3>
+          <p>Ink on paper, reverse on green or dark, or brand green on paper. Never brass, never a gradient, never two colours at once.</p>
+        </div>
+      </div>
+
+      <h3 class="sub">Do not</h3>
+      <div class="donts">
+        <figure><svg aria-hidden="true" style="transform: rotate(-30deg)"><use href="#qm-mark"/></svg><figcaption>Rotate the mark</figcaption></figure>
+        <figure><svg aria-hidden="true" style="transform: scaleX(1.5)"><use href="#qm-mark"/></svg><figcaption>Stretch it</figcaption></figure>
+        <figure><svg aria-hidden="true" style="color: var(--brass)"><use href="#qm-mark"/></svg><figcaption>Colour it brass</figcaption></figure>
+        <figure><svg aria-hidden="true" style="transform: scaleX(-1)"><use href="#qm-mark"/></svg><figcaption>Mirror the tail</figcaption></figure>
+        <figure><span class="dont-type">Quillmark</span><figcaption>Retype the wordmark</figcaption></figure>
+      </div>
+    </section>
+
+    <!-- Colour -->
+    <section id="colour" class="block">
+      <h2>Colour</h2>
+      <div class="cols">
+        <p class="prose">Paper and ink carry the page. Brand green marks the action and fills the occasional whole section. Brass is a jeweller’s amount: a small square, a dot, a rule beside a list. Proportions, roughly: ground 80%, ink 15%, green under 5%, brass a trace.</p>
+        <div class="proportion" aria-hidden="true"><span style="flex:80;background:var(--qm-paper)"></span><span style="flex:14;background:var(--qm-ink)"></span><span style="flex:5;background:var(--qm-green)"></span><span style="flex:1;background:var(--qm-brass)"></span></div>
+      </div>
+
+      <h3 class="sub">Light</h3>
+      <div class="swatches">
+        <div class="sw" style="--c:#F5F1E8;--t:#16201C"><b>Surface</b><span>#F5F1E8</span><em>Ground</em></div>
+        <div class="sw" style="--c:#FBF9F4;--t:#16201C"><b>Raised</b><span>#FBF9F4</span><em>Sheets and panels</em></div>
+        <div class="sw" style="--c:#16201C;--t:#F7F3EA"><b>Ink</b><span>#16201C</span><em>14.8:1 on surface</em></div>
+        <div class="sw" style="--c:#55605A;--t:#F7F3EA"><b>Muted</b><span>#55605A</span><em>5.8:1 on surface</em></div>
+        <div class="sw" style="--c:#1D4A40;--t:#F7F3EA"><b>Brand green</b><span>#1D4A40</span><em>Text on it #F7F3EA, 9.0:1</em></div>
+        <div class="sw" style="--c:#B8893A;--t:#16201C"><b>Brass</b><span>#B8893A</span><em>Fills only, never text on light</em></div>
+        <div class="sw" style="--c:#D8D0BE;--t:#16201C"><b>Hairline</b><span>#D8D0BE</span><em>Fields, tables, product only</em></div>
+        <div class="sw" style="--c:#868B82;--t:#F7F3EA"><b>Control</b><span>#868B82</span><em>Input borders, 3.1:1</em></div>
+      </div>
+
+      <h3 class="sub">Dark</h3>
+      <div class="swatches">
+        <div class="sw" style="--c:#0E1412;--t:#EEE8DA"><b>Surface</b><span>#0E1412</span><em>Ground</em></div>
+        <div class="sw" style="--c:#151C19;--t:#EEE8DA"><b>Raised</b><span>#151C19</span><em>Sheets and panels</em></div>
+        <div class="sw" style="--c:#EEE8DA;--t:#0E1412"><b>Ink</b><span>#EEE8DA</span><em>15.3:1 on surface</em></div>
+        <div class="sw" style="--c:#A6AEA8;--t:#0E1412"><b>Muted</b><span>#A6AEA8</span><em>8.2:1 on surface</em></div>
+        <div class="sw" style="--c:#86BCAB;--t:#0E1412"><b>Brand green</b><span>#86BCAB</span><em>Text on it #0E1412, 8.7:1</em></div>
+        <div class="sw" style="--c:#D6AB5A;--t:#0E1412"><b>Brass</b><span>#D6AB5A</span><em>Fills; text allowed on dark</em></div>
+        <div class="sw" style="--c:#2C3632;--t:#EEE8DA"><b>Hairline</b><span>#2C3632</span><em>Fields, tables, product only</em></div>
+        <div class="sw" style="--c:#6B756F;--t:#EEE8DA"><b>Control</b><span>#6B756F</span><em>Input borders, 3.9:1</em></div>
+      </div>
+
+      <table class="contrast">
+        <caption>Measured contrast (WCAG 2.2). Text needs 4.5:1, large text and control borders 3:1.</caption>
+        <thead><tr><th scope="col">Pair</th><th scope="col">Light</th><th scope="col">Dark</th><th scope="col">Use</th></tr></thead>
+        <tbody>
+          <tr><td>Ink on surface</td><td class="fig">14.82</td><td class="fig">15.25</td><td>All running text</td></tr>
+          <tr><td>Ink on raised</td><td class="fig">15.87</td><td class="fig">14.18</td><td>Text on sheets</td></tr>
+          <tr><td>Muted on surface</td><td class="fig">5.81</td><td class="fig">8.20</td><td>Secondary notes</td></tr>
+          <tr><td>Muted on raised</td><td class="fig">6.22</td><td class="fig">7.62</td><td>Secondary notes on sheets</td></tr>
+          <tr><td>Brand green on surface</td><td class="fig">8.85</td><td class="fig">8.69</td><td>Hero headline</td></tr>
+          <tr><td>On-brand text on green</td><td class="fig">9.01</td><td class="fig">8.69</td><td>Buttons, green fields</td></tr>
+          <tr><td>Control border on surface</td><td class="fig">3.10</td><td class="fig">3.90</td><td>Inputs and chips</td></tr>
+          <tr><td>Brass on surface</td><td class="fig">2.79</td><td class="fig">8.72</td><td>Decorative fill only in light</td></tr>
+        </tbody>
+      </table>
+      <p class="note">Change from the original palette: the light control border moved from #8A8F86 (2.93:1, just under the 3:1 needed for input borders) to #868B82 (3.10:1). The difference is not visible; the pass is.</p>
+    </section>
+
+    <!-- Type -->
+    <section id="type" class="block">
+      <h2>Type</h2>
+      <div class="faces">
+        <div class="face">
+          <p class="face__sample face__sample--display">Aa</p>
+          <h3>Newsreader</h3>
+          <p>Display and letters. Headlines, the wordmark, statements and the body of sample updates. Regular 400 for headlines, Medium 500 for the wordmark. Tracking −0.02 to −0.025em at display size, leading 1.0 to 1.05.</p>
+        </div>
+        <div class="face">
+          <p class="face__sample face__sample--text">Aa</p>
+          <h3>Hanken Grotesk</h3>
+          <p>Interface and running text. Body at 18px with leading 1.55, labels at 14px. Regular 400, Medium 500 for labels and buttons, Semibold 600 for run-in questions. Sentence case always.</p>
+        </div>
+        <div class="face">
+          <p class="face__sample face__sample--fig fig">$29</p>
+          <h3>Geist Mono</h3>
+          <p>Figures only: prices, metrics, dates and times in data. Never for labels, captions or anything a sentence would say. It is how Quillmark sets a ledger.</p>
+        </div>
+      </div>
+
+      <h3 class="sub">Five sizes do all the work</h3>
+      <ol class="scale">
+        <li><span class="scale__k">Figure, 128 to 248px</span><span class="scale__s scale__s--figure fig">$29</span></li>
+        <li><span class="scale__k">Large, 40 to 64px</span><span class="scale__s scale__s--large">Your investor update</span></li>
+        <li><span class="scale__k">Mid, 24 to 32px</span><span class="scale__s scale__s--mid">How it works</span></li>
+        <li><span class="scale__k">Body, 18px</span><span class="scale__s">Connect Stripe read-only and type five rough bullets.</span></li>
+        <li><span class="scale__k">Small, 14px</span><span class="scale__s scale__s--small">One email when your invite is ready.</span></li>
+      </ol>
+      <p class="note">No text under 13px. Headlines stay on two lines or fewer at every width: about 32 characters is safe everywhere.</p>
+    </section>
+
+    <!-- Voice -->
+    <section id="voice" class="block">
+      <h2>Voice</h2>
+      <div class="cols">
+        <div class="prose">
+          <p class="statement">Write like a founder who respects the reader’s time: plain, specific, unhurried.</p>
+          <ul class="rules">
+            <li><b>Say the specific thing.</b> “Pulls MRR, churn and customer count from Stripe” beats “powerful insights”.</li>
+            <li><b>Use real numbers or none.</b> No invented customers, quotes, logos, ratings or statistics. Sample figures are labelled as fictional.</li>
+            <li><b>Short sentences, full stops.</b> No em dashes anywhere. Use a full stop or a comma.</li>
+            <li><b>Sentence case.</b> For headings, buttons and labels. No all-caps lines, no small tracked labels.</li>
+            <li><b>Buttons name the action.</b> “Join the waitlist”, the same words everywhere.</li>
+            <li><b>Calm, not cute.</b> No exclamation marks, no emoji, no puns about quills.</li>
+          </ul>
+        </div>
+        <div class="pairs">
+          <div class="pair"><p class="pair__no">Supercharge your investor relations with AI-powered updates!</p><p class="pair__yes">Your investor update, written from Stripe.</p></div>
+          <div class="pair"><p class="pair__no">Trusted by 1,000+ founders.</p><p class="pair__yes">For founders with 5 to 100 investors.</p></div>
+          <div class="pair"><p class="pair__no">Seamless, effortless, secure.</p><p class="pair__yes">Read-only. It cannot charge, refund or edit.</p></div>
+          <div class="pair"><p class="pair__no">Oops! Something went wrong 😬</p><p class="pair__yes">That did not go through. Please try again.</p></div>
+        </div>
+      </div>
+      <p class="note">Words we do not use: unlock, unleash, supercharge, elevate, empower, streamline, seamless, effortless, robust, cutting-edge, next-generation, world-class, all-in-one, game-changing.</p>
+    </section>
+
+    <!-- Imagery -->
+    <section id="imagery" class="block">
+      <h2>Imagery</h2>
+      <div class="cols">
+        <div class="prose">
+          <p>Two kinds of picture, and nothing else.</p>
+          <p><b>Old pictures of people writing and keeping accounts.</b> Public-domain paintings, ledgers and letters from museum collections. They carry the idea: this is an old and serious ritual. Always credited by title, maker and date. Never presented as customers or the team.</p>
+          <p><b>The product, built for real.</b> Fragments of the actual interface with numbers that add up, labelled as sample data. No device frames, no grey bars, no stock photos of people at laptops, no illustrations of rockets or graphs.</p>
+          <p>Pictures are left untouched: no colour wash, no duotone, no brand tint. Corners take the 16px radius.</p>
+        </div>
+        <div class="gallery">
+          <figure><img src="/assets/img/scholar-sharpening-his-quill.jpg" width="1769" height="1973" alt="Scholar sharpening his quill" loading="lazy"><figcaption>Gerrit Dou, Scholar Sharpening His Quill, about 1633</figcaption></figure>
+          <figure><img src="/assets/img/a-young-lady-writing-at-her-desk.jpg" width="1625" height="1991" alt="A young lady writing at her desk" loading="lazy"><figcaption>Circle of Gerard ter Borch, A Young Lady Writing at her Desk, 1670</figcaption></figure>
+          <figure><img src="/assets/img/pittsboro-merchant-business-ledger.jpg" width="1920" height="2881" alt="Merchant ledger page, September 1833" loading="lazy"><figcaption>Merchant ledger, Pittsborough, September 1833</figcaption></figure>
+        </div>
+      </div>
+      <p class="note">All three are public domain, via Wikimedia Commons. Sources and licences are recorded in assets/img/credits.json.</p>
+    </section>
+
+    <!-- Components -->
+    <section id="components" class="block">
+      <h2>Components</h2>
+      <div class="kit">
+        <div class="kit__cell">
+          <h3>Button</h3>
+          <div class="kit__demo"><span class="btn">Join the waitlist</span><span class="btn btn--quiet">Join the waitlist</span></div>
+          <p>One shape: flat brand fill, 6px corners, 52px tall. One primary button per screen. On green, the button inverts.</p>
+        </div>
+        <div class="kit__cell">
+          <h3>Fields and choices</h3>
+          <div class="kit__demo kit__demo--stack">
+            <span class="inp">you@company.com</span>
+            <span class="chips"><span>1–10</span><span class="on">11–30</span><span>31–100</span><span>100+</span></span>
+          </div>
+          <p>Filled with the ground colour, a control border, 6px corners. The chosen chip fills with brand green.</p>
+        </div>
+        <div class="kit__cell">
+          <h3>Figures</h3>
+          <div class="kit__demo kit__figs">
+            <div><span>MRR</span><b class="fig">$48,200</b><i class="fig">+6.1%</i></div>
+            <div><span>Customers</span><b class="fig">412</b><i class="fig">+19</i></div>
+          </div>
+          <p>Label in small text, the figure in Geist Mono, the change beneath in muted. Every figure on a page must add up with the others.</p>
+        </div>
+        <div class="kit__cell">
+          <h3>Marks of brass</h3>
+          <div class="kit__demo"><ul class="brasslist"><li>Stripe numbers filled in</li><li>Sent from your own domain</li></ul></div>
+          <p>A 6 to 8px square with 2px corners, the full stop of the mark. The only decoration the brand allows.</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- Layout and motion -->
+    <section id="motion" class="block">
+      <h2>Layout and motion</h2>
+      <div class="rules3">
+        <div>
+          <h3>Frame</h3>
+          <p>A 12-column grid with equal outer margins from 16 to 32px. Sections sit 96 to 144px apart. Surfaces are told apart by a tone step, never by a shadow or a divider line.</p>
+        </div>
+        <div>
+          <h3>Radius</h3>
+          <p>6px for controls, 10px for panels inside the product, 16px for sheets, stages and pictures. Nothing else.</p>
+        </div>
+        <div>
+          <h3>Motion</h3>
+          <p>Strong ease-outs that settle like a spring without overshooting: cubic-bezier(0.16, 1, 0.3, 1). Hover 220ms, small moves 380ms, entrances 820ms staggered 75ms, pictures crossfade over 1.6s. No bounce, no parallax, and everything still works with reduced motion.</p>
+        </div>
+      </div>
+      <div class="motion-demo" aria-hidden="true">
+        <span class="motion-demo__dot"></span>
+      </div>
+    </section>
+
+    <!-- Files -->
+    <section id="files" class="block">
+      <h2>Files</h2>
+      <div class="files">
+        <a href="/assets/logo/quillmark-lockup-horizontal-ink.svg" download>Horizontal lockup, ink</a>
+        <a href="/assets/logo/quillmark-lockup-horizontal-reverse.svg" download>Horizontal lockup, reverse</a>
+        <a href="/assets/logo/quillmark-lockup-horizontal-brand.svg" download>Horizontal lockup, brand green</a>
+        <a href="/assets/logo/quillmark-lockup-stacked-ink.svg" download>Stacked lockup, ink</a>
+        <a href="/assets/logo/quillmark-lockup-stacked-reverse.svg" download>Stacked lockup, reverse</a>
+        <a href="/assets/logo/quillmark-mark-ink.svg" download>Mark, ink</a>
+        <a href="/assets/logo/quillmark-mark-reverse.svg" download>Mark, reverse</a>
+        <a href="/assets/logo/quillmark-mark-brand.svg" download>Mark, brand green</a>
+        <a href="/assets/logo/quillmark-wordmark-ink.svg" download>Wordmark, ink</a>
+        <a href="/assets/logo/quillmark-app-icon.svg" download>App icon, green</a>
+        <a href="/assets/logo/quillmark-app-icon-light.svg" download>App icon, paper</a>
+        <a href="/assets/logo/favicon.svg" download>Favicon, follows the theme</a>
+        <a href="/brand/tokens.css" download>Design tokens, CSS</a>
+        <a href="/brand/tokens.json" download>Design tokens, JSON</a>
+      </div>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p>Quillmark brand guidelines, version 1.0</p>
+    <a href="/">Back to the waitlist page</a>
+  </footer>
+
+  <script>
+    document.querySelector(".theme").addEventListener("click", function () {
+      var r = document.documentElement, set = r.getAttribute("data-theme");
+      var dark = set ? set === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
+      var next = dark ? "light" : "dark";
+      r.setAttribute("data-theme", next);
+      try { localStorage.setItem("qm-theme", next); } catch (e) {}
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,92 @@
+/* Quillmark design tokens. The single source for colour, type, space, radius and motion.
+   Brand names first, then the role names every component uses. Components use roles only. */
+
+:root {
+  /* Brand palette, light */
+  --qm-paper: #F5F1E8;        /* surface: the ground */
+  --qm-paper-raised: #FBF9F4; /* raised: one tone step up */
+  --qm-ink: #16201C;
+  --qm-muted: #55605A;
+  --qm-green: #1D4A40;        /* brand deep green */
+  --qm-on-green: #F7F3EA;
+  --qm-hairline: #D8D0BE;     /* form fields, tables and product fragments only */
+  --qm-brass: #B8893A;        /* fills only, never text on light */
+  --qm-control: #868B82;      /* control borders: 3.1:1 on paper (was #8A8F86, 2.93:1) */
+  --qm-error: #9B2C1F;
+
+  /* Roles */
+  --bg: var(--qm-paper);
+  --surface: var(--qm-paper-raised);
+  --ink: var(--qm-ink);
+  --muted: var(--qm-muted);
+  --accent: var(--qm-green);
+  --accent-ink: var(--qm-on-green);
+  --line: var(--qm-hairline);
+  --brass: var(--qm-brass);
+  --control: var(--qm-control);
+  --error: var(--qm-error);
+  --focus: var(--qm-green);
+
+  /* Type */
+  --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
+  --font-text: "Hanken Grotesk", system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-figures: "Geist Mono", ui-monospace, "SF Mono", Menlo, monospace; /* figures only */
+
+  /* Five sizes do all the work */
+  --size-small: 14px;
+  --size-body: 18px;
+  --size-mid: clamp(24px, 2.2vw, 32px);
+  --size-large: clamp(40px, 4.4vw, 64px);
+  --size-figure: clamp(128px, 17vw, 248px);
+
+  /* Space */
+  --margin: clamp(16px, 2.2vw, 32px);
+  --gap: 12px;
+  --section: clamp(96px, 9.5vw, 144px);
+
+  /* Radius: 6 for controls, 10 for small panels, 16 for large panels and pictures */
+  --r-control: 6px;
+  --r-panel: 10px;
+  --r-stage: 16px;
+
+  /* Motion: strong ease-outs that settle like a spring, without overshoot */
+  --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
+  --ease-move: cubic-bezier(0.65, 0, 0.35, 1);
+  --t-hover: 220ms;
+  --t-small: 380ms;
+  --t-reveal: 820ms;
+  --t-picture: 1600ms;
+  --stagger: 75ms;
+
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --qm-paper: #0E1412;
+    --qm-paper-raised: #151C19;
+    --qm-ink: #EEE8DA;
+    --qm-muted: #A6AEA8;
+    --qm-green: #86BCAB;
+    --qm-on-green: #0E1412;
+    --qm-hairline: #2C3632;
+    --qm-brass: #D6AB5A;
+    --qm-control: #6B756F;
+    --qm-error: #F0A595;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --qm-paper: #0E1412;
+  --qm-paper-raised: #151C19;
+  --qm-ink: #EEE8DA;
+  --qm-muted: #A6AEA8;
+  --qm-green: #86BCAB;
+  --qm-on-green: #0E1412;
+  --qm-hairline: #2C3632;
+  --qm-brass: #D6AB5A;
+  --qm-control: #6B756F;
+  --qm-error: #F0A595;
+  color-scheme: dark;
+}

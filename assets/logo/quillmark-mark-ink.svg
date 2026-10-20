@@ -1,5 +1,1 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Quillmark">
-  <circle cx="13" cy="13" r="8" fill="none" stroke="#16201C" stroke-width="2.5"/>
-  <path d="M18.8 18.8 L24.4 24.4" stroke="#16201C" stroke-width="2.5" stroke-linecap="butt"/>
-  <rect x="23.6" y="23.6" width="4.4" height="4.4" rx="0.6" fill="#16201C"/>
-</svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32" width="32" height="32" role="img" aria-label="Quillmark"><g transform="translate(0 0) scale(1)" fill="none"><circle cx="14.0" cy="14.0" r="9.0" stroke="#16201C" stroke-width="2.6"/><path d="M17.6 17.6L23.9 23.9" stroke="#16201C" stroke-width="2.6"/><rect x="23.2" y="23.2" width="4.8" height="4.8" rx="0.5" fill="#16201C"/></g></svg>
