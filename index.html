@@ -1,0 +1,332 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Quillmark</title>
+  <meta name="description" content="Quillmark writes your monthly investor update from live Stripe numbers and five rough bullets, sends it from your own domain, and shows who opened it. Join the waitlist.">
+  <meta name="theme-color" content="#F5F1E8" media="(prefers-color-scheme: light)">
+  <meta name="theme-color" content="#0E1412" media="(prefers-color-scheme: dark)">
+  <link rel="icon" href="assets/logo/favicon.svg" type="image/svg+xml">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Newsreader:ital,opsz,wght@0,6..72,400;0,6..72,500;1,6..72,400&family=Hanken+Grotesk:wght@400;500;600&family=Geist+Mono:wght@400&display=swap" rel="stylesheet"> <!-- taste-skill-ignore: Geist Mono for figures only, a brand rule -->
+  <link rel="stylesheet" href="brand/tokens.css">
+  <link rel="stylesheet" href="styles.css">
+  <script>
+    document.documentElement.classList.add("js");
+    try {
+      var t = localStorage.getItem("qm-theme");
+      if (t === "light" || t === "dark") document.documentElement.setAttribute("data-theme", t);
+    } catch (e) {}
+  </script>
+</head>
+<body>
+  <a class="skip" href="#main">Skip to content</a>
+
+  <svg width="0" height="0" style="position:absolute" aria-hidden="true">
+    <symbol id="qm-mark" viewBox="0 0 32 32">
+      <circle cx="14" cy="14" r="9" fill="none" stroke="currentColor" stroke-width="2.6"/>
+      <path d="M17.6 17.6L23.9 23.9" stroke="currentColor" stroke-width="2.6"/>
+      <rect x="23.2" y="23.2" width="4.8" height="4.8" rx="0.5" fill="currentColor"/>
+    </symbol>
+  </svg>
+
+  <main id="main">
+    <!-- Hero: the letter sheet on the left, the old pictures of people writing to their backers on the right -->
+    <section class="hero" id="top" aria-labelledby="hero-title">
+      <div class="hero__sheet">
+        <nav class="bar" aria-label="Main">
+          <div class="bar__side">
+            <a href="#how">How it works</a>
+            <a href="#pricing">Pricing</a>
+          </div>
+          <a class="bar__brand" href="#top" aria-label="Quillmark home">
+            <svg class="bar__mark" aria-hidden="true"><use href="#qm-mark"/></svg>
+            <span>Quillmark</span>
+          </a>
+          <div class="bar__side bar__side--end">
+            <a href="#faq">FAQ</a>
+            <button class="theme" type="button" aria-label="Switch between light and dark">
+              <svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="6.5" fill="none" stroke="currentColor" stroke-width="1.5"/><path d="M10 3.5a6.5 6.5 0 0 1 0 13z" fill="currentColor"/></svg>
+            </button>
+          </div>
+        </nav>
+
+        <div class="hero__body">
+          <h1 class="hero__title" id="hero-title" data-rise>Your investor update, written from&nbsp;Stripe</h1>
+          <p class="hero__lede" data-rise>Connect Stripe read-only and type five rough bullets. Quillmark writes the finished update, sends it from your own domain and shows you which investors opened it.</p>
+
+          <div class="join" id="waitlist" data-rise>
+            <form class="form" novalidate data-state="form">
+              <div class="form__row">
+                <div class="field">
+                  <label for="email">Work email</label>
+                  <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254" placeholder="you@company.com">
+                  <p class="field__error" id="email-error" hidden></p>
+                </div>
+                <div class="field">
+                  <label for="company">Company name</label>
+                  <input id="company" name="company" type="text" autocomplete="organization" required maxlength="120">
+                  <p class="field__error" id="company-error" hidden></p>
+                </div>
+              </div>
+
+              <fieldset class="field">
+                <legend>How many investors you have</legend>
+                <div class="chips chips--four">
+                  <label><input type="radio" name="investor_count" value="1-10" required><span>1–10</span></label>
+                  <label><input type="radio" name="investor_count" value="11-30"><span>11–30</span></label>
+                  <label><input type="radio" name="investor_count" value="31-100"><span>31–100</span></label>
+                  <label><input type="radio" name="investor_count" value="100+"><span>100+</span></label>
+                </div>
+                <p class="field__error" id="investor_count-error" hidden></p>
+              </fieldset>
+
+              <fieldset class="field">
+                <legend>How you send updates today</legend>
+                <div class="chips chips--four">
+                  <label><input type="radio" name="current_method" value="visible" required><span>Visible</span></label>
+                  <label><input type="radio" name="current_method" value="plain_email"><span>Plain email</span></label>
+                  <label><input type="radio" name="current_method" value="other"><span>Other</span></label>
+                  <label><input type="radio" name="current_method" value="not_sending"><span>Not yet</span></label>
+                </div>
+                <p class="field__error" id="current_method-error" hidden></p>
+              </fieldset>
+
+              <div class="hp" aria-hidden="true">
+                <label for="website">Leave this empty</label>
+                <input id="website" name="website" type="text" tabindex="-1" autocomplete="off">
+              </div>
+
+              <div class="form__foot">
+                <button class="button" type="submit"><span class="button__label">Join the waitlist</span></button>
+                <p class="form__note">One email when your invite is ready. Nothing else.</p>
+              </div>
+              <p class="form__status" role="status" aria-live="polite"></p>
+            </form>
+
+            <div class="joined" data-state="success" hidden>
+              <svg class="joined__mark" aria-hidden="true"><use href="#qm-mark"/></svg>
+              <h2 class="joined__title" tabindex="-1">You are on the list.</h2>
+              <p>Thank you. When your invite is ready we will write to <span class="joined__email"></span>. Until then, there is nothing else to do.</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <figure class="hero__stage" aria-label="Pictures of people keeping accounts and writing letters">
+        <div class="hero__pictures">
+          <img class="is-on" src="assets/img/scholar-sharpening-his-quill.jpg" width="1769" height="1973" alt="An old scholar in a fur-trimmed coat sharpening a quill pen over an open book, painted by Gerrit Dou" fetchpriority="high"
+               data-title="Scholar Sharpening His Quill" data-by="Gerrit Dou, about 1633">
+          <img src="assets/img/a-young-lady-writing-at-her-desk.jpg" width="1625" height="1991" alt="A young woman in a red jacket writing a letter at a desk beside an inkstand" decoding="async"
+               data-title="A Young Lady Writing at her Desk" data-by="Circle of Gerard ter Borch, 1670">
+          <img src="assets/img/pittsboro-merchant-business-ledger.jpg" width="1920" height="2881" alt="A handwritten merchant's ledger page headed Pittsborough, September 1833, with columns of accounts" decoding="async"
+               data-title="Merchant ledger, Pittsborough" data-by="September 1833">
+        </div>
+        <figcaption class="hero__caption" aria-live="off">
+          <span class="hero__caption-title">Scholar Sharpening His Quill</span>
+          <span class="hero__caption-by">Gerrit Dou, about 1633</span>
+        </figcaption>
+      </figure>
+    </section>
+
+    <!-- How it works: three statements beside one pinned product fragment that changes state -->
+    <section class="how" id="how" aria-labelledby="how-title">
+      <div class="how__text">
+        <h2 class="how__title" id="how-title" data-rise>How it works</h2>
+        <ol class="how__steps">
+          <li class="how__step is-active" data-step="connect">
+            <p class="how__statement">First, connect Stripe read-only.</p>
+            <p class="how__detail">Quillmark reads subscriptions, customers and invoices to work out the month’s MRR, growth, churn and customer count. It cannot change anything in your account.</p>
+          </li>
+          <li class="how__step" data-step="bullets">
+            <p class="how__statement">Then type five rough bullets.</p>
+            <p class="how__detail">Wins, misses, hires and asks. Fragments are fine. The numbers are already filled in, so you only bring the story.</p>
+          </li>
+          <li class="how__step" data-step="sent">
+            <p class="how__statement">Last, send it and see who read it.</p>
+            <p class="how__detail">Quillmark writes the finished update, sends it from your own domain and shows which investors opened it.</p>
+          </li>
+        </ol>
+      </div>
+
+      <div class="how__stage">
+        <div class="app" data-ui data-state="connect" aria-live="polite">
+          <div class="app__pane" data-pane="connect">
+            <p class="app__head"><span>Stripe connection</span><span class="app__pill">Read only</span></p>
+            <p class="app__sub">Ledgerlane, September figures pulled Oct 1</p>
+            <dl class="app__figures">
+              <div><dt>MRR</dt><dd class="fig">$48,200</dd></div>
+              <div><dt>Net new MRR</dt><dd class="fig">$2,780</dd></div>
+              <div><dt>Customers</dt><dd class="fig">412</dd></div>
+              <div><dt>Revenue churn</dt><dd class="fig">1.9%</dd></div>
+            </dl>
+            <p class="app__scopes">Reads subscriptions, customers and invoices. Cannot charge, refund or edit.</p>
+          </div>
+
+          <div class="app__pane" data-pane="bullets">
+            <p class="app__head"><span>Your five bullets</span><span class="app__count">5 of 5</span></p>
+            <ol class="app__bullets">
+              <li>closed 2 annual plans, both from referrals</li>
+              <li>churn up a bit, lost 1 agency to budget cuts</li>
+              <li>shipped team workspaces, early users like it</li>
+              <li>hired senior eng, starts nov 3</li>
+              <li>ask: intros to ops leads at 20–200 person agencies<span class="caret" aria-hidden="true"></span></li>
+            </ol>
+          </div>
+
+          <div class="app__pane" data-pane="sent">
+            <p class="app__head"><span>September update</span><span class="app__pill">Sent</span></p>
+            <p class="app__sub">From maya@ledgerlane.example to 14 investors</p>
+            <table class="app__opens">
+              <caption class="sr">Who opened the September update</caption>
+              <thead><tr><th scope="col">Investor</th><th scope="col">Opened</th></tr></thead>
+              <tbody>
+                <tr><td>Priya Raman</td><td class="fig">Oct 2, 09:14</td></tr>
+                <tr><td>Tomás Albrecht</td><td class="fig">Oct 2, 11:40</td></tr>
+                <tr><td>Hannah Osei</td><td class="fig">Oct 2, 16:02</td></tr>
+                <tr><td>Daniel Kerr</td><td class="fig">Oct 3, 08:51</td></tr>
+                <tr class="is-quiet"><td>Mei Lin Ota</td><td>Not yet</td></tr>
+              </tbody>
+            </table>
+            <p class="app__sub">9 of 14 opened</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- Sample updates: an index of letters, one live sheet -->
+    <section class="sample" id="sample" aria-labelledby="sample-title">
+      <div class="sample__index">
+        <h2 class="sample__title" id="sample-title" data-rise>Sample updates</h2>
+        <p class="sample__note" data-rise>One fictional company, Ledgerlane, across three months. Or try your own numbers.</p>
+        <div class="sample__names" role="tablist" aria-label="Choose an update">
+          <button role="tab" type="button" aria-selected="false" data-month="jul">July</button>
+          <button role="tab" type="button" aria-selected="false" data-month="aug">August</button>
+          <button role="tab" type="button" aria-selected="true" data-month="sep">September</button>
+          <button role="tab" type="button" aria-selected="false" data-month="you">Your numbers</button>
+        </div>
+        <div class="yours" hidden>
+          <div class="field">
+            <label for="y-last">MRR last month</label>
+            <input id="y-last" type="text" inputmode="numeric" value="21,000" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="y-now">MRR this month</label>
+            <input id="y-now" type="text" inputmode="numeric" value="22,400" autocomplete="off">
+          </div>
+          <div class="field">
+            <label for="y-cust">Customers</label>
+            <input id="y-cust" type="text" inputmode="numeric" value="186" autocomplete="off">
+          </div>
+          <p class="yours__note">Nothing you type here leaves this page.</p>
+        </div>
+      </div>
+
+      <div class="sample__stage">
+        <article class="letter" data-ui aria-live="polite" aria-label="Sample investor update">
+          <dl class="letter__meta">
+            <div><dt>From</dt><dd data-k="from">Maya Okafor &lt;maya@ledgerlane.example&gt;</dd></div>
+            <div><dt>To</dt><dd data-k="to">Ledgerlane investors</dd></div>
+            <div><dt>Subject</dt><dd data-k="subject">Ledgerlane, September update</dd></div>
+          </dl>
+          <div class="letter__body">
+            <p data-k="hello">Hi all,</p>
+            <p data-k="open">September was a strong month. MRR grew 6.1% to $48,200, adding $2,780 in net new MRR, and we ended with 412 customers.</p>
+            <dl class="letter__figures">
+              <div><dt>MRR</dt><dd class="fig" data-k="mrr">$48,200</dd><dd class="letter__delta fig" data-k="mrr-d">+6.1%</dd></div>
+              <div><dt>Net new MRR</dt><dd class="fig" data-k="net">$2,780</dd><dd class="letter__delta fig" data-k="net-d">Aug $2,360</dd></div>
+              <div><dt>Customers</dt><dd class="fig" data-k="cust">412</dd><dd class="letter__delta fig" data-k="cust-d">+19</dd></div>
+              <div><dt>Revenue churn</dt><dd class="fig" data-k="churn">1.9%</dd><dd class="letter__delta fig" data-k="churn-d">Aug 1.4%</dd></div>
+            </dl>
+            <h3>Highlights</h3>
+            <ul data-k="wins">
+              <li>We closed two annual plans, both through referrals, which is now our most efficient channel.</li>
+              <li>Team workspaces shipped, and the first accounts using them are positive.</li>
+              <li>A senior engineer joins on November 3.</li>
+            </ul>
+            <h3>Lowlights</h3>
+            <ul data-k="misses">
+              <li>Churn rose after one agency account cancelled because of budget cuts.</li>
+            </ul>
+            <h3>How you can help</h3>
+            <ul data-k="asks">
+              <li>Introductions to operations leads at agencies with 20 to 200 people.</li>
+            </ul>
+            <p>Thank you for the continued support.</p>
+            <p class="letter__sign" data-k="sign">Maya</p>
+          </div>
+        </article>
+      </div>
+    </section>
+
+    <!-- Pricing: one plan, the price very large -->
+    <section class="price" id="pricing" aria-labelledby="price-title">
+      <div class="price__intro">
+        <h2 class="price__title" id="price-title" data-rise>One plan</h2>
+        <p data-rise>For subscription founders, pre-seed to Series A, with 5 to 100 investors, who have outgrown free update tools and do not need a heavier platform. The price is planned and will be confirmed before anyone is charged.</p>
+      </div>
+      <div class="price__offer">
+        <p class="price__figure" aria-label="29 dollars per month"><span class="price__cur" aria-hidden="true">$</span><span aria-hidden="true">29</span></p>
+        <p class="price__per">per month, planned</p>
+        <ul class="price__includes">
+          <li data-rise>Stripe numbers filled in every month</li>
+          <li data-rise>Your five bullets written into a finished update</li>
+          <li data-rise>Sent from your own domain</li>
+          <li data-rise>Open tracking for each investor</li>
+        </ul>
+        <a class="button" href="#waitlist" data-focus="email">Join the waitlist</a>
+      </div>
+      <figure class="price__picture" data-rise>
+        <img src="assets/img/pittsboro-merchant-business-ledger.jpg" width="1920" height="2881" alt="A merchant’s ledger page headed Pittsborough, September 1833, with columns of handwritten accounts" loading="lazy" decoding="async">
+        <figcaption>Merchant ledger, Pittsborough, September 1833</figcaption>
+      </figure>
+    </section>
+
+    <!-- FAQ: answers as reading text -->
+    <section class="faq" id="faq" aria-labelledby="faq-title">
+      <h2 class="faq__title" id="faq-title" data-rise>Questions</h2>
+      <div class="faq__text">
+        <p data-rise><strong>Is Stripe access read-only?</strong> Yes. Quillmark asks for read-only access and reads subscriptions, customers and invoices to calculate your monthly numbers. It cannot create charges, issue refunds, edit customers or change a setting, and you can revoke access from your Stripe dashboard at any time.</p>
+        <p data-rise><strong>Who owns my data?</strong> You do. Your Stripe figures, bullets, updates and investor list belong to you. We use them only to write and send your updates, we do not sell them or use them to train shared models, and you can export or delete everything when you leave.</p>
+        <p data-rise><strong>Which numbers come from Stripe?</strong> Monthly recurring revenue and its change, net new MRR, customer count and revenue churn, each compared with the month before.</p>
+        <p data-rise><strong>What do I write myself?</strong> Five rough bullets: what went well, what did not, who joined and what you need. Quillmark turns them into finished paragraphs around your numbers, and you read the result before it goes out.</p>
+        <p data-rise><strong>Why send from my own domain?</strong> Investors see your name and your company’s address, not a tool’s mailing domain, and their replies come straight back to you.</p>
+        <p data-rise><strong>How does open tracking work?</strong> Each investor receives their own copy, so you can see who opened each update. Some email apps block tracking, so read it as a guide to who to follow up with, not a verdict.</p>
+        <p data-rise><strong>What will it cost?</strong> The planned price is $29 per month for everything on this page. We will confirm pricing before anyone is charged.</p>
+        <p data-rise><strong>Who is it for?</strong> Founders of subscription startups from pre-seed to Series A, with somewhere between 5 and 100 investors, who bill through Stripe.</p>
+        <p data-rise><strong>What happens after I join?</strong> We invite founders in small groups so each one is set up properly. You will get a single email when your invite is ready, and no newsletter.</p>
+      </div>
+    </section>
+
+    <!-- Close -->
+    <section class="close" aria-labelledby="close-title">
+      <div class="close__text">
+        <h2 class="close__title" id="close-title" data-rise>Next month’s update, half written</h2>
+        <p class="close__line" data-rise>Join the waitlist and we will let you know when Quillmark is ready for you.</p>
+        <a class="button" href="#waitlist" data-focus="email" data-rise>Join the waitlist</a>
+      </div>
+      <figure class="close__picture" data-rise>
+        <img src="assets/img/a-young-lady-writing-at-her-desk.jpg" width="1625" height="1991" alt="Detail of a young woman writing a letter at her desk, her pen on the page" loading="lazy" decoding="async">
+        <figcaption>A Young Lady Writing at her Desk, circle of Gerard ter Borch, 1670</figcaption>
+      </figure>
+    </section>
+  </main>
+
+  <footer class="foot">
+    <p class="foot__what">Quillmark, investor updates from Stripe</p>
+    <nav class="foot__links" aria-label="Footer">
+      <a href="#how">How it works</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#faq">FAQ</a>
+      <a href="/brand">Brand</a>
+    </nav>
+    <p class="foot__legal">2026. Working name. Not affiliated with Stripe.</p>
+    <p class="foot__credits">Paintings and ledger: public domain, via Wikimedia Commons. Companies, people and figures in the product examples are fictional.</p>
+  </footer>
+
+  <script src="config.js"></script>
+  <script src="app.js"></script>
+</body>
+</html>
