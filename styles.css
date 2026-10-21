@@ -75,21 +75,30 @@ p, li { text-wrap: pretty; }
 
 /* Nav */
 
-.nav {
-  position: sticky; top: 0; z-index: 50;
-  background: color-mix(in srgb, var(--bg) 94%, transparent);
-  backdrop-filter: saturate(160%) blur(14px); -webkit-backdrop-filter: saturate(160%) blur(14px);
-  border-bottom: 1px solid transparent;
-  transition: border-color var(--t-small) ease;
+.nav { position: sticky; top: 0; z-index: 50; pointer-events: none; }
+.nav__inner {
+  height: 68px; display: flex; align-items: center; gap: 24px; pointer-events: auto;
+  border-radius: 999px; background: transparent; box-shadow: 0 0 0 1px transparent;
+  transition: max-width 700ms var(--spring-soft), height 500ms var(--spring-soft), margin-top 500ms var(--spring-soft),
+    padding 500ms var(--spring-soft), background-color 300ms ease, box-shadow 300ms ease, backdrop-filter 300ms ease;
 }
-.nav.is-scrolled { border-bottom-color: var(--line); }
-.nav__inner { height: 68px; display: flex; align-items: center; gap: 32px; }
 .nav__logo svg { height: 26px; width: 113px; color: var(--ink); }
-.nav__links { display: flex; gap: 4px; margin: 0 auto; }
+.nav__links { display: flex; gap: 4px; margin: 0 auto; max-width: 0; opacity: 0; overflow: hidden; visibility: hidden; white-space: nowrap; transition: max-width 700ms var(--spring-soft), opacity 300ms ease, visibility 0s linear 300ms; }
 .nav__links a { padding: 8px 12px; border-radius: var(--r-control); font-size: 15px; color: var(--muted); transition: color var(--t-hover) ease, background-color var(--t-hover) ease; }
 .nav__links a:hover { color: var(--ink); background: var(--surface); }
-.nav__end { display: flex; align-items: center; gap: 8px; }
-@media (max-width: 900px) { .nav__links { display: none; } .nav__end { margin-left: auto; } }
+.nav__end { display: flex; align-items: center; gap: 8px; margin-left: auto; }
+.nav__links ~ .nav__end { margin-left: 0; }
+
+/* Past the hero's first screen the bar becomes a floating pill with the menu */
+.nav.is-scrolled .nav__inner {
+  max-width: 880px; height: 56px; margin-top: 12px; padding: 0 10px 0 22px;
+  background: color-mix(in srgb, var(--bg) 78%, transparent);
+  backdrop-filter: saturate(160%) blur(16px); -webkit-backdrop-filter: saturate(160%) blur(16px);
+  box-shadow: 0 0 0 1px var(--line), var(--shadow-md);
+}
+.nav.is-scrolled .nav__links { max-width: 520px; opacity: 1; visibility: visible; transition-delay: 0s, 120ms, 0s; }
+.nav.is-scrolled .nav__logo svg { height: 22px; width: 96px; }
+@media (max-width: 900px) { .nav.is-scrolled .nav__links { max-width: 0; opacity: 0; visibility: hidden; } .nav__links ~ .nav__end { margin-left: auto; } }
 
 /* Hero */
 

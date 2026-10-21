@@ -17,7 +17,7 @@
 
   var nav = document.querySelector(".nav");
   if (nav) {
-    var onScroll = function () { nav.classList.toggle("is-scrolled", window.scrollY > 8); };
+    var onScroll = function () { nav.classList.toggle("is-scrolled", window.scrollY > 80); };
     window.addEventListener("scroll", onScroll, { passive: true });
     onScroll();
   }
