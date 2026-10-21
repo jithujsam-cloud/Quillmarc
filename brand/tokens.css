@@ -16,6 +16,9 @@
   --qm-error: #9B2C1F;
   --qm-stage: #102542;        /* navy fields behind product and in closing panels */
   --qm-on-stage: #FAF8F5;
+  /* Dot grid for navy fields: soft blue points, 22px apart */
+  --dots: radial-gradient(circle at 1.5px 1.5px, rgba(122, 160, 212, 0.38) 1.2px, transparent 1.8px);
+  --dots-size: 22px 22px;
 
   /* Roles */
   --bg: var(--qm-ivory);
