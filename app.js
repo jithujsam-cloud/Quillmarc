@@ -223,7 +223,7 @@
   // Waitlist: email first, then three short questions, then one insert into Supabase
   var form = $(".join__form"), stepOne = $(".join__step--one"), stepTwo = $(".join__step--two");
   var joined = $(".joined"), status = $(".form__status"), submitTwo = $('[data-step="two"]');
-  var config = window.QUILLMARK_CONFIG || {};
+  var config = window.QUILLMARC_CONFIG || {};
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   var messages = {
     email: "Enter a work email, like you@company.com.",
@@ -309,7 +309,7 @@
     var data = read();
     busy(true);
     save(data).then(function () { done(data.email); }).catch(function (err) {
-      if (err && err.message === "not_configured") console.warn("Quillmark: set supabaseUrl and supabaseAnonKey in config.js to store submissions.");
+      if (err && err.message === "not_configured") console.warn("Quillmarc: set supabaseUrl and supabaseAnonKey in config.js to store submissions.");
       status.textContent = "That did not go through. Please check your connection and try again.";
       busy(false);
     });

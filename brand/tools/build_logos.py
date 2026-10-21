@@ -1,9 +1,9 @@
-"""Builds every Quillmark logo SVG.
+"""Builds every Quillmarc logo SVG.
 
 Run from the repo root:  python3 brand/tools/build_logos.py
 
 Two parts:
-- The wordmark (primary logo): the pen-written Q, then "uillmark" in Newsreader Regular
+- The wordmark (primary logo): the pen-written Q, then "uillmarc" in Newsreader Regular
   (72pt optical size, 2000 units per em, -0.02em tracking; wordmark-path.txt, made by
   outline_wordmark.py, which removes the dot of the "i"). Gold squares end the Q's tail
   and dot the "i".
@@ -20,8 +20,8 @@ HERE = Path(__file__).parent
 OUT = HERE.parents[1] / "assets" / "logo"
 WORD = (HERE / "wordmark-path.txt").read_text().strip()
 MARK = json.loads((HERE / "mark.json").read_text())
-WORD_W, CAP, XH, ASC, DESC = 7221.0, 1340.0, 852.0, 1470.0, 530.0  # WORD_W: "uillmark"
-I_DOT = (1245.0, -1471.0, 268.0)  # the i dot's box within "uillmark", from outline_wordmark.py
+WORD_W, CAP, XH, ASC, DESC = 7027.0, 1340.0, 852.0, 1470.0, 530.0  # WORD_W: "uillmarc"
+I_DOT = (1245.0, -1471.0, 268.0)  # the i dot's box within "uillmarc", from outline_wordmark.py
 
 INK, REVERSE, SAPPHIRE, NAVY, BRASS, PAPER = "#102542", "#FAF8F5", "#1E3A5F", "#102542", "#DDB040", "#FAF8F5"
 
@@ -39,7 +39,7 @@ def svg(w, h, body, minx=0.0, miny=0.0, bg=None, radius=0):
     rect = f'<rect x="{minx:g}" y="{miny:g}" width="{w:g}" height="{h:g}" rx="{radius:g}" fill="{bg}"/>' if bg else ""
     return (
         f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{minx:g} {miny:g} {w:g} {h:g}" '
-        f'width="{w:g}" height="{h:g}" role="img" aria-label="Quillmark">{rect}{body}</svg>\n'
+        f'width="{w:g}" height="{h:g}" role="img" aria-label="Quillmarc">{rect}{body}</svg>\n'
     )
 
 
@@ -126,15 +126,15 @@ OUT.mkdir(parents=True, exist_ok=True)
 # Primary logo: the wordmark with its full stop. Cap height 40 at 1:1.
 for k, (ink, dot) in WAYS.items():
     body, w, asc, desc = wordmark(ink, dot, 40)
-    write(f"quillmark-logo-{k}.svg", svg(round(w + 1), round(asc + desc), body, 0, -round(asc)))
+    write(f"quillmarc-logo-{k}.svg", svg(round(w + 1), round(asc + desc), body, 0, -round(asc)))
 
 # Symbol alone
 for k, (ink, dot) in WAYS.items():
-    write(f"quillmark-symbol-{k}.svg", svg(40, 40, mark(ink, dot)))
+    write(f"quillmarc-symbol-{k}.svg", svg(40, 40, mark(ink, dot)))
 
 # App icons
-write("quillmark-app-icon.svg", svg(512, 512, mark(REVERSE, BRASS, 96, 96, 8.0), bg=NAVY, radius=112))
-write("quillmark-app-icon-paper.svg", svg(512, 512, mark(INK, BRASS, 96, 96, 8.0), bg=PAPER, radius=112))
+write("quillmarc-app-icon.svg", svg(512, 512, mark(REVERSE, BRASS, 96, 96, 8.0), bg=NAVY, radius=112))
+write("quillmarc-app-icon-paper.svg", svg(512, 512, mark(INK, BRASS, 96, 96, 8.0), bg=PAPER, radius=112))
 
 # Favicon: follows the browser's colour scheme
 x, y, q = MARK["sq"]

@@ -1,4 +1,4 @@
--- Quillmark waitlist.
+-- Quillmarc waitlist.
 -- The public (anon) role may insert rows and nothing else: no select, update or delete.
 
 create table if not exists public.waitlist (
