@@ -3,15 +3,21 @@ import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
 import { connectionLabel, StripeConnectPanel } from "@/components/forms/stripe-connect-panel";
-import { env } from "@/lib/env";
 import { InvestorPasteForm } from "@/components/forms/investor-paste-form";
 import { SenderForm } from "@/components/forms/sender-form";
+import { TitleRow } from "@/components/title-row";
+import { StepsAhead } from "@/components/steps-ahead";
 import { requireUser } from "@/lib/auth";
+import { env } from "@/lib/env";
 import { getSetupState } from "@/lib/setup";
 
 export const metadata: Metadata = { title: "Set up" };
 
-const STEPS = ["Connect Stripe", "Add investors", "Sender details"] as const;
+const STEPS = [
+  { title: "Connect Stripe", why: "Quillmarc reads your subscriptions to calculate MRR, customers and growth. Read only." },
+  { title: "Add investors", why: "Each investor gets their own email and their own page. Nobody sees who else received it." },
+  { title: "Sender details", why: "Your name in the From line, your company in the subject, and where replies go." },
+] as const;
 
 export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ step?: string; stripe?: string }> }) {
   const { supabase, user } = await requireUser();
@@ -20,63 +26,72 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
   const requested = Number(sp.step);
   const step = ([1, 2, 3].includes(requested) ? requested : state.nextStep ?? 1) as 1 | 2 | 3;
   if (!requested && state.nextStep === null) redirect("/dashboard");
+  const done = [Boolean(state.connection), state.investorCount > 0, state.senderDone];
+  const current = STEPS[step - 1];
 
   return (
-    <AppShell>
-      <p className="hint">
-        Step {step} of 3
-      </p>
-      <h1 className="mt-2 text-4xl">{STEPS[step - 1]}</h1>
-      <ol className="mt-6 flex flex-wrap gap-2" aria-label="Setup steps">
-        {STEPS.map((label, i) => {
-          const n = i + 1;
-          const done = n === 1 ? !!state.connection : n === 2 ? state.investorCount > 0 : state.senderDone;
-          return (
-            <li key={label}>
-              <Link href={`/onboarding?step=${n}`} aria-current={n === step ? "step" : undefined} className={`badge no-underline ${n === step ? "" : "badge-quiet"}`}>
-                <span className="num">{n}</span> {label}
-                {done && <span className="sr-only">, done</span>}
-                {done && <span aria-hidden="true">✓</span>}
-              </Link>
-            </li>
-          );
-        })}
-      </ol>
+    <AppShell crumbs={[{ label: "Updates", href: "/dashboard" }, { label: "Set up" }]}>
+      <TitleRow title="Set up Quillmarc" sub={`${done.filter(Boolean).length} of 3 done. About five minutes in all.`} />
 
-      <section className="card mt-8 p-5 sm:p-8">
-        {step === 1 &&
-          (state.connection ? (
-            <div className="space-y-4">
-              {sp.stripe === "connected" && <p className="text-ok" role="status">Stripe is connected.</p>}
-              <p>{connectionLabel(state.connection)}</p>
-              <Link href="/onboarding?step=2" className="btn">
-                Continue
-              </Link>
+      <nav aria-label="Setup steps" className="tabs mb-6">
+        {STEPS.map((s, i) => (
+          <Link key={s.title} href={`/onboarding?step=${i + 1}`} aria-current={i + 1 === step ? "step" : undefined}>
+            {s.title}
+            {done[i] && <span className="pill pill-pos">Done</span>}
+          </Link>
+        ))}
+      </nav>
+
+      <section className="setting !border-0 !pt-0" aria-labelledby="step-h">
+        <div>
+          <h2 id="step-h">{current.title}</h2>
+          <p className="desc">{current.why}</p>
+        </div>
+        <div className="setting-panel">
+          {step === 1 &&
+            (state.connection ? (
+              <div className="grid gap-4">
+                {sp.stripe === "connected" && (
+                  <p className="ok" role="status">
+                    Stripe is connected.
+                  </p>
+                )}
+                <p>{connectionLabel(state.connection)}</p>
+                <div>
+                  <Link href="/onboarding?step=2" className="btn">
+                    Continue
+                  </Link>
+                </div>
+              </div>
+            ) : (
+              <StripeConnectPanel from="onboarding" connectAvailable={Boolean(env.stripeConnect())} code={sp.stripe} next="/onboarding?step=2" />
+            ))}
+
+          {step === 2 && (
+            <div className="grid gap-5">
+              {sp.stripe === "connected" && (
+                <p className="ok" role="status">
+                  Stripe is connected with read-only access.
+                </p>
+              )}
+              {state.investorCount > 0 && (
+                <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-tint px-4 py-3 text-accent-ink">
+                  <span>
+                    {state.investorCount} {state.investorCount === 1 ? "investor" : "investors"} added. <Link href="/investors">See the list</Link>
+                  </span>
+                  <Link href="/onboarding?step=3" className="btn btn-sm">
+                    Continue
+                  </Link>
+                </div>
+              )}
+              <InvestorPasteForm />
             </div>
-          ) : (
-            <StripeConnectPanel from="onboarding" connectAvailable={Boolean(env.stripeConnect())} code={sp.stripe} next="/onboarding?step=2" />
-          ))}
+          )}
 
-        {step === 2 && (
-          <div className="space-y-6">
-            {sp.stripe === "connected" && <p className="text-ok" role="status">Stripe is connected with read-only access.</p>}
-            {state.investorCount > 0 && (
-              <p>
-                You have <span className="num">{state.investorCount}</span> {state.investorCount === 1 ? "investor" : "investors"}.{" "}
-                <Link href="/investors">See the list</Link>.
-              </p>
-            )}
-            <InvestorPasteForm />
-            {state.investorCount > 0 && (
-              <Link href="/onboarding?step=3" className="btn btn-secondary">
-                Continue
-              </Link>
-            )}
-          </div>
-        )}
-
-        {step === 3 && <SenderForm profile={state.profile} next="/dashboard" submitLabel="Finish setup" />}
+          {step === 3 && <SenderForm profile={state.profile} next="/dashboard" submitLabel="Finish setup" />}
+        </div>
       </section>
+      <StepsAhead heading="After setup, each month" />
     </AppShell>
   );
 }

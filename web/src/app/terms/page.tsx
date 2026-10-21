@@ -7,7 +7,7 @@ export default function TermsPage() {
   const contact = process.env.CONTACT_EMAIL ?? "";
   return (
     <LegalPage>
-      <h1 className="text-4xl">Terms</h1>
+      <h1>Terms</h1>
       <p className="text-muted">Last updated October 21, 2026.</p>
 
       <h2>The service</h2>

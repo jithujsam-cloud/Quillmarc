@@ -7,7 +7,7 @@ export default function PrivacyPage() {
   const contact = process.env.CONTACT_EMAIL ?? "";
   return (
     <LegalPage>
-      <h1 className="text-4xl">Privacy</h1>
+      <h1>Privacy</h1>
       <p className="text-muted">Last updated October 21, 2026. This covers the Quillmarc app. The waitlist has its own page on the marketing site.</p>
 
       <h2>What we collect</h2>

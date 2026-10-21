@@ -1,6 +1,6 @@
 // Demo seed. Creates one founder account with SAMPLE data: a sample Stripe connection
 // (fictional subscriptions, labeled "Sample data" on every screen), fictional investors on
-// example.com, and one sent update from two months ago with sample delivery events.
+// the reserved .example domain, and one sent update from two months ago with sample delivery events.
 //
 // Usage:  SEED_USER_EMAIL=you@yourdomain.com npm run seed
 // Reads NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from .env.local.
@@ -12,7 +12,7 @@ import { sampleBillingData } from "../src/lib/stripe/sample";
 
 const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
 const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-const email = (process.env.SEED_USER_EMAIL ?? "demo@example.com").toLowerCase();
+const email = (process.env.SEED_USER_EMAIL ?? "morgan@ledgerlane.example").toLowerCase();
 if (!url || !serviceKey) {
   console.error("Set NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY first.");
   process.exit(1);
@@ -20,13 +20,14 @@ if (!url || !serviceKey) {
 
 const admin = createClient(url, serviceKey, { auth: { persistSession: false, autoRefreshToken: false } });
 
+// Fictional people. The .example domain is reserved (RFC 2606) and can never receive email.
 const INVESTORS = [
-  ["Riley Moss", "riley.moss"],
-  ["Jordan Okafor", "jordan.okafor"],
-  ["Sam Lindqvist", "sam.lindqvist"],
-  ["Priya Raman", "priya.raman"],
-  ["Theo Marchetti", "theo.marchetti"],
-  ["Alex Kim", "alex.kim"],
+  ["Riley Moss", "riley@harbourline.example"],
+  ["Jordan Okafor", "jordan@okafor-angels.example"],
+  ["Sam Lindqvist", "sam@northfold.example"],
+  ["Priya Raman", "priya@ramancapital.example"],
+  ["Theo Marchetti", "theo@marchetti.example"],
+  ["Alex Kim", "alex@seedwell.example"],
 ];
 
 function monthOffset(n: number): string {
@@ -56,7 +57,7 @@ async function main() {
 
   const { data: existing } = await admin.from("investors").select("id, email").eq("user_id", userId);
   const have = new Set((existing ?? []).map((i) => i.email));
-  const fresh = INVESTORS.filter(([, e]) => !have.has(`${e}@example.com`)).map(([name, e]) => ({ user_id: userId, name, email: `${e}@example.com` }));
+  const fresh = INVESTORS.filter(([, e]) => !have.has(e)).map(([name, e]) => ({ user_id: userId, name, email: e }));
   if (fresh.length) await admin.from("investors").insert(fresh);
   const { data: investors } = await admin.from("investors").select("id, name, email").eq("user_id", userId).order("name");
 

@@ -1,47 +1,55 @@
-// The hosted update: metrics with their labels, then the bullets. Used by /u/[token] and the preview.
+// The hosted update: the letter investors read. The serif leads here and nowhere else.
 import type { UpdateContent } from "@/lib/email/render";
 import { BULLET_GROUPS } from "@/lib/email/render";
 import type { MetricWarning } from "@/lib/metrics";
 
 export function UpdateDocument({ content, greetingName, warnings = [] }: { content: UpdateContent; greetingName?: string; warnings?: MetricWarning[] }) {
   const groups = BULLET_GROUPS.map((g) => ({ ...g, items: content.bullets[g.key].filter(Boolean) })).filter((g) => g.items.length);
-  // Currency exclusions change what MRR covers, so investors see them too.
+  // Currency and price exclusions change what MRR covers, so investors see them too.
   const shown = warnings.filter((w) => w.code === "multi_currency" || w.code === "metered_excluded" || w.code === "tiered_excluded");
+  const [lead, ...rest] = content.figures;
   return (
-    <article className="space-y-10">
+    <article className="letter grid gap-10">
       <header>
-        <p className="text-muted">{content.companyName}</p>
-        <h1 className="mt-2 text-4xl sm:text-5xl">Investor update, {content.monthLabel}</h1>
-        <hr className="rule-brass mt-6" />
-        {greetingName && <p className="mt-6">Hi {greetingName}, here is where {content.companyName} stands.</p>}
+        <p className="font-sans text-muted">{content.companyName}</p>
+        <h1 className="mt-2 text-[28px] leading-[34px] sm:text-[32px] sm:leading-[38px]">Investor update, {content.monthLabel}</h1>
+        {greetingName && <p className="letter-body mt-6">Hi {greetingName}, here is where {content.companyName} stands this month.</p>}
         {content.sample && (
-          <p className="notice mt-6">
+          <p className="notice mt-6 font-sans">
             <strong>Sample data.</strong> These figures are fictional and come from the demo account.
           </p>
         )}
       </header>
 
-      <section aria-labelledby="numbers">
-        <h2 id="numbers" className="text-3xl">
+      <section aria-labelledby="numbers" className="font-sans">
+        <h2 id="numbers" className="mb-4 text-[24px] leading-[30px]">
           Key numbers
         </h2>
-        <dl className="mt-5 grid grid-cols-1 gap-3 sm:grid-cols-2">
-          {content.figures.map((f) => (
-            <div key={f.key} className="card p-4">
-              <dt className="text-[15px] text-muted">{f.label}</dt>
-              <dd className="num mt-1 text-3xl">{f.display}</dd>
-              {(f.adjusted || f.estimated) && (
-                <dd className="mt-2 flex flex-wrap gap-2">
-                  {f.adjusted && <span className="badge">Adjusted by founder</span>}
-                  {f.estimated && !f.adjusted && <span className="badge badge-quiet">Estimated</span>}
+        <div className="panel overflow-hidden">
+          <dl className="border-b border-line p-5">
+            <div>
+              <dt className="text-[13px] text-muted">{lead.label}</dt>
+              <dd className="mt-1 text-[36px] font-medium leading-[42px] tracking-tight">{lead.display}</dd>
+              {lead.adjusted && (
+                <dd className="mt-2">
+                  <span className="pill pill-accent">Adjusted by founder</span>
                 </dd>
               )}
             </div>
-          ))}
-        </dl>
-        <p className="hint mt-3">From Stripe. Last month is rebuilt from subscription dates at today&apos;s prices, so it and the growth figures are estimates.</p>
+          </dl>
+          <dl className="grid grid-cols-2 sm:grid-cols-3">
+            {rest.map((f, i) => (
+              <div key={f.key} className={`border-line p-5 ${i % 2 === 1 ? "border-l" : ""} ${i >= 2 ? "border-t" : ""} sm:border-l sm:border-t-0 sm:[&:nth-child(3n+1)]:border-l-0 sm:[&:nth-child(n+4)]:border-t`}>
+                <dt className="text-[13px] text-muted">{f.label}</dt>
+                <dd className="mt-1 text-[22px] font-medium leading-[28px]">{f.display}</dd>
+                {(f.adjusted || f.estimated) && <dd className="mt-1 text-[12px] text-faint">{f.adjusted ? "Adjusted by founder" : "Estimated"}</dd>}
+              </div>
+            ))}
+          </dl>
+        </div>
+        <p className="hint mt-3">From Stripe. Last month is rebuilt from subscription dates at today&apos;s prices, so it and growth are estimates.</p>
         {shown.map((w) => (
-          <p key={w.code} className="hint mt-2">
+          <p key={w.code} className="hint mt-1">
             {w.message}
           </p>
         ))}
@@ -49,10 +57,10 @@ export function UpdateDocument({ content, greetingName, warnings = [] }: { conte
 
       {groups.map((g) => (
         <section key={g.key} aria-labelledby={`g-${g.key}`}>
-          <h2 id={`g-${g.key}`} className="text-3xl">
+          <h2 id={`g-${g.key}`} className="text-[26px] leading-[32px]">
             {g.label}
           </h2>
-          <ul className="mt-4 list-disc space-y-2 pl-6">
+          <ul className="letter-body mt-3 grid list-disc gap-2 pl-6">
             {g.items.map((b, i) => (
               <li key={i}>{b}</li>
             ))}
@@ -60,7 +68,7 @@ export function UpdateDocument({ content, greetingName, warnings = [] }: { conte
         </section>
       ))}
 
-      <footer className="border-t border-line pt-6">
+      <footer className="letter-body border-t border-line pt-6">
         <p>{content.founderName}</p>
         <p className="text-muted">{content.companyName}</p>
       </footer>

@@ -14,12 +14,20 @@ The marketing site's decisions live in `../DECISIONS.md`.
 - **Separate Supabase project from the waitlist.** The app's migrations live in `web/supabase/migrations`; mixing them with the waitlist table would couple two products.
 
 ## Brand and UI
-- **Used the marketing site's current tokens (ivory, Midnight Navy, Sapphire, Gilt gold), not navy and green.** The site's own DECISIONS.md records the owner approved this palette after the green-era brief.
-- **Fonts: Newsreader (display), Hanken Grotesk (text), Geist Mono (figures), via `next/font`.** Same as the marketing site, self-hosted, no layout shift.
-- **Desktop layout follows the owner's mockup: sidebar with nav and Stripe status, editor on the left, live email preview on the right, top bar with Preview and Send.** Requested mid-build; phones keep a single column.
-- **Left out the mockup's MRR chart and Domain nav item.** History charts and own-domain sending are out of scope for this build.
-- **Emails stay light in dark mode.** Many mail apps force or ignore dark styles; a fixed light email reads the same everywhere.
-- **The email shows four headline figures; the hosted page shows all seven.** The email stays short; the page is the full update.
+- **Rebuilt every screen with the taste skill's app-screen rules (October 21, owner's request: "the overall UI does not look good").** Style dealt: accent ladder (seed 1271542462), with Quillmarc's own palette kept.
+- **Accent ladder: Sapphire at full strength only on small marks** (the one filled button style, the read marks, the active nav icon); its pale tints carry areas. Gilt gold stays in the logo only. The skill bans a second accent family.
+- **Shell: ruled T-frame.** A 232px sidebar (wordmark, company, nav, Stripe status, account) and a 64px top bar (breadcrumb, this screen's actions, theme switch) on one ground, divided by 1px rules. On phones the sidebar folds into a full-screen menu.
+- **Light, dark and match-system, switchable from the top bar, Settings and the investor page.** Saved per device in `localStorage` (same key as the marketing site) and set before first paint, so there is no flash.
+- **Dark is a true neutral dark, not navy.** The skill's study found navy or slate dark themes read as templates; elevation is by lightness steps.
+- **One grotesk (Hanken Grotesk) for the app, with tabular figures. Newsreader (serif) has one job: the letter investors read.** Geist Mono dropped: the skill allows monospace only for IDs or code, and mono commas looked wide at large sizes.
+- **App titles are 24px nouns with a one-line finding underneath** ("August: 2 of 6 investors read it"), not display headlines.
+- **Signature element: the read strip.** One mark per investor, Sapphire at three intensities (read, opened, delivered), so "who read it" is seen at a glance on the dashboard and the status page.
+- **KPIs are one divided panel, label over value, no icons or tiles.** The lead figure (MRR, or Read on the status page) is larger than its siblings.
+- **One filled button per screen.** In the editor the step's "Save and continue" is the primary; the top bar's "Send to N" is outlined.
+- **The editor keeps the owner's mockup layout:** steps on the left, the live email on the right (desktop). The Preview tab shows only on phones.
+- **Emails stay light in dark mode.** Many mail apps force or ignore dark styles.
+- **Demo seed uses believable fictional people on the reserved `.example` domain.** The skill flags `example.com` as placeholder data, and `.example` can never receive email.
+- **Checks:** the skill's lint and its inspector (`--app`) pass with 0 fails and 0 warnings on all 14 screens at 1440, 768 and 390px; axe (WCAG 2.1 AA, including contrast) passes on every page in light and dark.
 
 ## Auth
 - **Magic link with PKCE (`/auth/callback` exchanges the code), plus the `token_hash` flow.** Supabase's default, and the token-hash form works if the email template is customised later.

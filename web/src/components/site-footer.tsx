@@ -1,17 +1,15 @@
 import Link from "next/link";
 
-export function SiteFooter({ className = "max-w-3xl" }: { className?: string }) {
+export function SiteFooter() {
   return (
-    <footer className={`mx-auto mt-24 w-full px-4 pb-10 text-[15px] text-muted sm:px-6 ${className}`}>
-      <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-line pt-6">
-        <span>Quillmarc</span>
-        <Link href="/privacy" className="text-muted">
-          Privacy
-        </Link>
-        <Link href="/terms" className="text-muted">
-          Terms
-        </Link>
-      </div>
+    <footer className="mt-16 flex flex-wrap gap-x-5 gap-y-2 text-[13px] text-faint">
+      <span>Quillmarc</span>
+      <Link href="/privacy" className="text-faint">
+        Privacy
+      </Link>
+      <Link href="/terms" className="text-faint">
+        Terms
+      </Link>
     </footer>
   );
 }

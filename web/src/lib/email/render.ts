@@ -53,7 +53,7 @@ const C = {
 };
 const SERIF = "Georgia, 'Times New Roman', serif";
 const SANS = "-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif";
-const MONO = "'SFMono-Regular', Menlo, Consolas, monospace";
+
 
 export function renderUpdateEmail(c: UpdateContent, o: RenderOptions): { subject: string; html: string; text: string } {
   const subject = subjectFor(c.companyName, c.monthLabel);
@@ -63,7 +63,7 @@ export function renderUpdateEmail(c: UpdateContent, o: RenderOptions): { subject
   const cell = (f: Figure) => `
     <td valign="top" width="50%" style="padding:16px;border:1px solid ${C.line};background:${C.sheet};">
       <div style="font:500 13px/1.4 ${SANS};color:${C.muted};">${e(f.label)}</div>
-      <div style="font:400 24px/1.3 ${MONO};color:${C.ink};padding-top:4px;">${e(f.display)}</div>
+      <div style="font:500 24px/1.3 ${SANS};font-variant-numeric:tabular-nums;color:${C.ink};padding-top:4px;">${e(f.display)}</div>
       ${f.adjusted ? `<div style="font:400 12px/1.4 ${SANS};color:${C.muted};padding-top:4px;">Adjusted by founder</div>` : ""}
     </td>`;
 

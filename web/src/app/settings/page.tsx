@@ -2,92 +2,100 @@ import type { Metadata } from "next";
 import { AppShell } from "@/components/app-shell";
 import { SenderForm } from "@/components/forms/sender-form";
 import { connectionLabel, StripeConnectPanel } from "@/components/forms/stripe-connect-panel";
-import { env } from "@/lib/env";
-import { connectMessage } from "@/lib/stripe/connect-messages";
+import { ThemeToggle } from "@/components/theme-toggle";
+import { TitleRow } from "@/components/title-row";
 import { requireUser } from "@/lib/auth";
 import { disconnectStripe } from "@/lib/actions/setup";
+import { env } from "@/lib/env";
 import { formatDateTime } from "@/lib/format";
 import { getSetupState } from "@/lib/setup";
+import { connectMessage } from "@/lib/stripe/connect-messages";
 import { DeleteForm } from "./delete-form";
 
 export const metadata: Metadata = { title: "Settings" };
+
+function Setting({ id, title, desc, children }: { id: string; title: string; desc: React.ReactNode; children: React.ReactNode }) {
+  return (
+    <section className="setting" aria-labelledby={`${id}-h`} id={id}>
+      <div>
+        <h2 id={`${id}-h`}>{title}</h2>
+        <div className="desc">{desc}</div>
+      </div>
+      <div className="setting-panel">{children}</div>
+    </section>
+  );
+}
 
 export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ done?: string; stripe?: string }> }) {
   const { supabase, user } = await requireUser();
   const { profile, connection } = await getSetupState(supabase, user.id);
   const { done, stripe } = await searchParams;
   const connectAvailable = Boolean(env.stripeConnect());
+  const msg = connectMessage(stripe);
 
   return (
-    <AppShell>
-      <h1 className="text-4xl">Settings</h1>
-      <p className="mt-2 text-muted">
-        Signed in as <span className="num break-all">{user.email}</span>
-      </p>
+    <AppShell crumbs={[{ label: "Settings" }]}>
+      <TitleRow title="Settings" sub={<>Signed in as {user.email}</>} />
 
-      <section className="card mt-8 p-5 sm:p-8" aria-labelledby="sender-h">
-        <h2 id="sender-h" className="mb-5 text-2xl">
-          Sender details
-        </h2>
+      <Setting id="sender" title="Sender details" desc="How your update arrives: who it is from, the subject, and where replies go.">
         <SenderForm profile={profile} />
-      </section>
+      </Setting>
 
-      <section className="card mt-6 p-5 sm:p-8" aria-labelledby="stripe-h">
-        <h2 id="stripe-h" className="text-2xl">
-          Stripe
-        </h2>
+      <Setting
+        id="stripe"
+        title="Stripe"
+        desc={
+          connection ? (
+            <>
+              {connectionLabel(connection)}
+              {connection.last_checked_at && <span className="mt-2 block">Last read {formatDateTime(connection.last_checked_at)}.</span>}
+            </>
+          ) : (
+            "Not connected. Quillmarc reads subscriptions to calculate your numbers. Read only."
+          )
+        }
+      >
         {done === "disconnected" && (
-          <p className="text-ok mt-3" role="status">
+          <p className="ok mb-4" role="status">
             Stripe is disconnected and the key is deleted.
           </p>
         )}
         {connection ? (
-          <div className="mt-4 space-y-4">
-            {connectMessage(stripe) && (
-              <p className={connectMessage(stripe)!.ok ? "text-ok" : "error"} role="status">
-                {connectMessage(stripe)!.text}
+          <div className="grid gap-4">
+            {msg && (
+              <p className={msg.ok ? "ok" : "error"} role="status">
+                {msg.text}
               </p>
             )}
-            <p>
-              {connectionLabel(connection)}
-              {connection.last_checked_at && <> Last read {formatDateTime(connection.last_checked_at)}.</>}
-            </p>
             {connection.status === "error" && <p className="notice">{connection.last_error}</p>}
-            <form action={disconnectStripe}>
-              <button className="btn btn-secondary">Disconnect Stripe</button>
-            </form>
-            <p className="hint">Disconnecting removes Quillmarc&apos;s access at once: the stored key is deleted, or the Stripe Connect link is revoked. Sent updates stay as they are.</p>
-            <details>
-              <summary className="cursor-pointer text-accent">Connect a different Stripe account</summary>
+            <div className="flex flex-wrap items-center gap-3">
+              <form action={disconnectStripe}>
+                <button className="btn btn-secondary">Disconnect Stripe</button>
+              </form>
+              <span className="hint">Removes access at once. Sent updates stay as they are.</span>
+            </div>
+            <details className="border-t border-line pt-4">
+              <summary className="cursor-pointer font-medium text-accent">Connect a different Stripe account</summary>
               <div className="mt-4">
                 <StripeConnectPanel from="settings" connectAvailable={connectAvailable} next="/settings" />
               </div>
             </details>
           </div>
         ) : (
-          <div className="mt-4">
-            <StripeConnectPanel from="settings" connectAvailable={connectAvailable} code={stripe} next="/settings" />
-          </div>
+          <StripeConnectPanel from="settings" connectAvailable={connectAvailable} code={stripe} next="/settings" />
         )}
-      </section>
+      </Setting>
 
-      <section className="card mt-6 p-5 sm:p-8" aria-labelledby="delete-h">
-        <h2 id="delete-h" className="text-2xl">
-          Delete all my data
-        </h2>
-        <p className="mt-3">
-          This deletes your account, your Stripe key, investors, updates, sends and tracking events. It happens at once and cannot be undone. Investors keep any emails already in their inbox, but the links in them stop working.
-        </p>
-        <div className="mt-5">
-          <DeleteForm />
+      <Setting id="appearance" title="Appearance" desc="Light, dark, or match your computer. Saved on this device.">
+        <div className="flex items-center justify-between gap-4">
+          <span>Theme</span>
+          <ThemeToggle />
         </div>
-      </section>
+      </Setting>
 
-      <section className="mt-6" aria-label="Session">
-        <form action="/auth/signout" method="post">
-          <button className="btn btn-secondary">Sign out</button>
-        </form>
-      </section>
+      <Setting id="delete" title="Delete all my data" desc="Deletes your account, Stripe access, investors, updates, sends and tracking events at once. This cannot be undone. Links in emails already sent stop working.">
+        <DeleteForm />
+      </Setting>
     </AppShell>
   );
 }

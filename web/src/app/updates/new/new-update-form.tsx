@@ -6,12 +6,12 @@ import type { FormState } from "@/lib/actions/setup";
 export function NewUpdateForm({ months, defaultMonth, existing }: { months: { value: string; label: string }[]; defaultMonth: string; existing: string[] }) {
   const [state, action, pending] = useActionState<FormState, FormData>(createUpdate, {});
   return (
-    <form action={action} className="space-y-5">
+    <form action={action} className="grid gap-4">
       <div>
         <label htmlFor="month" className="label">
-          Month
+          Which month is this update about?
         </label>
-        <select id="month" name="month" defaultValue={defaultMonth} className="field" aria-describedby="month-hint">
+        <select id="month" name="month" defaultValue={defaultMonth} className="field max-w-80">
           {months.map((m) => (
             <option key={m.value} value={m.value}>
               {m.label}
@@ -19,18 +19,17 @@ export function NewUpdateForm({ months, defaultMonth, existing }: { months: { va
             </option>
           ))}
         </select>
-        <p id="month-hint" className="hint mt-2">
-          We read your Stripe subscriptions and calculate the numbers. Nothing is sent yet.
-        </p>
       </div>
       {state.error && (
         <p className="error" role="alert">
           {state.error}
         </p>
       )}
-      <button className="btn" disabled={pending}>
-        {pending ? "Reading Stripe" : "Calculate the numbers"}
-      </button>
+      <div>
+        <button className="btn" disabled={pending}>
+          {pending ? "Reading Stripe" : "Calculate the numbers"}
+        </button>
+      </div>
     </form>
   );
 }

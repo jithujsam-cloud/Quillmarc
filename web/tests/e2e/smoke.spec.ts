@@ -13,7 +13,7 @@ test("founder sends an update and sees statuses", async ({ page, context }) => {
   await expect(page.getByRole("heading", { name: "Updates", exact: true })).toBeVisible();
 
   // Create an update for the last full month.
-  await page.getByRole("link", { name: "New update" }).click();
+  await page.getByRole("link", { name: /^Write .* update$/ }).click();
   await page.getByRole("button", { name: "Calculate the numbers" }).click();
   await expect(page.getByRole("heading", { name: "Review the numbers" })).toBeVisible();
   await expect(page.getByText("Sample data.").first()).toBeVisible();
@@ -26,7 +26,7 @@ test("founder sends an update and sees statuses", async ({ page, context }) => {
   await page.getByRole("button", { name: "Save and continue" }).click();
 
   // Bullets.
-  await expect(page.getByRole("heading", { name: "Write the bullets" })).toBeVisible();
+  await expect(page.getByLabel("Wins")).toBeVisible();
   await page.getByLabel("Wins").fill("Closed our largest annual plan\nShipped team billing");
   await page.getByLabel("Problems").fill("Sales cycle is getting longer");
   await page.getByLabel("Asks").fill("Intros to finance leads");
@@ -34,18 +34,18 @@ test("founder sends an update and sees statuses", async ({ page, context }) => {
 
   // Preview.
   await expect(page.getByRole("heading", { name: "Preview" })).toBeVisible();
-  const email = page.frameLocator('iframe[title="Email preview"]:visible');
+  const email = page.frameLocator('iframe[title="Email preview"]').first();
   await expect(email.getByText("Closed our largest annual plan")).toBeVisible();
   await expect(email.getByText("Adjusted by founder")).toBeVisible();
   await page.getByRole("link", { name: "Continue" }).click();
 
   // Recipients: untick one.
-  await expect(page.getByRole("heading", { name: "Choose recipients" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Send to" })).toBeVisible();
   await page.getByLabel(/Alex Kim/).uncheck();
   await page.getByRole("button", { name: "Save and continue" }).click();
 
   // Send is locked until a test goes out.
-  await expect(page.getByRole("heading", { name: "Test, then send" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Send a test to yourself" })).toBeVisible();
   const send = page.getByRole("button", { name: "Send to investors" });
   await expect(send).toBeDisabled();
   await page.getByRole("button", { name: "Send test to me" }).click();

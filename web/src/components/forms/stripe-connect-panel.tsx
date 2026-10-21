@@ -6,24 +6,26 @@ import { connectMessage } from "@/lib/stripe/connect-messages";
 export function StripeConnectPanel({ from, connectAvailable, code, next }: { from: "onboarding" | "settings"; connectAvailable: boolean; code?: string; next: string }) {
   const message = connectMessage(code);
   return (
-    <div className="space-y-6">
+    <div className="grid gap-5">
       {message && (
-        <p role={message.ok ? "status" : "alert"} className={message.ok ? "text-ok" : "error"}>
+        <p role={message.ok ? "status" : "alert"} className={message.ok ? "ok" : "error"}>
           {message.text}
         </p>
       )}
       {connectAvailable ? (
         <>
-          <div className="space-y-3">
-            <p>Quillmarc asks Stripe for read-only access. It can see subscriptions and invoices. It cannot charge, refund or change anything.</p>
-            {/* A plain link, not next/link: this route redirects to Stripe and must not be prefetched. */}
-            <a href={`/api/stripe/connect?from=${from}`} className="btn no-underline">
-              Connect with Stripe
-            </a>
-            <p className="hint">You approve it on Stripe&apos;s own page. You can remove access at any time, here or in Stripe.</p>
+          <div className="grid gap-3">
+            <p>Quillmarc asks Stripe for read-only access. It reads subscriptions and invoices. It cannot charge, refund or change anything.</p>
+            <div>
+              {/* A plain link, not next/link: this route redirects to Stripe and must not be prefetched. */}
+              <a href={`/api/stripe/connect?from=${from}`} className="btn btn-lg">
+                Connect with Stripe
+              </a>
+            </div>
+            <p className="hint">You approve it on Stripe&apos;s own page, and you can remove access at any time.</p>
           </div>
           <details className="border-t border-line pt-4">
-            <summary className="cursor-pointer text-accent">Or paste a restricted key instead</summary>
+            <summary className="cursor-pointer font-medium text-accent">Paste a restricted key instead</summary>
             <div className="mt-4">
               <StripeKeyForm next={next} />
             </div>

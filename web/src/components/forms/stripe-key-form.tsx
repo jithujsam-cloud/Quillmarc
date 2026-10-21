@@ -6,25 +6,19 @@ import { REQUIRED_READ_PERMISSIONS } from "@/lib/stripe/permissions";
 export function StripeKeyForm({ next }: { next: string }) {
   const [state, action, pending] = useActionState<FormState, FormData>(connectStripe, {});
   return (
-    <div className="space-y-6">
-      <ol className="list-decimal space-y-2 pl-5">
+    <div className="grid gap-4">
+      <ol className="grid list-decimal gap-1.5 pl-5 text-muted">
         <li>
           In Stripe, open{" "}
           <a href="https://dashboard.stripe.com/apikeys" target="_blank" rel="noopener noreferrer">
             Developers, then API keys
           </a>
-          .
+          , and choose Create restricted key.
         </li>
-        <li>Choose Create restricted key. Name it Quillmarc.</li>
-        <li>
-          Set these to <strong>Read</strong>: {REQUIRED_READ_PERMISSIONS.join(", ")}. Leave everything else as None.
-        </li>
-        <li>Create the key, copy it, and paste it below. It starts with rk_live_.</li>
+        <li>Set {REQUIRED_READ_PERMISSIONS.join(", ")} to Read. Leave the rest as None.</li>
+        <li>Create the key and paste it below. It starts with rk_.</li>
       </ol>
-      <p className="hint">
-        Quillmarc checks the key can read and cannot write. A key with any write access is refused. The key is encrypted and never shown again.
-      </p>
-      <form action={action} className="space-y-4" noValidate>
+      <form action={action} className="grid gap-4" noValidate>
         <input type="hidden" name="next" value={next} />
         <div>
           <label htmlFor="key" className="label">
@@ -36,20 +30,25 @@ export function StripeKeyForm({ next }: { next: string }) {
             type="password"
             autoComplete="off"
             spellCheck={false}
-            className="field num"
-            placeholder="rk_live_"
+            className="field"
+            placeholder="rk_live_..."
             aria-invalid={state.error ? true : undefined}
-            aria-describedby={state.error ? "key-error" : undefined}
+            aria-describedby={`key-hint${state.error ? " key-error" : ""}`}
           />
+          <p id="key-hint" className="hint mt-2">
+            We check it can read and cannot write, then encrypt it. It is never shown again.
+          </p>
           {state.error && (
             <p id="key-error" className="error mt-2" role="alert">
               {state.error}
             </p>
           )}
         </div>
-        <button className="btn" disabled={pending}>
-          {pending ? "Checking the key" : "Connect Stripe"}
-        </button>
+        <div>
+          <button className="btn btn-secondary" disabled={pending}>
+            {pending ? "Checking the key" : "Connect with this key"}
+          </button>
+        </div>
       </form>
     </div>
   );

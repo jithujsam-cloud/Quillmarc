@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
+import { ThemeToggle } from "@/components/theme-toggle";
 import { UpdateDocument } from "@/components/update/update-document";
 import { firstName } from "@/lib/investors";
 import { contentFor } from "@/lib/sending/queue";
@@ -21,24 +22,28 @@ export default async function HostedUpdatePage({ params }: { params: Promise<{ t
   return (
     <div className="flex min-h-dvh flex-col">
       <ReadBeacon token={token} />
-      <main id="main" className="mx-auto w-full max-w-2xl flex-1 px-4 pt-12 sm:px-6 sm:pt-16">
+      <header className="flex h-16 items-center justify-between gap-4 border-b border-line px-4 sm:px-8">
+        <span className="font-medium">{content.companyName}</span>
+        <ThemeToggle />
+      </header>
+      <main id="main" className="mx-auto w-full max-w-[680px] flex-1 px-4 pt-12 sm:px-6 sm:pt-16">
         <UpdateDocument content={content} greetingName={firstName(send.investor_name)} warnings={update.metrics_json?.warnings} />
         {profile.reply_to_email && (
           <p className="mt-8">
-            Questions? <a href={`mailto:${profile.reply_to_email}`}>Email {content.founderName}</a>.
+            <a href={`mailto:${profile.reply_to_email}`} className="btn btn-secondary">
+              Reply to {content.founderName}
+            </a>
           </p>
         )}
       </main>
-      <footer className="mx-auto w-full max-w-2xl px-4 pb-10 pt-16 text-[15px] text-muted sm:px-6">
-        <div className="flex flex-wrap gap-x-6 gap-y-2 border-t border-line pt-6">
-          <span>Sent with Quillmarc</span>
-          <Link href={`/u/${token}/stop`} className="text-muted">
-            Stop receiving these updates
-          </Link>
-          <Link href="/privacy" className="text-muted">
-            Privacy
-          </Link>
-        </div>
+      <footer className="mx-auto mt-16 flex w-full max-w-[680px] flex-wrap gap-x-5 gap-y-2 px-4 pb-10 text-[13px] text-faint sm:px-6">
+        <span>Sent with Quillmarc</span>
+        <Link href={`/u/${token}/stop`} className="text-faint">
+          Stop receiving these updates
+        </Link>
+        <Link href="/privacy" className="text-faint">
+          Privacy
+        </Link>
       </footer>
     </div>
   );

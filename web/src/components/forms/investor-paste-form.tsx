@@ -9,30 +9,25 @@ export function InvestorPasteForm({ submitLabel = "Add investors" }: { submitLab
     if (state.message && !state.error) ref.current?.reset();
   }, [state]);
   return (
-    <form ref={ref} action={action} className="space-y-4" noValidate>
+    <form ref={ref} action={action} className="grid gap-4" noValidate>
       <div>
         <label htmlFor="list" className="label">
           Paste your investors
         </label>
-        <p id="list-hint" className="hint mb-2">
+        <textarea id="list" name="list" rows={7} className="field" aria-describedby="list-hint" placeholder={"Jordan Lee, jordan@fund.com\nSam Rivera <sam@angel.co>"} />
+        <p id="list-hint" className="hint mt-2">
           One per line, as Name, email. A CSV with name and email columns works too.
         </p>
-        <textarea
-          id="list"
-          name="list"
-          rows={8}
-          className="field num"
-          aria-describedby="list-hint"
-          placeholder={"Jordan Lee, jordan@fund.com\nSam Rivera, sam@angel.co"}
-        />
       </div>
-      <div aria-live="polite" className="space-y-2">
-        {state.message && <p className="text-ok">{state.message}</p>}
+      <div aria-live="polite" className="grid gap-1">
+        {state.message && <p className="ok">{state.message}</p>}
         {state.error && <p className="error">{state.error}</p>}
       </div>
-      <button className="btn" disabled={pending}>
-        {pending ? "Saving" : submitLabel}
-      </button>
+      <div>
+        <button className="btn" disabled={pending}>
+          {pending ? "Saving" : submitLabel}
+        </button>
+      </div>
     </form>
   );
 }

@@ -2,58 +2,76 @@ import Link from "next/link";
 import { createUserClient } from "@/lib/supabase/server";
 import { getSetupState } from "@/lib/setup";
 import { Wordmark } from "./wordmark";
+import { SideNav } from "./nav-links";
+import { MobileMenu } from "./mobile-menu";
+import { ThemeToggle } from "./theme-toggle";
 import { SiteFooter } from "./site-footer";
-import { NavLinks, SideNav } from "./nav-links";
 
-// Phones and tablets: a top bar. Desktop: a quiet sidebar with the nav and the Stripe status.
-export async function AppShell({ children, width = "narrow", topBar }: { children: React.ReactNode; width?: "narrow" | "wide" | "full"; topBar?: React.ReactNode }) {
+export interface Crumb {
+  label: string;
+  href?: string;
+}
+
+// Ruled T-frame: a 232px sidebar and a 64px top bar on one ground, divided by 1px rules.
+// The top bar carries where you are and what you can do here.
+export async function AppShell({ crumbs, actions, children }: { crumbs: Crumb[]; actions?: React.ReactNode; children: React.ReactNode }) {
   const supabase = await createUserClient();
   const { data } = await supabase.auth.getUser();
   const setup = data.user ? await getSetupState(supabase, data.user.id) : null;
   const conn = setup?.connection;
-  const max = width === "full" ? "max-w-6xl" : width === "wide" ? "max-w-5xl" : "max-w-3xl";
+  const company = setup?.profile?.company_name ?? null;
+  const stripeLabel = !conn ? null : conn.status === "error" ? "Stripe needs attention" : conn.method === "sample" ? "Sample Stripe data" : conn.key_mode === "test" ? "Stripe connected, test mode" : "Stripe connected";
 
   return (
-    <div className="min-h-dvh lg:grid lg:grid-cols-[232px_minmax(0,1fr)]">
-      <header className="border-b border-line lg:hidden">
-        <div className="mx-auto flex w-full items-center justify-between gap-4 px-4 py-4 sm:px-6">
-          <Link href="/dashboard" className="text-ink" aria-label="Quillmarc, your updates">
-            <Wordmark className="h-5 w-auto sm:h-6" />
-          </Link>
-          <NavLinks />
-        </div>
-      </header>
-
-      <aside className="hidden border-r border-line bg-surface lg:flex lg:min-h-dvh lg:flex-col lg:px-4 lg:py-6">
-        <Link href="/dashboard" className="px-2 text-ink" aria-label="Quillmarc, your updates">
-          <Wordmark className="h-6 w-auto" />
+    <div className="app">
+      <aside className="app-side" aria-label="Sidebar">
+        <Link href="/dashboard" className="app-brand" aria-label="Quillmarc, your updates">
+          <Wordmark className="h-[22px] w-auto" />
         </Link>
-        {setup?.profile?.company_name && <p className="mt-6 truncate px-2 text-[15px] font-medium">{setup.profile.company_name}</p>}
-        <div className="mt-4">
-          <SideNav investorCount={setup?.investorCount ?? 0} />
-        </div>
-        <div className="mt-auto border-t border-line px-2 pt-4 text-[14px]">
-          {conn ? (
-            <>
-              <p className="flex items-center gap-2 font-medium">
-                <span aria-hidden="true" className={`size-2 rounded-full ${conn.status === "error" ? "bg-error" : "bg-ok"}`} />
-                {conn.status === "error" ? "Stripe needs attention" : conn.method === "sample" ? "Sample data" : "Stripe connected"}
-              </p>
-              <p className="mt-1 text-muted">Read only</p>
-            </>
+        <p className="side-group mt-4 truncate font-medium text-ink">{company ?? "Your company"}</p>
+        <SideNav investorCount={setup?.investorCount ?? 0} />
+        <div className="side-foot">
+          {stripeLabel ? (
+            <Link href="/settings#stripe" className="flex items-center gap-2 text-muted no-underline hover:text-ink">
+              <span aria-hidden="true" className={`size-2 rounded-full ${conn?.status === "error" ? "bg-negative" : "bg-positive"}`} />
+              {stripeLabel}
+              <span className="sr-only">, read only</span>
+            </Link>
           ) : (
             <Link href="/onboarding?step=1">Connect Stripe</Link>
           )}
+          <p className="meta truncate" title={data.user?.email}>
+            {data.user?.email}
+          </p>
+          <form action="/auth/signout" method="post">
+            <button className="link-btn text-[13px] text-muted">Sign out</button>
+          </form>
         </div>
       </aside>
 
-      <div className="flex min-h-dvh flex-col">
-        {topBar && <div className="border-b border-line bg-bg/95 lg:sticky lg:top-0 lg:z-10">{topBar}</div>}
-        <main id="main" className={`mx-auto w-full flex-1 px-4 pt-10 sm:px-6 lg:px-10 ${max}`}>
-          {children}
-        </main>
-        <SiteFooter className={`lg:px-10 ${max}`} />
-      </div>
+      <header className="app-top">
+        <MobileMenu investorCount={setup?.investorCount ?? 0} email={data.user?.email ?? ""} company={company} />
+        <nav aria-label="Breadcrumb" className="crumbs min-w-0">
+          {crumbs.map((c, i) => (
+            <span key={i} className="flex min-w-0 items-center gap-2">
+              {i > 0 && <span aria-hidden="true">/</span>}
+              {c.href && i < crumbs.length - 1 ? <Link href={c.href}>{c.label}</Link> : <span aria-current="page">{c.label}</span>}
+            </span>
+          ))}
+        </nav>
+        <div className="top-actions">
+          {actions}
+          <span className="top-divider hide-phone" aria-hidden="true" />
+          <span className="hide-phone">
+            <ThemeToggle />
+          </span>
+        </div>
+      </header>
+
+      <main id="main" className="app-canvas">
+        <div className="app-canvas-inner">{children}</div>
+        <SiteFooter />
+      </main>
     </div>
   );
 }

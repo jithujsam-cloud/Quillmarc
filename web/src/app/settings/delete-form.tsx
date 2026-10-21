@@ -5,7 +5,7 @@ import { deleteAccount, type FormState } from "@/lib/actions/setup";
 export function DeleteForm() {
   const [state, action, pending] = useActionState<FormState, FormData>(deleteAccount, {});
   return (
-    <form action={action} className="space-y-4" noValidate>
+    <form action={action} className="grid gap-4" noValidate>
       <div>
         <label htmlFor="confirm" className="label">
           Type DELETE to confirm
@@ -17,9 +17,11 @@ export function DeleteForm() {
           </p>
         )}
       </div>
-      <button className="btn btn-danger" disabled={pending}>
-        {pending ? "Deleting" : "Delete all my data"}
-      </button>
+      <div>
+        <button className="btn btn-danger" disabled={pending}>
+          {pending ? "Deleting" : "Delete all my data"}
+        </button>
+      </div>
     </form>
   );
 }

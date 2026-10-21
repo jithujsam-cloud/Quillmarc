@@ -35,7 +35,7 @@ const env = {
   APP_URL: appUrl,
   CONTACT_EMAIL: "privacy@example.test",
   EMAIL_PROVIDER: "mock",
-  SEED_USER_EMAIL: "demo@example.com",
+  SEED_USER_EMAIL: "morgan@ledgerlane.example",
   // Connect with Stripe against the fake Stripe above. Never set these two bases in production.
   STRIPE_CONNECT_CLIENT_ID: FAKE.clientId,
   STRIPE_SECRET_KEY: FAKE.secretKey,
