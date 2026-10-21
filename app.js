@@ -22,14 +22,26 @@
   }
 
   // Hero entrance, in reading order
-  $$(".rise").forEach(function (el, i) { el.style.setProperty("--i", i); });
-  // The "waking up" screen stays for at least 900ms so it reads as intentional, then the curtain lifts and the hero rises
+  // The headline arrives word by word, so the rest of the hero waits for it
+  var title = $(".hero__title");
+  if (title && !reduced) {
+    var parts = title.textContent.trim().split(/\s+/);
+    title.setAttribute("aria-label", parts.join(" "));
+    title.textContent = "";
+    parts.forEach(function (w, i) {
+      var span = document.createElement("span");
+      span.className = "word"; span.setAttribute("aria-hidden", "true"); span.textContent = w;
+      span.style.setProperty("--w", i);
+      title.appendChild(span);
+      if (i < parts.length - 1) title.appendChild(document.createTextNode(" "));
+    });
+  }
+  var lead = title && !reduced ? Math.min(parts.length, 8) * 0.6 : 0;
+  $$(".rise").forEach(function (el, i) { el.style.setProperty("--i", i === 0 ? 0 : i + 1 + lead); });
   function loaded() { root.classList.add("is-loaded"); }
-  var wakeMin = reduced ? 0 : 900, wakeAt = Math.max(0, wakeMin - (performance.now ? performance.now() : 0));
-  function release() { setTimeout(loaded, wakeAt); }
   if (document.fonts && document.fonts.ready) {
-    Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 1500); })]).then(release);
-  } else { release(); }
+    Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 600); })]).then(loaded);
+  } else { loaded(); }
 
   // Section reveals: the parts of each section arrive in order, once
   $$("section").forEach(function (s) { $$(".reveal", s).forEach(function (el, i) { el.style.setProperty("--i", i % 4); }); });
