@@ -700,6 +700,7 @@ html.modal-open { overflow: hidden; }
 .modal__done .thanks__icon { margin-bottom: 8px; }
 .modal__done .thanks__lede { margin-top: 0; font-size: 17px; }
 .modal__done .thanks__email, .modal__done .thanks__founding { margin-top: 0; }
+.modal__done .thanks__founding { max-width: none; }
 .modal__done a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
 .modal__done a.btn { color: var(--accent-ink); text-decoration: none; }
 .modal__close { position: absolute; top: 14px; right: 18px; z-index: 1; width: 40px; height: 40px; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--surface); color: var(--ink); cursor: pointer; transition: background var(--t-hover) ease; }
@@ -716,6 +717,10 @@ html.modal-open { overflow: hidden; }
 .modal .thanks__hint { margin-top: 6px; font-size: 15px; }
 .modal .answers { margin-top: 18px; gap: 18px; }
 .modal .chips--five { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+@media (min-width: 900px) {
+  .modal { width: min(720px, calc(100vw - 64px)); }
+  .modal .chips--five { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+}
 .modal .field textarea { min-height: 84px; }
 @media (max-width: 560px) {
   .modal__form, .modal__done { padding: 24px 20px; }
