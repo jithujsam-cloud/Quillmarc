@@ -11,6 +11,7 @@ import { formatDateTime } from "@/lib/format";
 import { getSetupState } from "@/lib/setup";
 import { connectMessage } from "@/lib/stripe/connect-messages";
 import { DeleteForm } from "./delete-form";
+import { SubmitButton } from "@/components/submit-button";
 
 export const metadata: Metadata = { title: "Settings" };
 
@@ -70,7 +71,9 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             {connection.status === "error" && <p className="notice">{connection.last_error}</p>}
             <div className="flex flex-wrap items-center gap-3">
               <form action={disconnectStripe}>
-                <button className="btn btn-secondary">Disconnect Stripe</button>
+                <SubmitButton className="btn btn-secondary" pendingLabel="Disconnecting">
+                  Disconnect Stripe
+                </SubmitButton>
               </form>
               <span className="hint">Removes access at once. Sent updates stay as they are.</span>
             </div>

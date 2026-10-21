@@ -45,7 +45,7 @@ export function StripeKeyForm({ next }: { next: string }) {
           )}
         </div>
         <div>
-          <button className="btn btn-secondary" disabled={pending}>
+          <button className="btn btn-secondary" disabled={pending} aria-busy={pending}>
             {pending ? "Checking the key" : "Connect with this key"}
           </button>
         </div>

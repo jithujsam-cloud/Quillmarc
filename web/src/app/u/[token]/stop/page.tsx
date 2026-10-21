@@ -4,6 +4,7 @@ import { adminClient } from "@/lib/supabase/admin";
 import { findByToken } from "@/lib/tracking";
 import { confirmOptOut } from "./actions";
 import { PlainFrame } from "@/components/plain-frame";
+import { SubmitButton } from "@/components/submit-button";
 
 export const metadata: Metadata = { title: "Stop receiving updates", robots: { index: false, follow: false } };
 export const dynamic = "force-dynamic";
@@ -32,7 +33,9 @@ export default async function StopPage({ params, searchParams }: { params: Promi
           <p className="mt-3 text-muted">You will no longer get investor updates from {company}.</p>
           <form action={confirmOptOut} className="mt-8">
             <input type="hidden" name="token" value={token} />
-            <button className="btn btn-lg">Stop receiving updates</button>
+            <SubmitButton className="btn btn-lg" pendingLabel="Stopping">
+              Stop receiving updates
+            </SubmitButton>
           </form>
         </>
       )}

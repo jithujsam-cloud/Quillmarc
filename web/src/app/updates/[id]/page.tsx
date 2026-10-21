@@ -15,6 +15,7 @@ import { loadSendStatuses } from "@/lib/status-data";
 import { isUuid } from "@/lib/validate";
 import { QueueRunner } from "./queue-runner";
 import { simulate } from "./actions";
+import { SubmitButton } from "@/components/submit-button";
 
 export const metadata: Metadata = { title: "Who read it" };
 
@@ -63,6 +64,20 @@ export default async function UpdateStatusPage({ params }: { params: Promise<{ i
       <QueueRunner id={id} pending={pending} />
       <TitleRow title={`${month} update`} sub={<span aria-live="polite">{sub}</span>} />
 
+      {pending && (
+        <div className="panel panel-pad mb-6" role="status">
+          <div className="flex items-center justify-between gap-3">
+            <p className="font-medium">Sending</p>
+            <p className="text-muted">
+              {t.recipients - t.queued} of {t.recipients}
+            </p>
+          </div>
+          <div className="mt-3 h-1.5 overflow-hidden rounded-full bg-raised" role="progressbar" aria-label="Emails sent" aria-valuemin={0} aria-valuemax={t.recipients} aria-valuenow={t.recipients - t.queued}>
+            <div className="h-full rounded-full bg-accent transition-[width] duration-500" style={{ width: `${t.recipients ? ((t.recipients - t.queued) / t.recipients) * 100 : 0}%` }} />
+          </div>
+        </div>
+      )}
+
       {mock && (
         <div className="notice mb-6 flex flex-wrap items-center justify-between gap-3">
           <p>
@@ -70,7 +85,9 @@ export default async function UpdateStatusPage({ params }: { params: Promise<{ i
           </p>
           <form action={simulate}>
             <input type="hidden" name="id" value={id} />
-            <button className="btn btn-secondary btn-sm">Simulate events</button>
+            <SubmitButton className="btn btn-secondary btn-sm" pendingLabel="Simulating">
+              Simulate events
+            </SubmitButton>
           </form>
         </div>
       )}

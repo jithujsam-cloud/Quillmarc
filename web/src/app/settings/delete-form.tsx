@@ -18,7 +18,7 @@ export function DeleteForm() {
         )}
       </div>
       <div>
-        <button className="btn btn-danger" disabled={pending}>
+        <button className="btn btn-danger" disabled={pending} aria-busy={pending}>
           {pending ? "Deleting" : "Delete all my data"}
         </button>
       </div>

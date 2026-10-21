@@ -26,7 +26,7 @@ export function NewUpdateForm({ months, defaultMonth, existing }: { months: { va
         </p>
       )}
       <div>
-        <button className="btn" disabled={pending}>
+        <button className="btn" disabled={pending} aria-busy={pending}>
           {pending ? "Reading Stripe" : "Calculate the numbers"}
         </button>
       </div>

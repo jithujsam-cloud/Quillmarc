@@ -35,7 +35,7 @@ export function SenderForm({ profile, next, submitLabel = "Save" }: { profile: P
       <Field name="company_name" label="Company name" hint="Used in the subject line." value={profile?.company_name ?? ""} error={fe.company_name} autoComplete="organization" />
       <Field name="reply_to_email" label="Reply-to email" hint="Investor replies go here. Use an inbox you read." type="email" value={profile?.reply_to_email ?? profile?.email ?? ""} error={fe.reply_to_email} autoComplete="email" />
       <div className="flex flex-wrap items-center gap-3">
-        <button className="btn" disabled={pending}>
+        <button className="btn" disabled={pending} aria-busy={pending}>
           {pending ? "Saving" : submitLabel}
         </button>
         <span aria-live="polite">

@@ -27,6 +27,7 @@ The marketing site's decisions live in `../DECISIONS.md`.
 - **The editor keeps the owner's mockup layout:** steps on the left, the live email on the right (desktop). The Preview tab shows only on phones.
 - **Emails stay light in dark mode.** Many mail apps force or ignore dark styles.
 - **Demo seed uses believable fictional people on the reserved `.example` domain.** The skill flags `example.com` as placeholder data, and `.example` can never receive email.
+- **Loading and motion (owner's request: "there is no loading or any animation").** Each app screen has a loading screen in its final layout with flat grey placeholders (no shimmer). Every button that saves, sends or recalculates shows a spinner and locks. Nav and step links show a small ring until the next screen arrives. New screens rise in over 220ms, the read strip fills in mark by mark, the phone menu slides in, messages fade in, and theme changes ease over 200ms. The skill's app rules say screens should not perform an entrance; the owner asked for motion, so it is kept short and subtle. Everything turns off under "reduce motion".
 - **Checks:** the skill's lint and its inspector (`--app`) pass with 0 fails and 0 warnings on all 14 screens at 1440, 768 and 390px; axe (WCAG 2.1 AA, including contrast) passes on every page in light and dark.
 
 ## Auth

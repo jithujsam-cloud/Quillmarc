@@ -11,6 +11,8 @@ const WIDTHS = [360, 390, 768, 1280];
 async function check(page: Page, name: string) {
   for (const scheme of ["light", "dark"] as const) {
     await page.emulateMedia({ colorScheme: scheme });
+    // Colours ease for 200ms when the theme changes; measure the settled screen.
+    await page.waitForTimeout(400);
     for (const width of WIDTHS) {
       await page.setViewportSize({ width, height: 900 });
       if (process.env.QA_SHOTS) await page.screenshot({ path: `${process.env.QA_SHOTS}/${name}-${scheme}-${width}.png`, fullPage: true });

@@ -27,7 +27,7 @@ export function SendPanel({ id, testSentAt, recipientCount, founderEmail, mock }
           </p>
           <form action={testAction}>
             <input type="hidden" name="id" value={id} />
-            <button className="btn btn-secondary" disabled={testing}>
+            <button className="btn btn-secondary" disabled={testing} aria-busy={testing}>
               {testing ? "Sending test" : tested ? "Send another test" : "Send test to me"}
             </button>
           </form>
@@ -63,10 +63,10 @@ export function SendPanel({ id, testSentAt, recipientCount, founderEmail, mock }
                 Send this update to {recipientCount} {recipientCount === 1 ? "investor" : "investors"} now?
               </p>
               <div className="flex flex-wrap gap-2">
-                <button className="btn" disabled={sending}>
+                <button className="btn" disabled={sending} aria-busy={sending}>
                   {sending ? "Starting" : "Yes, send it"}
                 </button>
-                <button type="button" className="btn btn-secondary" onClick={() => setConfirming(false)} disabled={sending}>
+                <button type="button" className="btn btn-secondary" onClick={() => setConfirming(false)} disabled={sending} aria-busy={sending}>
                   Cancel
                 </button>
               </div>

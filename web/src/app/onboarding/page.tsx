@@ -7,6 +7,7 @@ import { InvestorPasteForm } from "@/components/forms/investor-paste-form";
 import { SenderForm } from "@/components/forms/sender-form";
 import { TitleRow } from "@/components/title-row";
 import { StepsAhead } from "@/components/steps-ahead";
+import { LinkPending } from "@/components/link-pending";
 import { requireUser } from "@/lib/auth";
 import { env } from "@/lib/env";
 import { getSetupState } from "@/lib/setup";
@@ -37,6 +38,7 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
         {STEPS.map((s, i) => (
           <Link key={s.title} href={`/onboarding?step=${i + 1}`} aria-current={i + 1 === step ? "step" : undefined}>
             {s.title}
+            <LinkPending />
             {done[i] && <span className="pill pill-pos">Done</span>}
           </Link>
         ))}

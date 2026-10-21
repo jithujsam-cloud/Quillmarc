@@ -5,6 +5,7 @@ import { TitleRow } from "@/components/title-row";
 import { requireUser } from "@/lib/auth";
 import { removeInvestor } from "@/lib/actions/setup";
 import type { InvestorRow } from "@/lib/db-types";
+import { SubmitButton } from "@/components/submit-button";
 
 export const metadata: Metadata = { title: "Investors" };
 
@@ -67,9 +68,9 @@ export default async function InvestorsPage() {
                       <td className="n row-start-1 col-start-2">
                         <form action={removeInvestor}>
                           <input type="hidden" name="id" value={i.id} />
-                          <button className="btn btn-ghost btn-sm" aria-label={`Remove ${i.name}`}>
+                          <SubmitButton className="btn btn-ghost btn-sm" aria-label={`Remove ${i.name}`} pendingLabel="Removing">
                             Remove
-                          </button>
+                          </SubmitButton>
                         </form>
                       </td>
                     </tr>

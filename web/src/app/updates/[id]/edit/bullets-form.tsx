@@ -30,10 +30,10 @@ export function BulletsForm({ id, bullets }: { id: string; bullets: Bullets }) {
         ))}
       </div>
       <div className="flex flex-wrap items-center gap-3">
-        <button className="btn" name="continue" value="1" disabled={pending}>
+        <button className="btn" name="continue" value="1" disabled={pending} aria-busy={pending}>
           Save and continue
         </button>
-        <button className="btn btn-secondary" disabled={pending}>
+        <button className="btn btn-secondary" disabled={pending} aria-busy={pending}>
           Save
         </button>
         <span aria-live="polite">

@@ -26,7 +26,7 @@ export function ReadStrip({ statuses, names }: { statuses: DisplayStatus[]; name
     <div className="grid gap-3">
       <div className="strip" role="img" aria-label={legend.filter((l) => count(l.k)).map((l) => `${count(l.k)} ${l.label.toLowerCase()}`).join(", ")}>
         {kinds.map((k, i) => (
-          <span key={i} className="mark" data-k={k} title={names?.[i]} />
+          <span key={i} className="mark" data-k={k} title={names?.[i]} style={{ ["--i" as string]: i }} />
         ))}
       </div>
       <div className="legend" aria-hidden="true">

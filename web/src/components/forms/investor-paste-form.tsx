@@ -24,7 +24,7 @@ export function InvestorPasteForm({ submitLabel = "Add investors" }: { submitLab
         {state.error && <p className="error">{state.error}</p>}
       </div>
       <div>
-        <button className="btn" disabled={pending}>
+        <button className="btn" disabled={pending} aria-busy={pending}>
           {pending ? "Saving" : submitLabel}
         </button>
       </div>

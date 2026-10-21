@@ -15,6 +15,8 @@ import { BulletsForm } from "./bullets-form";
 import { MetricsForm, type EditableFigure } from "./metrics-form";
 import { RecipientsForm, type RecipientOption } from "./recipients-form";
 import { SendPanel } from "./send-panel";
+import { SubmitButton } from "@/components/submit-button";
+import { LinkPending } from "@/components/link-pending";
 
 export const metadata: Metadata = { title: "Edit update" };
 
@@ -106,6 +108,7 @@ export default async function EditUpdatePage({ params, searchParams }: { params:
             {STEPS.map((s) => (
               <Link key={s.key} href={`/updates/${update.id}/edit?step=${s.key}`} aria-current={s.key === step ? "step" : undefined} className={"phoneOnly" in s ? "lg:!hidden" : undefined}>
                 {s.label}
+                <LinkPending />
               </Link>
             ))}
           </nav>
@@ -124,7 +127,9 @@ export default async function EditUpdatePage({ params, searchParams }: { params:
                 </div>
                 <form action={recalculate}>
                   <input type="hidden" name="id" value={update.id} />
-                  <button className="btn btn-secondary btn-sm">Recalculate</button>
+                  <SubmitButton className="btn btn-secondary btn-sm" pendingLabel="Reading Stripe">
+                    Recalculate
+                  </SubmitButton>
                 </form>
               </div>
               {sp.error === "stripe" && (
@@ -196,7 +201,9 @@ export default async function EditUpdatePage({ params, searchParams }: { params:
 
           <form action={deleteDraft} className="mt-12 border-t border-line pt-5">
             <input type="hidden" name="id" value={update.id} />
-            <button className="link-btn danger text-[13px]">Delete this draft</button>
+            <SubmitButton className="link-btn danger text-[13px]" pendingLabel="Deleting">
+              Delete this draft
+            </SubmitButton>
           </form>
         </div>
 

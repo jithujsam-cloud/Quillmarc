@@ -34,7 +34,7 @@ export function LoginForm({ linkError }: { linkError: boolean }) {
           </p>
         )}
       </div>
-      <button type="submit" className="btn btn-lg w-full" disabled={pending}>
+      <button type="submit" className="btn btn-lg w-full" disabled={pending} aria-busy={pending}>
         {pending ? "Sending" : "Email me a sign-in link"}
       </button>
     </form>

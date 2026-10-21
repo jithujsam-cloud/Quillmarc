@@ -125,7 +125,7 @@
 .nav a:hover { background: var(--raised); color: var(--text); }
 .nav a[aria-current="page"] { background: var(--tint-1); color: var(--accent-ink); font-weight: 500; }
 .nav a[aria-current="page"] svg { color: var(--accent); }
-.nav .count { margin-left: auto; color: var(--faint); font-size: 12px; }
+.nav .count { color: var(--faint); font-size: 12px; }
 .side-group { margin: 20px 10px 6px; font-size: 12px; color: var(--faint); }
 .side-foot { margin-top: auto; display: grid; gap: 12px; padding: 12px 10px 0; border-top: 1px solid var(--border); font-size: 13px; }
 
@@ -276,6 +276,41 @@ textarea.field { min-height: 112px; resize: vertical; }
 .letter { font-family: var(--font-letter); }
 .letter h1, .letter h2 { font-family: var(--font-letter); font-weight: 500; letter-spacing: -0.015em; }
 .letter-body { font: 400 18px/30px var(--font-letter); }
+}
+
+/* ---------- motion: feedback first, all of it off for reduced motion ---------- */
+@layer components {
+  /* loading placeholders: flat bars at the size of what will arrive */
+  .skeleton { display: block; background: var(--raised); border-radius: 6px; }
+  .skeleton-line { height: 12px; }
+  .link-spin { width: 12px; height: 12px; flex: none; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; opacity: 0; }
+  .link-spin.is-pending { opacity: 0.7; }
+
+  /* a busy button keeps its size and shows a small ring */
+  .btn[aria-busy="true"] { cursor: progress; }
+  .btn[aria-busy="true"]::before { content: ""; width: 14px; height: 14px; flex: none; border-radius: 50%; border: 2px solid currentColor; border-right-color: transparent; opacity: 0.85; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @keyframes qm-rise { from { opacity: 0; transform: translateY(6px); } to { opacity: 1; transform: none; } }
+  @keyframes qm-fade { from { opacity: 0; } to { opacity: 1; } }
+  @keyframes qm-pop { from { opacity: 0; transform: scale(0.6); } to { opacity: 1; transform: none; } }
+  @keyframes qm-spin { to { transform: rotate(360deg); } }
+  @keyframes qm-breathe { 0%, 100% { opacity: 1; } 50% { opacity: 0.55; } }
+  @keyframes qm-slide { from { opacity: 0; transform: translateX(-16px); } to { opacity: 1; transform: none; } }
+
+  /* a new screen settles in, quickly */
+  .app-canvas-inner, .plain-main { animation: qm-rise 220ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .btn[aria-busy="true"]::before, .link-spin.is-pending { animation: qm-spin 700ms linear infinite; }
+  .link-spin { transition: opacity 150ms ease 120ms; }
+  .skeleton { animation: qm-breathe 1.4s ease-in-out infinite; }
+  /* the read strip fills in, one investor at a time */
+  .strip .mark { animation: qm-pop 260ms cubic-bezier(0.22, 1, 0.36, 1) both; animation-delay: calc(var(--i, 0) * 35ms); }
+  .sheet { animation: qm-slide 220ms cubic-bezier(0.22, 1, 0.36, 1) both; }
+  .ok, .error, .notice, details[open] > :not(summary) { animation: qm-fade 200ms ease-out both; }
+  /* switching light and dark eases instead of snapping */
+  body, .panel, .setting-panel, .app-top, .app-side, .field, .btn, .pill, .nav a, .segmented button { transition: background-color 200ms ease, border-color 200ms ease, color 200ms ease, filter 150ms ease, transform 120ms ease; }
+  .panel-hover:hover { border-color: var(--control); }
 }
 
 @media (prefers-reduced-motion: reduce) {

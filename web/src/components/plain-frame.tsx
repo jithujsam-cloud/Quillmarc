@@ -13,7 +13,7 @@ export function PlainFrame({ children, width = "max-w-md" }: { children: React.R
         </Link>
         <ThemeToggle />
       </header>
-      <main id="main" className={`mx-auto w-full flex-1 px-4 pt-14 sm:px-6 sm:pt-20 ${width}`}>
+      <main id="main" className={`plain-main mx-auto w-full flex-1 px-4 pt-14 sm:px-6 sm:pt-20 ${width}`}>
         {children}
         <SiteFooter />
       </main>
