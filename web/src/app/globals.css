@@ -1,34 +1,35 @@
 @import "tailwindcss";
 
 /* Quillmarc app styles. Style: "accent ladder" (taste skill, app screens).
-   One brand hue, Sapphire, at full strength only on small marks: the one filled button, the read
-   marks, the active nav icon. Its pale tints carry the areas. Gilt gold appears only in the logo.
-   Dark is a true neutral dark (elevation by lightness), not navy.
+   Colours follow the landing page's Sapphire Lounge palette (brand/tokens.css): ivory ground,
+   champagne hairlines and Midnight Navy ink in light; deep navy with Gilt gold in dark.
+   The accent (Sapphire in light, Gilt in dark) is at full strength only on small marks: the one
+   filled button, the read marks, the active nav icon. Its pale tints carry the areas.
    Every text pair passes 4.5:1 and every control edge 3:1 in both themes (checked when set). */
 
 :root {
-  --ground: #f6f7f9;     /* sidebar, top bar and page: one ground */
-  --surface: #ffffff;    /* panels */
-  --raised: #f0f2f5;     /* wells, hover rows */
-  --tint-1: #edf2f8;     /* palest sapphire: active nav row, the selected thing */
-  --tint-2: #dce6f2;     /* sapphire 200: read-strip "opened", progress tracks */
-  --border: #e3e6eb;     /* panel edges */
-  --rule: #edeff2;       /* row rules */
-  --control: #848e9d;    /* input and outlined-button edges, 3:1 */
-  --text: #0f1b2d;       /* Midnight Navy ink */
-  --muted: #4d5868;
-  --faint: #5e6977;      /* the lightest grey that holds 4.5:1 on every surface */
+  --ground: #faf7ef;     /* Ivory: sidebar, top bar and page, one ground */
+  --surface: #fffdf8;    /* panels */
+  --raised: #f3ede1;     /* wells, hover rows */
+  --tint-1: #f1e8d8;     /* champagne tint: active nav row, the selected thing */
+  --tint-2: #d9e0ea;     /* pale sapphire: read-strip "opened", progress tracks */
+  --border: #e8dfd0;     /* champagne hairline: panel edges */
+  --rule: #efe8db;       /* row rules */
+  --control: #8790a0;    /* input and outlined-button edges, 3:1 */
+  --text: #102542;       /* Midnight Navy ink */
+  --muted: #4a5a72;
+  --faint: #5a687d;      /* the lightest grey that holds 4.5:1 on every surface */
   --accent: #1e3a5f;     /* Sapphire */
-  --accent-ink: #17304f; /* dark ink on sapphire tints */
-  --on-accent: #ffffff;
-  --brass: #ddb040;      /* Gilt gold, logo only */
-  --positive: #247b50;
+  --accent-ink: #17304f; /* dark ink on tints */
+  --on-accent: #faf8f5;
+  --brass: #ddb040;      /* Gilt gold */
+  --positive: #1f7148;
   --negative: #b42328;
-  --pill-pos-bg: #dcfae5; --pill-pos-ink: #04250e;
-  --pill-neg-bg: #ffedea; --pill-neg-ink: #831c1e;
-  --pill-warn-bg: #fffbeb; --pill-warn-ink: #92400e; --pill-warn-line: #fde68a;
-  --pill-neutral-bg: #eceff3; --pill-neutral-ink: #2e3947;
-  --shadow-float: 0 12px 32px rgba(15, 27, 45, 0.16);
+  --pill-pos-bg: #dcf5e3; --pill-pos-ink: #04250e;
+  --pill-neg-bg: #fbe9e4; --pill-neg-ink: #831c1e;
+  --pill-warn-bg: #fdf6e3; --pill-warn-ink: #92400e; --pill-warn-line: #f0d98c;
+  --pill-neutral-bg: #efe8db; --pill-neutral-ink: #2e3a4d;
+  --shadow-float: 0 12px 32px rgba(16, 37, 66, 0.16);
 
   --font-ui: var(--font-hanken), system-ui, -apple-system, "Segoe UI", sans-serif;
   --font-letter: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
@@ -37,31 +38,31 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --ground: #0b0c0e; --surface: #141518; --raised: #1c1e22;
-    --tint-1: #17202c; --tint-2: #22324a;
-    --border: #26292e; --rule: #1f2226; --control: #5c636d;
-    --text: #f2f4f7; --muted: #b4bac3; --faint: #99a0aa;
-    --accent: #8db2e6; --accent-ink: #c9dbf4; --on-accent: #0b1626;
-    --positive: #4fc285; --negative: #f0828c;
-    --pill-pos-bg: #15291e; --pill-pos-ink: #6fd29c;
-    --pill-neg-bg: #2f1a1e; --pill-neg-ink: #f59aa2;
-    --pill-warn-bg: #2b2414; --pill-warn-ink: #e8b54d; --pill-warn-line: #4a3c1b;
-    --pill-neutral-bg: #23262b; --pill-neutral-ink: #dfe3e8;
+    --ground: #0a1628; --surface: #102542; --raised: #16304f;
+    --tint-1: #293642; --tint-2: #525141;
+    --border: #22385a; --rule: #1a2f4e; --control: #6b7c96;
+    --text: #faf8f5; --muted: #a8b3c4; --faint: #97a3b6;
+    --accent: #ddb040; --accent-ink: #f1dca0; --on-accent: #102542;
+    --positive: #4fc285; --negative: #f0a595;
+    --pill-pos-bg: #143a37; --pill-pos-ink: #6fd29c;
+    --pill-neg-bg: #3a2a3a; --pill-neg-ink: #f5b0a2;
+    --pill-warn-bg: #2e3330; --pill-warn-ink: #e8c66d; --pill-warn-line: #4d4a32;
+    --pill-neutral-bg: #1b3354; --pill-neutral-ink: #e3e8ef;
     --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.5);
     color-scheme: dark;
   }
 }
 :root[data-theme="dark"] {
-  --ground: #0b0c0e; --surface: #141518; --raised: #1c1e22;
-  --tint-1: #17202c; --tint-2: #22324a;
-  --border: #26292e; --rule: #1f2226; --control: #5c636d;
-  --text: #f2f4f7; --muted: #b4bac3; --faint: #99a0aa;
-  --accent: #8db2e6; --accent-ink: #c9dbf4; --on-accent: #0b1626;
-  --positive: #4fc285; --negative: #f0828c;
-  --pill-pos-bg: #15291e; --pill-pos-ink: #6fd29c;
-  --pill-neg-bg: #2f1a1e; --pill-neg-ink: #f59aa2;
-  --pill-warn-bg: #2b2414; --pill-warn-ink: #e8b54d; --pill-warn-line: #4a3c1b;
-  --pill-neutral-bg: #23262b; --pill-neutral-ink: #dfe3e8;
+  --ground: #0a1628; --surface: #102542; --raised: #16304f;
+  --tint-1: #293642; --tint-2: #525141;
+  --border: #22385a; --rule: #1a2f4e; --control: #6b7c96;
+  --text: #faf8f5; --muted: #a8b3c4; --faint: #97a3b6;
+  --accent: #ddb040; --accent-ink: #f1dca0; --on-accent: #102542;
+  --positive: #4fc285; --negative: #f0a595;
+  --pill-pos-bg: #143a37; --pill-pos-ink: #6fd29c;
+  --pill-neg-bg: #3a2a3a; --pill-neg-ink: #f5b0a2;
+  --pill-warn-bg: #2e3330; --pill-warn-ink: #e8c66d; --pill-warn-line: #4d4a32;
+  --pill-neutral-bg: #1b3354; --pill-neutral-ink: #e3e8ef;
   --shadow-float: 0 12px 32px rgba(0, 0, 0, 0.5);
   color-scheme: dark;
 }
