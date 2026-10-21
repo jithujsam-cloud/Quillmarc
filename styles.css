@@ -94,8 +94,7 @@ p, li { text-wrap: pretty; }
 /* Past the hero's first screen the bar becomes a floating pill with the menu */
 .nav.is-scrolled .nav__inner {
   max-width: min(880px, calc(100% - 2 * var(--margin))); padding: 0 10px 0 22px;
-  background: color-mix(in srgb, var(--bg) 82%, transparent);
-  backdrop-filter: saturate(160%) blur(16px); -webkit-backdrop-filter: saturate(160%) blur(16px);
+  background: var(--surface);
   box-shadow: 0 0 0 1px var(--line), var(--shadow-md);
 }
 .nav.is-scrolled .nav__links { max-width: 520px; opacity: 1; visibility: visible; transition-delay: 0s, 120ms, 0s; }
