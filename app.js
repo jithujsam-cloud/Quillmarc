@@ -69,6 +69,26 @@
     }, { passive: true });
   }
 
+  // FAQ: answers open and close with a height animation instead of snapping
+  $$(".faq details").forEach(function (d) {
+    var sum = $("summary", d), anim = null, EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
+    sum.addEventListener("click", function (e) {
+      if (reduced || !d.animate) return;
+      e.preventDefault();
+      if (anim) anim.cancel();
+      var start = d.offsetHeight, opening = !d.open;
+      if (opening) d.open = true; else d.classList.add("is-closing");
+      var end = opening ? d.scrollHeight : sum.offsetHeight;
+      d.style.overflow = "hidden";
+      anim = d.animate({ height: [start + "px", end + "px"] }, { duration: opening ? 480 : 360, easing: EASE });
+      anim.onfinish = function () {
+        anim = null; d.style.overflow = ""; d.classList.remove("is-closing");
+        if (!opening) d.open = false;
+      };
+      anim.oncancel = function () { d.style.overflow = ""; };
+    });
+  });
+
   // The product stage is drawn at 1088px and scaled to fit, like a screenshot that stays sharp
   var stage = $(".stage");
   function fitStage() {

@@ -616,7 +616,11 @@ fieldset[aria-invalid="true"] .chips span { border-color: var(--error); }
 .faq details[open] .faq__icon { transform: rotate(45deg); background: var(--tint); }
 .faq summary:hover .faq__icon { background: var(--tint); }
 .faq details p { padding: 0 48px 26px 0; color: var(--muted); }
-.faq details[open] p { animation: settle 420ms var(--ease-out) both; }
+.faq details { overflow: hidden; }
+.faq details p { opacity: 0; transform: translateY(-6px); transition: opacity 300ms ease, transform 450ms cubic-bezier(0.22, 1, 0.36, 1); }
+.faq details[open]:not(.is-closing) p { opacity: 1; transform: none; transition-delay: 80ms; }
+.faq summary { transition: color var(--t-hover) ease; }
+.faq summary:hover { color: var(--accent); }
 @media (max-width: 900px) { .faq { grid-template-columns: 1fr; } .faq .head { position: static; } .faq summary { font-size: 20px; } .faq details p { padding-right: 0; } }
 
 /* Footer: the closing call to action, links, and the name set very large */
@@ -821,7 +825,7 @@ html.modal-open { overflow: hidden; }
 .btn:hover { transform: translateY(-1px) scale(1.03); }
 .btn:active { transform: scale(0.95); transition-duration: 120ms; }
 .btn:hover svg { transform: translateX(4px); transition-timing-function: var(--spring); }
-.faq__icon { transition-timing-function: var(--spring); }
+.faq__icon { transition: transform 450ms cubic-bezier(0.22, 1, 0.36, 1), background-color var(--t-hover) ease; }
 
 /* Entrance: nav drops in, headline words rise one after another, the rest follows */
 .js .nav { animation: nav-in 700ms cubic-bezier(0.22, 1, 0.36, 1) both; }
