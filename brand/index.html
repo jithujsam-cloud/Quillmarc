@@ -340,14 +340,43 @@
     </section>
   </main>
 
-  <footer class="foot">
+  <footer class="foot" aria-labelledby="foot-title">
     <div class="wrap foot__inner">
-      <div class="foot__brand">
-        <svg class="foot__logo" aria-hidden="true"><use href="#qm-word"/></svg>
-        <p>Brand guidelines, version 2.0.</p>
+      <div class="foot__top">
+        <div class="foot__pitch">
+          <p class="kicker kicker--on">Brand guidelines, version 2.0</p>
+          <h2 class="foot__line" id="foot-title">Calm, exact and finished, like the letter it writes.</h2>
+          <p class="foot__sub">Questions about using the Quillmarc brand, or need a file that is not here? Start from the assets above and the design tokens.</p>
+          <a class="btn btn--light foot__btn" href="#files">Download assets<svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+        </div>
+        <nav class="foot__cols" aria-label="Footer">
+          <div>
+            <p class="foot__h">Guidelines</p>
+            <a href="#principles">Principles</a>
+            <a href="#logo">Logo</a>
+            <a href="#colour">Colour</a>
+            <a href="#type">Type</a>
+          </div>
+          <div>
+            <p class="foot__h">Usage</p>
+            <a href="#voice">Voice</a>
+            <a href="#imagery">Imagery</a>
+            <a href="#components">Components</a>
+            <a href="#motion">Motion</a>
+          </div>
+          <div>
+            <p class="foot__h">Quillmarc</p>
+            <a href="/">Waitlist page</a>
+            <a href="#files">Files</a>
+          </div>
+        </nav>
       </div>
-      <nav class="foot__links" aria-label="Footer"><a href="/">Waitlist page</a><a href="#logo">Logo</a><a href="#colour">Colour</a><a href="#files">Files</a></nav>
+      <div class="foot__base">
+        <p>© 2026 Quillmarc.</p>
+        <p>Newsreader, Hanken Grotesk and Geist Mono are open-source fonts from Google Fonts.</p>
+      </div>
     </div>
+    <div class="foot__giant" aria-hidden="true"><svg><use href="#qm-word"/></svg></div>
   </footer>
 
   <script>

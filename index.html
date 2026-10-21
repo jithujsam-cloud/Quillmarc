@@ -534,37 +534,49 @@
       </div>
     </section>
 
-    <!-- Final call to action -->
-    <section class="wrap cta-wrap">
-      <div class="cta reveal">
-        <svg class="cta__mark" aria-hidden="true"><use href="#qm-mark"/></svg>
-        <h2>Next month’s update, already half written.</h2>
-        <p>Join the waitlist. We will email you once, when your invite is ready.</p>
-        <form class="cta__form" novalidate>
-          <label class="sr" for="cta-email">Work email</label>
-          <input id="cta-email" type="email" autocomplete="email" placeholder="you@company.com">
-          <button class="btn btn--light" type="submit">Join the waitlist</button>
-        </form>
-      </div>
-    </section>
   </main>
 
-  <footer class="foot">
+  <footer class="foot" aria-labelledby="foot-title">
     <div class="wrap foot__inner">
-      <div class="foot__brand">
-        <svg class="foot__logo" role="img" aria-label="Quillmarc"><use href="#qm-word"/></svg>
-        <p class="foot__line">Keep every investor close, without losing a day to the update.</p>
-        <p class="foot__sub">Your numbers from Stripe, your story in five bullets, a finished letter in their inbox every month.</p>
+      <div class="foot__top">
+        <div class="foot__pitch">
+          <p class="kicker kicker--on">Join the waitlist</p>
+          <h2 class="foot__line" id="foot-title">Keep every investor close, without losing a day to the update.</h2>
+          <p class="foot__sub">Your numbers from Stripe, your story in five bullets, a finished letter in their inbox every month.</p>
+          <form class="cta__form" novalidate>
+            <label class="sr" for="cta-email">Work email</label>
+            <input id="cta-email" type="email" autocomplete="email" placeholder="you@company.com">
+            <button class="btn btn--light" type="submit">Join the waitlist<svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </form>
+          <p class="foot__note">$29 a month, planned. Read-only Stripe access. One email when your invite is ready.</p>
+        </div>
+        <nav class="foot__cols" aria-label="Footer">
+          <div>
+            <p class="foot__h">Product</p>
+            <a href="#how">How it works</a>
+            <a href="#features">Features</a>
+            <a href="#sample">Sample update</a>
+            <a href="#pricing">Pricing</a>
+          </div>
+          <div>
+            <p class="foot__h">Why Quillmarc</p>
+            <a href="#proof">Why updates matter</a>
+            <a href="#value">Compare</a>
+            <a href="#faq">FAQ</a>
+          </div>
+          <div>
+            <p class="foot__h">Company</p>
+            <a href="/brand">Brand guidelines</a>
+            <a href="#top">Back to top</a>
+          </div>
+        </nav>
       </div>
-      <nav class="foot__links" aria-label="Footer">
-        <a href="#how">How it works</a>
-        <a href="#features">Features</a>
-        <a href="#pricing">Pricing</a>
-        <a href="#faq">FAQ</a>
-        <a href="/brand">Brand</a>
-      </nav>
-      <p class="foot__small">© 2026 Quillmarc. Not affiliated with Stripe. Product examples use fictional companies, people and figures.</p>
+      <div class="foot__base">
+        <p>© 2026 Quillmarc. Not affiliated with Stripe.</p>
+        <p>Product examples use fictional companies, people and figures.</p>
+      </div>
     </div>
+    <div class="foot__giant" aria-hidden="true"><svg><use href="#qm-word"/></svg></div>
   </footer>
 
   <script src="/config.js"></script>
