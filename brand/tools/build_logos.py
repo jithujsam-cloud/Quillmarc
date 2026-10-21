@@ -20,15 +20,15 @@ MARK = json.loads((HERE / "mark.json").read_text())
 WORD_W, CAP, XH, ASC, DESC = 8780.0, 1340.0, 852.0, 1470.0, 530.0
 DOT_K = 0.36  # full stop size as a share of x-height
 
-INK, REVERSE, GREEN, BRASS, BRASS_DARK, PAPER = "#16201C", "#F7F3EA", "#1D4A40", "#B8893A", "#D6AB5A", "#F5F1E8"
+INK, REVERSE, SAPPHIRE, NAVY, BRASS, PAPER = "#102542", "#FAF8F5", "#1E3A5F", "#102542", "#C79C5A", "#FAF8F5"
 
 # (ink, full stop) per colourway
 WAYS = {
     "ink": (INK, BRASS),            # primary, on paper
     "ink-mono": (INK, INK),         # one colour: print, fax, embossing
-    "reverse": (REVERSE, BRASS_DARK),   # on green or dark
+    "reverse": (REVERSE, BRASS),       # on navy, sapphire or dark
     "reverse-mono": (REVERSE, REVERSE),
-    "green": (GREEN, BRASS),
+    "sapphire": (SAPPHIRE, BRASS),
 }
 
 
@@ -93,7 +93,7 @@ for k in ("ink", "reverse"):
     )
 
 # App icons
-write("quillmark-app-icon.svg", svg(512, 512, mark(REVERSE, BRASS_DARK, 96, 96, 8.0), bg=GREEN, radius=112))
+write("quillmark-app-icon.svg", svg(512, 512, mark(REVERSE, BRASS, 96, 96, 8.0), bg=NAVY, radius=112))
 write("quillmark-app-icon-paper.svg", svg(512, 512, mark(INK, BRASS, 96, 96, 8.0), bg=PAPER, radius=112))
 
 # Favicon: follows the browser's colour scheme
@@ -101,7 +101,7 @@ x, y, q = MARK["sq"]
 write(
     "favicon.svg",
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="32" height="32">'
-    "<style>.i{fill:#16201C}.d{fill:#B8893A}@media (prefers-color-scheme: dark){.i{fill:#EEE8DA}.d{fill:#D6AB5A}}</style>"
+    "<style>.i{fill:#102542}.d{fill:#C79C5A}@media (prefers-color-scheme: dark){.i{fill:#FAF8F5}.d{fill:#C79C5A}}</style>"
     f'<path class="i" fill-rule="evenodd" d="{MARK["ring"]}"/><path class="i" d="{MARK["tail"]}"/>'
     f'<rect class="d" x="{x}" y="{y}" width="{q}" height="{q}" rx="0.5"/></svg>\n',
 )
