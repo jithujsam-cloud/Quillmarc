@@ -297,12 +297,24 @@
     shareUrl: $('[data-done="share-url"]', doneView), share: $('[data-done="share"]', doneView)
   };
 
+  // Soft fades at the top and bottom edge show when there is more to scroll
+  function updateFades() {
+    [formView, doneView].forEach(function (el) {
+      el.classList.toggle("has-top", el.scrollTop > 4);
+      el.classList.toggle("has-bottom", el.scrollHeight - el.clientHeight - el.scrollTop > 4);
+    });
+  }
+  [formView, doneView].forEach(function (el) { el.addEventListener("scroll", updateFades, { passive: true }); });
+  window.addEventListener("resize", updateFades);
+
   function openStepTwo() {
     stepTwo.hidden = false;
     stepTwo.style.animation = reduced ? "none" : "settle 600ms var(--ease-out) both";
-    stepOneBtn.innerHTML = "Change email";
+    stepOneBtn.innerHTML = "Change";
+    stepOneBtn.setAttribute("aria-label", "Change email");
     stepOneBtn.classList.add("btn--quiet");
     form.elements.company.focus({ preventScroll: true });
+    requestAnimationFrame(updateFades);
   }
   function busy(on) { submitTwo.disabled = on; $(".btn__label", submitTwo).textContent = on ? "Sending" : "Join the waitlist"; }
   function fail(msg) {
@@ -314,6 +326,7 @@
   function openModal(prefill) {
     if (!modal.open) modal.showModal();
     root.classList.add("modal-open");
+    requestAnimationFrame(updateFades);
     if (doneSignup) return;
     var valid = !!prefill && EMAIL_RE.test(prefill.trim());
     if (valid) {
@@ -344,7 +357,10 @@
     // Share link, with attribution so referrals show up in the signups table.
     var base = (cfg.siteUrl || location.origin).replace(/\/$/, "");
     done.shareUrl.value = base + "/?utm_source=share&utm_medium=referral";
+    Array.prototype.forEach.call(doneView.children, function (c, i) { c.style.setProperty("--i", i); });
+    doneView.scrollTop = 0;
     done.title.focus({ preventScroll: true });
+    requestAnimationFrame(updateFades);
   }
   function finish(result, email) {
     doneSignup = { status: result.status, token: result.token || null, founding: !!result.founding, emailed: !!result.emailed, email: email };

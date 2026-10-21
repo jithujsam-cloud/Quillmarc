@@ -446,6 +446,11 @@ fieldset[aria-invalid="true"] .chips span { border-color: var(--error); }
 .stat__so { font: italic 400 18px/1.45 var(--font-display); color: var(--accent); padding-top: 14px; border-top: 1px solid var(--line); margin-top: auto; }
 .stat__src, .quote figcaption a { font-size: 14px; color: var(--muted); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; transition: color var(--t-hover) ease, text-decoration-color var(--t-hover) ease; }
 .stat__src:hover, .quote figcaption a:hover { color: var(--ink); text-decoration-color: currentColor; }
+@media (max-width: 760px) {
+  .proof { grid-template-columns: 1fr; gap: 16px; }
+  .stat { padding: 26px 24px 24px; }
+  .stat__n { font-size: 56px; }
+}
 .quote {
   grid-column: 1 / -1; margin: 28px 0 0; padding-top: clamp(32px, 4vw, 48px); border-top: 1px solid var(--line);
   display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 28px clamp(32px, 5vw, 72px); align-items: end;
@@ -528,6 +533,11 @@ fieldset[aria-invalid="true"] .chips span { border-color: var(--error); }
   .letter__kpis { grid-template-columns: 1fr 1fr; }
   .letter__meta, .letter__body { padding-left: 22px; padding-right: 22px; }
   .letter__body { font-size: 17px; }
+}
+@media (max-width: 560px) {
+  /* The flag moves out of the header row so it never covers the From address */
+  .letter__flag { position: static; display: block; width: fit-content; margin: 18px 22px 0; }
+  .letter__meta { padding-top: 14px; }
 }
 
 /* Pricing */
@@ -658,16 +668,32 @@ fieldset[aria-invalid="true"] .chips span { border-color: var(--error); }
 .foot--compact { padding-top: clamp(40px, 5vw, 64px); margin-top: 0; }
 .foot--compact .foot__base { margin-top: 0; }
 .foot__base a:not(.totop) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(250, 248, 245, 0.4); margin-right: 14px; }
-@media (max-width: 640px) { .chips--five { grid-template-columns: 1fr 1fr; } .share { flex-direction: column; } }
+@media (max-width: 640px) { .chips--five { grid-template-columns: 1fr 1fr; } .share { flex-direction: column; } .share__url { flex: none; width: 100%; } .share .btn { width: 100%; } }
 
 /* Waitlist modal: the form and the thank-you view share one dialog */
 
+@property --fade-t { syntax: "<length>"; inherits: false; initial-value: 0px; }
+@property --fade-b { syntax: "<length>"; inherits: false; initial-value: 0px; }
 html.modal-open { overflow: hidden; }
-.modal { position: relative; width: min(600px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0; margin: auto; border: 0; border-radius: 22px; background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line), var(--shadow-lg); overflow: auto; }
+.modal { position: relative; width: min(600px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0; margin: auto; border: 0; border-radius: 22px; background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line), var(--shadow-lg); overflow: hidden; }
 .modal::backdrop { background: rgba(10, 22, 40, 0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
-.modal[open] { animation: settle 500ms var(--ease-out) both; }
-.modal__form, .modal__done { padding: clamp(28px, 4vw, 44px); }
-.modal__done { display: grid; gap: 16px; align-content: start; }
+.modal[open] { display: flex; flex-direction: column; animation: settle 500ms var(--ease-out) both; }
+/* The dialog stays put; the view inside it scrolls, so the corners clip the scrollbar and the close button stays pinned */
+.modal__form, .modal__done {
+  flex: 1 1 auto; min-height: 0; padding: clamp(28px, 4vw, 44px);
+  overflow-y: auto; overscroll-behavior: contain; scroll-behavior: smooth;
+  scrollbar-width: thin; scrollbar-color: var(--control) transparent;
+}
+/* Edge fades hint at more content in the thank-you view. The form never fades, so nothing cuts across its button */
+.modal__done {
+  -webkit-mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-t), #000 calc(100% - var(--fade-b)), transparent 100%);
+  mask-image: linear-gradient(to bottom, transparent 0, #000 var(--fade-t), #000 calc(100% - var(--fade-b)), transparent 100%);
+  transition: --fade-t 250ms ease, --fade-b 250ms ease;
+}
+.modal__done.has-top { --fade-t: 28px; }
+.modal__done.has-bottom { --fade-b: 36px; }
+.modal__done { display: grid; gap: 14px; align-content: start; }
+.modal__done > * { animation: settle 600ms var(--ease-out) both; animation-delay: calc(120ms + var(--i, 0) * 70ms); }
 .modal [hidden] { display: none !important; }
 .modal__title { font: 400 clamp(28px, 3.4vw, 38px)/1.1 var(--font-display); letter-spacing: -0.02em; padding-right: 40px; margin-bottom: 22px; }
 .modal__done .modal__title { margin-bottom: 0; }
@@ -675,17 +701,39 @@ html.modal-open { overflow: hidden; }
 .modal__done .thanks__lede { margin-top: 0; font-size: 17px; }
 .modal__done .thanks__email, .modal__done .thanks__founding { margin-top: 0; }
 .modal__done a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
-.modal__done .btn { color: var(--accent-ink); text-decoration: none; }
-.modal__close { position: absolute; top: 14px; right: 14px; z-index: 1; width: 40px; height: 40px; border: 0; border-radius: 50%; display: grid; place-items: center; background: transparent; color: var(--ink); cursor: pointer; }
+.modal__done a.btn { color: var(--accent-ink); text-decoration: none; }
+.modal__close { position: absolute; top: 14px; right: 18px; z-index: 1; width: 40px; height: 40px; border: 0; border-radius: 50%; display: grid; place-items: center; background: var(--surface); color: var(--ink); cursor: pointer; transition: background var(--t-hover) ease; }
 .modal__close:hover { background: var(--bg); }
+.modal:has(.has-top) .modal__close { box-shadow: 0 0 0 1px var(--line), 0 4px 12px -2px rgba(16, 37, 66, 0.18); }
 .modal__close:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
 .modal__close svg { width: 16px; height: 16px; }
-.modal .join__step--two { padding: 0; background: none; box-shadow: none; }
+.modal .join__step--two { padding: 0; margin-top: 26px; background: none; box-shadow: none; }
 .modal .join__row { box-shadow: inset 0 0 0 1.5px var(--control); }
 .modal .join__row:focus-within { box-shadow: inset 0 0 0 1px var(--accent), 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent); }
 .modal .join__legal { margin-top: 18px; }
-.modal .thanks__card { background: var(--bg); }
-@media (max-width: 560px) { .modal__form, .modal__done { padding: 24px 20px; } .modal__title { font-size: 28px; } }
+.modal .thanks__card { background: var(--bg); padding: clamp(18px, 3vw, 24px); }
+.modal .thanks__card h2 { font-size: 22px; }
+.modal .thanks__hint { margin-top: 6px; font-size: 15px; }
+.modal .answers { margin-top: 18px; gap: 18px; }
+.modal .chips--five { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+.modal .field textarea { min-height: 84px; }
+@media (max-width: 560px) {
+  .modal__form, .modal__done { padding: 24px 20px; }
+  .modal__title { font-size: 28px; }
+  .modal .join__row { flex-direction: row; padding: 5px; }
+  .modal .join__row input { flex: 1; height: 50px; padding: 0 12px; font-size: 16px; }
+  .modal .join__row .btn { width: auto; height: 50px; padding: 0 16px; font-size: 16px; }
+  .modal .join__row .btn--quiet { padding: 0 10px; font-size: 14px; }
+  .modal .chips--five { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+}
+@media (max-height: 720px) {
+  .modal { max-height: calc(100dvh - 16px); }
+  .modal__form, .modal__done { padding-top: 24px; padding-bottom: 20px; }
+  .modal__title { font-size: 28px; margin-bottom: 14px; }
+  .modal .join__step--two { margin-top: 18px; gap: 14px; }
+  .modal .join__hello { font-size: 19px; }
+  .modal .join__legal { margin-top: 12px; }
+}
 
 /* Motion */
 
