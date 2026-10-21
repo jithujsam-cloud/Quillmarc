@@ -558,7 +558,7 @@ fieldset[aria-invalid="true"] .chips span { border-color: var(--error); }
 .yours__note { grid-column: 1 / -1; font-size: 14px; opacity: 0.88; }
 .sample :focus-visible { outline-color: #FAF8F5; }
 
-.letter { position: relative; background: #FFFFFF; color: #102542; border-radius: var(--r-stage); box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.5); overflow: hidden; transition: opacity 200ms ease, transform 300ms var(--ease-out); }
+.letter { position: relative; background: #FFFBF3; color: #102542; border-radius: var(--r-stage); box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.5); overflow: hidden; transition: opacity 200ms ease, transform 300ms var(--ease-out); }
 .letter.is-swapping { opacity: 0; transform: translateY(6px); }
 .letter__meta { padding: 22px 36px; border-bottom: 1px solid #E8DFD0; display: grid; gap: 4px; font-size: 14px; }
 .letter__meta div { display: grid; grid-template-columns: 70px 1fr; }

@@ -3,8 +3,8 @@
 
 :root {
   /* Sapphire Lounge palette, light */
-  --qm-ivory: #FAF8F5;        /* ground */
-  --qm-raised: #FFFFFF;       /* sheets, cards */
+  --qm-ivory: #F6EFE2;        /* ground */
+  --qm-raised: #FFFBF3;       /* sheets, cards */
   --qm-navy: #102542;         /* Midnight Navy: ink, and the deep stage fields */
   --qm-muted: #4A5A72;        /* secondary text, 6.6:1 on ivory */
   --qm-sapphire: #1E3A5F;     /* Sapphire: actions and links, 10.9:1 on ivory */
