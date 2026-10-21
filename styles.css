@@ -533,7 +533,7 @@ fieldset[aria-invalid="true"] .chips span { border-color: var(--error); }
 
 /* Pricing */
 
-.pricing { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 480px); gap: clamp(40px, 6vw, 96px); align-items: center; }
+.pricing { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 480px); gap: clamp(40px, 6vw, 96px); align-items: start; }
 .pricing .head { margin-bottom: 0; }
 .price-card { background: var(--surface); border-radius: 20px; padding: 36px; box-shadow: inset 0 0 0 1px var(--line), var(--shadow-lg); }
 .price-card__top { display: flex; justify-content: space-between; align-items: flex-start; padding-bottom: 28px; border-bottom: 1px solid var(--line); }
