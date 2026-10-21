@@ -34,7 +34,7 @@ Audit of the live site (https://quillmarc.vercel.app, identical to `main` at com
 
 **Bad**
 - Huge headline, small pale form. **Fixed:** headline capped at 64px; form controls 56px tall with a visible label, stronger border and shadow; it is now the strongest element under the headline.
-- Navy sections in a row felt heavy. **Fixed:** the sample update became a light, warm section; navy remains only for the product stage, one quote panel and the footer.
+- Navy sections in a row felt heavy. **Fixed:** the sample update became a light, warm section; navy remains only for the product stage and the footer (the sample band later went back to navy by the owner's call).
 - Tiny captions and labels. **Fixed:** nothing readable below 14px outside the product mockups; faded footer text raised.
 - Step cards small. **Fixed:** taller art, larger titles and body text.
 - The finished update sat mid-page. **Fixed:** moved directly under the hero.

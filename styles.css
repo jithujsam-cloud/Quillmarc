@@ -447,28 +447,15 @@ fieldset[aria-invalid="true"] .chips span { border-color: var(--error); }
 .stat__src, .quote figcaption a { font-size: 14px; color: var(--muted); text-decoration: underline; text-decoration-color: var(--line); text-underline-offset: 3px; transition: color var(--t-hover) ease, text-decoration-color var(--t-hover) ease; }
 .stat__src:hover, .quote figcaption a:hover { color: var(--ink); text-decoration-color: currentColor; }
 .quote {
-  grid-column: 1 / -1; position: relative; overflow: hidden; isolation: isolate;
-  background: var(--stage); color: var(--on-stage);
-  border-radius: var(--r-stage);
-  padding: clamp(48px, 5vw, 72px) clamp(28px, 5vw, 72px) clamp(40px, 4.4vw, 56px);
+  grid-column: 1 / -1; margin: 28px 0 0; padding-top: clamp(32px, 4vw, 48px); border-top: 1px solid var(--line);
+  display: grid; grid-template-columns: minmax(0, 1.9fr) minmax(0, 1fr); gap: 28px clamp(32px, 5vw, 72px); align-items: end;
 }
-.quote > blockquote, .quote > figcaption { max-width: 880px; margin-left: auto; margin-right: auto; }
-.quote::before { content: ""; position: absolute; inset: 0; z-index: -1; background-image: var(--dots); background-size: var(--dots-size); }
-.quote blockquote { margin: 0 auto; position: relative; }
-.quote blockquote::before {
-  content: "\201C"; position: absolute; z-index: -1;
-  left: -0.34em; top: -0.34em;
-  font: 400 clamp(96px, 8.4vw, 132px)/1 var(--font-display);
-  color: var(--brass); pointer-events: none;
-}
-.quote blockquote p { position: relative; font: 400 clamp(26px, 2.9vw, 40px)/1.2 var(--font-display); letter-spacing: -0.02em; text-wrap: balance; }
-.quote figcaption { margin-top: 26px; display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; font-size: 15px; }
-.quote figcaption::before { content: ""; width: 28px; height: 2px; background: var(--brass); align-self: center; }
-.quote figcaption span { opacity: 0.9; max-width: 48em; }
-.quote figcaption a { color: inherit; opacity: 0.85; text-decoration-color: rgba(250, 248, 245, 0.4); }
-.quote figcaption a:hover { color: inherit; opacity: 1; }
-@media (max-width: 960px) { .proof { grid-template-columns: 1fr; } }
-@media (max-width: 560px) { .quote { padding-top: 64px; } .quote blockquote::before { left: -0.08em; top: -0.42em; } }
+.quote blockquote { margin: 0; }
+.quote blockquote p { font: 400 clamp(28px, 3.2vw, 44px)/1.16 var(--font-display); letter-spacing: -0.02em; color: var(--ink); text-wrap: pretty; }
+.quote figcaption { display: flex; flex-direction: column; align-items: flex-start; gap: 10px; padding-left: 24px; border-left: 1px solid var(--line); font-size: 15px; line-height: 1.5; color: var(--muted); }
+.quote__by { display: flex; align-items: center; gap: 10px; color: var(--ink); font-weight: 600; }
+.quote__by::before { content: ""; width: 8px; height: 8px; border-radius: 2px; background: var(--brass); }
+@media (max-width: 760px) { .quote { grid-template-columns: 1fr; } }
 
 /* Value comparison */
 

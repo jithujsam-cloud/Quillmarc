@@ -47,6 +47,7 @@ Every judgment call made during the October 21, 2026 audit and rebuild, with a o
 - **No visible text below 14px outside the product mockups; footer text opacity raised.** Small, faded captions risked failing contrast.
 - **Step cards enlarged (taller art, 28px titles, 17px text).** They looked small for the space around them.
 - **Dot texture back to the original faint off-white.** The owner found the pale gold distracting.
+- **The NFX quote is a light editorial row (quote left, attribution right, hairline rule), not a navy panel.** The owner disliked the panel; the page already has three navy blocks, and the quote reads as part of the evidence this way.
 - **Kept the navy, sapphire and gilt-gold palette from the last approved round, not the older green.** The owner approved it after the brief's green-era description was written.
 - **Google Fonts load without blocking first paint; hero text no longer fades in.** Both delayed first paint on phones.
 
