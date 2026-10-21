@@ -40,8 +40,8 @@ Every judgment call made during the October 21, 2026 audit and rebuild, with a o
 - **Annual billing mentioned only as "planned".** Per the brief.
 
 ## Design
-- **The sample update moved directly under the hero and became a light, warm section.** The finished letter is the most persuasive visual, and the page had a heavy run of navy.
-- **Navy is now used three times: the product stage, the NFX quote and the footer.** Enough to anchor the brand without four dark blocks in a row.
+- **The sample update moved directly under the hero.** The finished letter is the most persuasive visual.
+- **The sample update stays directly under the hero, on a navy band with off-white dots (owner's call, October 21).** The owner prefers the stronger blue presence of the earlier version over the lighter band the audit suggested.
 - **Hero form enlarged (56px controls, visible label, stronger border and shadow).** It is the page's one job and was its weakest element.
 - **Hero headline reduced to a 64px maximum.** The owner found 96px and 80px too big, and the smaller size brings the form and preview up.
 - **No visible text below 14px outside the product mockups; footer text opacity raised.** Small, faded captions risked failing contrast.

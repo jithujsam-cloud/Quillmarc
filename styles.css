@@ -491,24 +491,27 @@ fieldset[aria-invalid="true"] .chips span { border-color: var(--error); }
 .sample {
   margin-top: clamp(80px, 9vw, 128px);
   padding: clamp(72px, 9vw, 120px) 0;
-  background: var(--tint-band); color: var(--ink);
+  background: var(--stage); color: var(--on-stage);
+  position: relative; isolation: isolate;
 }
+.sample::before { content: ""; position: absolute; inset: 0; z-index: -1; background-image: var(--dots); background-size: var(--dots-size); }
 .sample__grid { display: grid; grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr); gap: clamp(40px, 6vw, 96px); align-items: start; }
 .sample__side { position: sticky; top: 112px; }
 .sample h2 { font: 400 clamp(32px, 3.8vw, 52px)/1.06 var(--font-display); letter-spacing: -0.03em; text-wrap: balance; }
-.kicker--on { color: var(--brass); }
-.sample__lede { margin-top: 20px; font-size: 18px; color: var(--muted); max-width: 30em; }
-.tabs { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 6px; padding: 5px; border-radius: 12px; background: var(--surface); box-shadow: inset 0 0 0 1px var(--line); width: fit-content; }
-.tabs button { height: 40px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); cursor: pointer; font-size: 15px; transition: background-color var(--t-hover) ease, color var(--t-hover) ease; }
-.tabs button:hover { color: var(--ink); }
-.tabs button[aria-selected="true"] { background: var(--accent); color: var(--accent-ink); box-shadow: var(--shadow-sm); }
+.sample .kicker, .kicker--on { color: var(--brass); }
+.sample__lede { margin-top: 20px; font-size: 18px; opacity: 0.88; max-width: 30em; }
+.tabs { margin-top: 36px; display: flex; flex-wrap: wrap; gap: 6px; padding: 5px; border-radius: 12px; background: rgba(0, 0, 0, 0.2); width: fit-content; }
+.tabs button { height: 40px; padding: 0 14px; border: 0; border-radius: 8px; background: transparent; color: inherit; opacity: 0.85; cursor: pointer; font-size: 15px; transition: background-color var(--t-hover) ease, color var(--t-hover) ease, opacity var(--t-hover) ease; }
+.tabs button:hover { opacity: 1; }
+.tabs button[aria-selected="true"] { background: var(--brass); color: #102542; opacity: 1; box-shadow: var(--shadow-sm); }
 .yours { margin-top: 24px; display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; max-width: 480px; }
-.yours label { font-size: 14px; font-weight: 500; }
-.yours input { width: 100%; height: 46px; padding: 0 12px; border-radius: var(--r-control); border: 1px solid var(--control); background: var(--surface); color: var(--ink); font: 400 16px/1 var(--font-figures); letter-spacing: -0.02em; }
-.yours input:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 18%, transparent); }
-.yours__note { grid-column: 1 / -1; font-size: 14px; color: var(--muted); }
+.yours label { font-size: 14px; font-weight: 500; opacity: 0.92; }
+.yours input { width: 100%; height: 46px; padding: 0 12px; border-radius: var(--r-control); border: 1px solid rgba(250, 248, 245, 0.4); background: rgba(0, 0, 0, 0.2); color: inherit; font: 400 16px/1 var(--font-figures); letter-spacing: -0.02em; }
+.yours input:focus { outline: none; border-color: #FAF8F5; box-shadow: 0 0 0 3px rgba(250, 248, 245, 0.2); }
+.yours__note { grid-column: 1 / -1; font-size: 14px; opacity: 0.88; }
+.sample :focus-visible { outline-color: #FAF8F5; }
 
-.letter { position: relative; background: #FFFFFF; color: #102542; border-radius: var(--r-stage); box-shadow: 0 0 0 1px #E8DFD0, 0 40px 80px -36px rgba(16, 37, 66, 0.35); overflow: hidden; transition: opacity 200ms ease, transform 300ms var(--ease-out); }
+.letter { position: relative; background: #FFFFFF; color: #102542; border-radius: var(--r-stage); box-shadow: 0 40px 80px -30px rgba(0, 0, 0, 0.5); overflow: hidden; transition: opacity 200ms ease, transform 300ms var(--ease-out); }
 .letter.is-swapping { opacity: 0; transform: translateY(6px); }
 .letter__meta { padding: 22px 36px; border-bottom: 1px solid #E8DFD0; display: grid; gap: 4px; font-size: 14px; }
 .letter__meta div { display: grid; grid-template-columns: 70px 1fr; }
