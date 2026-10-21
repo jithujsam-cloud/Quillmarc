@@ -22,6 +22,17 @@
     onScroll();
   }
 
+  // "#top" is the sticky nav, which is already on screen, so a plain anchor barely moves. Scroll to the real top.
+  Array.prototype.forEach.call(document.querySelectorAll('a[href="#top"]'), function (a) {
+    a.addEventListener("click", function (e) {
+      e.preventDefault();
+      var still = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+      window.scrollTo({ top: 0, behavior: still ? "auto" : "smooth" });
+      var logo = document.querySelector(".nav__logo");
+      if (logo) logo.focus({ preventScroll: true });
+    });
+  });
+
   // Plausible loads only when PLAUSIBLE_DOMAIN is set. No cookies, no personal data.
   window.plausible = window.plausible || function () { (window.plausible.q = window.plausible.q || []).push(arguments); };
   if (cfg.plausibleDomain) {
