@@ -660,6 +660,33 @@ fieldset[aria-invalid="true"] .chips span { border-color: var(--error); }
 .foot__base a:not(.totop) { color: inherit; text-decoration: underline; text-underline-offset: 3px; text-decoration-color: rgba(250, 248, 245, 0.4); margin-right: 14px; }
 @media (max-width: 640px) { .chips--five { grid-template-columns: 1fr 1fr; } .share { flex-direction: column; } }
 
+/* Waitlist modal: the form and the thank-you view share one dialog */
+
+html.modal-open { overflow: hidden; }
+.modal { position: relative; width: min(600px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); padding: 0; margin: auto; border: 0; border-radius: 22px; background: var(--surface); color: var(--ink); box-shadow: inset 0 0 0 1px var(--line), var(--shadow-lg); overflow: auto; }
+.modal::backdrop { background: rgba(10, 22, 40, 0.5); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px); }
+.modal[open] { animation: settle 500ms var(--ease-out) both; }
+.modal__form, .modal__done { padding: clamp(28px, 4vw, 44px); }
+.modal__done { display: grid; gap: 16px; align-content: start; }
+.modal [hidden] { display: none !important; }
+.modal__title { font: 400 clamp(28px, 3.4vw, 38px)/1.1 var(--font-display); letter-spacing: -0.02em; padding-right: 40px; margin-bottom: 22px; }
+.modal__done .modal__title { margin-bottom: 0; }
+.modal__done .thanks__icon { margin-bottom: 8px; }
+.modal__done .thanks__lede { margin-top: 0; font-size: 17px; }
+.modal__done .thanks__email, .modal__done .thanks__founding { margin-top: 0; }
+.modal__done a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+.modal__done .btn { color: var(--accent-ink); text-decoration: none; }
+.modal__close { position: absolute; top: 14px; right: 14px; z-index: 1; width: 40px; height: 40px; border: 0; border-radius: 50%; display: grid; place-items: center; background: transparent; color: var(--ink); cursor: pointer; }
+.modal__close:hover { background: var(--bg); }
+.modal__close:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; }
+.modal__close svg { width: 16px; height: 16px; }
+.modal .join__step--two { padding: 0; background: none; box-shadow: none; }
+.modal .join__row { box-shadow: inset 0 0 0 1.5px var(--control); }
+.modal .join__row:focus-within { box-shadow: inset 0 0 0 1px var(--accent), 0 0 0 4px color-mix(in srgb, var(--accent) 16%, transparent); }
+.modal .join__legal { margin-top: 18px; }
+.modal .thanks__card { background: var(--bg); }
+@media (max-width: 560px) { .modal__form, .modal__done { padding: 24px 20px; } .modal__title { font-size: 28px; } }
+
 /* Motion */
 
 .js .rise { opacity: 0; transform: translateY(16px); }

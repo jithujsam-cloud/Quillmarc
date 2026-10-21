@@ -221,10 +221,12 @@
   });
   yours.addEventListener("input", function () { render(yourMonth(), true); });
 
-  // Waitlist: email first, then three short questions, then one request to /api/join
-  var form = $(".join__form"), stepTwo = $(".join__step--two");
-  var status = $(".form__status"), submitTwo = $('[data-step="two"]');
+  // Waitlist: one modal. Email, then three short questions, then the thank-you view in the same dialog
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  var modal = $("#join-modal"), form = $(".join__form", modal);
+  var stepTwo = $(".join__step--two", modal), status = $(".form__status", form);
+  var submitTwo = $('[data-step="two"]', modal), stepOneBtn = $('[data-step="one"]', modal);
+  var formView = $(".modal__form", modal), doneView = $(".modal__done", modal);
   var messages = {
     email: "Enter a work email, like you@company.com.",
     company: "Enter your company name.",
@@ -269,12 +271,37 @@
     track("Form Start", { variant: variant });
   });
 
+  // The hero field is only a door into the modal: it checks the email, then opens with it filled in
+  var heroForm = $(".join__form--hero"), heroEmail = $("#hero-email"), heroError = $("#hero-email-error");
+  heroEmail.addEventListener("input", function () {
+    if (!heroError.hidden) { heroError.hidden = true; heroEmail.removeAttribute("aria-invalid"); }
+  });
+  heroForm.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var v = heroEmail.value.trim();
+    if (!EMAIL_RE.test(v)) {
+      heroError.textContent = messages.email; heroError.hidden = false;
+      heroEmail.setAttribute("aria-invalid", "true"); heroEmail.focus();
+      return;
+    }
+    openModal(v);
+  });
+
+  // The signup result, kept for the thank-you view and for the standalone /thanks page
+  var doneSignup = null;
+  var done = {
+    title: $('[data-done="title"]', doneView), lede: $('[data-done="lede"]', doneView),
+    emailed: $('[data-done="emailed"]', doneView), email: $('[data-done="email"]', doneView),
+    founding: $('[data-done="founding"]', doneView), questions: $('[data-done="questions"]', doneView),
+    call: $('[data-done="call"]', doneView), callLink: $('[data-done="call-link"]', doneView),
+    shareUrl: $('[data-done="share-url"]', doneView), share: $('[data-done="share"]', doneView)
+  };
+
   function openStepTwo() {
     stepTwo.hidden = false;
     stepTwo.style.animation = reduced ? "none" : "settle 600ms var(--ease-out) both";
-    var first = $(".join__row .btn");
-    first.innerHTML = "Change email";
-    first.classList.add("btn--quiet");
+    stepOneBtn.innerHTML = "Change email";
+    stepOneBtn.classList.add("btn--quiet");
     form.elements.company.focus({ preventScroll: true });
   }
   function busy(on) { submitTwo.disabled = on; $(".btn__label", submitTwo).textContent = on ? "Sending" : "Join the waitlist"; }
@@ -283,9 +310,46 @@
     status.textContent = msg + contact;
     busy(false);
   }
+
+  function openModal(prefill) {
+    if (!modal.open) modal.showModal();
+    root.classList.add("modal-open");
+    if (doneSignup) return;
+    var valid = !!prefill && EMAIL_RE.test(prefill.trim());
+    if (valid) {
+      form.elements.email.value = prefill.trim();
+      setError("email", "");
+      if (stepTwo.hidden) openStepTwo(); else form.elements.company.focus({ preventScroll: true });
+    } else {
+      (stepTwo.hidden ? form.elements.email : form.elements.company).focus({ preventScroll: true });
+    }
+  }
+  function closeModal() { modal.close(); }
+  modal.addEventListener("close", function () { root.classList.remove("modal-open"); });
+  modal.addEventListener("click", function (e) { if (e.target === modal) closeModal(); });
+  $$("[data-close]", modal).forEach(function (b) { b.addEventListener("click", closeModal); });
+
+  function showDone() {
+    var s = doneSignup;
+    formView.hidden = true;
+    doneView.hidden = false;
+    if (s.status === "exists") {
+      done.title.textContent = "You are already on the list.";
+      done.lede.textContent = "Good news: this email was already saved, so there is nothing more to do. We will write when your invite is ready.";
+    }
+    if (s.emailed && s.email) { done.email.textContent = s.email; done.emailed.hidden = false; }
+    if (s.founding) done.founding.hidden = false;
+    if (s.token) done.questions.hidden = false;
+    if (cfg.bookingUrl) { done.callLink.href = cfg.bookingUrl; done.call.hidden = false; }
+    // Share link, with attribution so referrals show up in the signups table.
+    var base = (cfg.siteUrl || location.origin).replace(/\/$/, "");
+    done.shareUrl.value = base + "/?utm_source=share&utm_medium=referral";
+    done.title.focus({ preventScroll: true });
+  }
   function finish(result, email) {
-    try { sessionStorage.setItem("qm-signup", JSON.stringify({ status: result.status, token: result.token || null, founding: !!result.founding, emailed: !!result.emailed, email: email })); } catch (e) {}
-    location.href = "/thanks";
+    doneSignup = { status: result.status, token: result.token || null, founding: !!result.founding, emailed: !!result.emailed, email: email };
+    try { sessionStorage.setItem("qm-signup", JSON.stringify(doneSignup)); } catch (e) {}
+    showDone();
   }
 
   form.addEventListener("submit", function (e) {
@@ -320,19 +384,46 @@
       .catch(function () { fail("We could not reach the server. Check your connection and try again."); });
   });
 
-  // Every "Join the waitlist" leads back to the one form at the top
-  function goToForm(prefill) {
-    $("#join").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
-    setTimeout(function () {
-      if (prefill && EMAIL_RE.test(prefill.trim())) {
-        form.elements.email.value = prefill.trim();
-        setError("email", "");
-        if (stepTwo.hidden) openStepTwo(); else form.elements.company.focus({ preventScroll: true });
-      } else {
-        (stepTwo.hidden ? form.elements.email : form.elements.company).focus({ preventScroll: true });
-      }
-    }, reduced ? 0 : 650);
+  // Optional answers after signup, using the one-time token from the signup
+  var answers = $(".answers", doneView), answersStatus = $(".answers .form__status", doneView), answersBtn = $(".answers .btn", doneView);
+  function postAnswers(body) {
+    return fetch("/api/answers", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(Object.assign({ token: doneSignup.token }, body)) })
+      .then(function (r) { return r.json().catch(function () { return { status: "error" }; }); });
   }
-  $$("[data-focus]").forEach(function (a) { a.addEventListener("click", function (e) { e.preventDefault(); goToForm(); }); });
-  $(".cta__form").addEventListener("submit", function (e) { e.preventDefault(); goToForm($("#cta-email").value); });
+  answers.addEventListener("submit", function (e) {
+    e.preventDefault();
+    var mrr = (answers.elements.mrr_range && answers.elements.mrr_range.value) || "";
+    var pain = answers.elements.pain_point.value.trim();
+    if (!mrr && !pain) { answersStatus.textContent = "Pick a range or write a line, or skip this. Both are optional."; return; }
+    answersStatus.textContent = "";
+    answersBtn.disabled = true;
+    postAnswers({ mrr_range: mrr || null, pain_point: pain || null }).then(function (r) {
+      if (r.status === "ok") {
+        track("Extra Answer", { mrr: mrr || "skipped", wrote: pain ? "yes" : "no" });
+        answers.hidden = true;
+        $(".answers__done", doneView).hidden = false;
+        return;
+      }
+      answersBtn.disabled = false;
+      answersStatus.textContent = "That did not save. Please try again.";
+    }).catch(function () { answersBtn.disabled = false; answersStatus.textContent = "We could not reach the server. Please try again."; });
+  });
+  done.callLink.addEventListener("click", function () {
+    track("Call Click");
+    if (doneSignup && doneSignup.token) postAnswers({ call_clicked: true }).catch(function () {});
+  });
+  done.share.addEventListener("click", function () {
+    var url = done.shareUrl.value;
+    var copied = function () { done.share.textContent = "Copied"; setTimeout(function () { done.share.textContent = "Copy link"; }, 2000); };
+    if (navigator.share && matchMedia("(pointer: coarse)").matches) {
+      navigator.share({ title: "Quillmarc", text: "Monthly investor updates, written from your Stripe numbers.", url: url }).catch(function () {});
+      return;
+    }
+    if (navigator.clipboard) navigator.clipboard.writeText(url).then(copied, function () { done.shareUrl.select(); });
+    else { done.shareUrl.select(); document.execCommand && document.execCommand("copy"); copied(); }
+  });
+
+  // Every "Join the waitlist" opens the modal; the footer field passes its email along
+  $$("[data-focus]").forEach(function (a) { a.addEventListener("click", function (e) { e.preventDefault(); openModal(); }); });
+  $(".cta__form").addEventListener("submit", function (e) { e.preventDefault(); openModal($("#cta-email").value); });
 })();

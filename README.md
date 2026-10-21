@@ -6,8 +6,8 @@ Static pages plus three dependency-free Vercel functions. No build step.
 
 | Path | What it is |
 | --- | --- |
-| `/` | Landing page with the two-step waitlist form and a headline A/B test |
-| `/thanks` | Confirms the spot, asks MRR range and the biggest headache, offers a call and a share link |
+| `/` | Landing page. The hero email opens a waitlist modal with the three questions, then a thank-you view (MRR range, biggest headache, call and share link) in the same dialog. Includes a headline A/B test |
+| `/thanks` | Standalone thank-you page, kept for old links. The signup flow no longer redirects here |
 | `/privacy`, `/terms` | Plain-English drafts. Review before launch. |
 | `/brand` | Brand guidelines. Unlisted and `noindex`. |
 | `/api/join` | Validates, rate limits, de-duplicates, stores the signup, sends the welcome email |

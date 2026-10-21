@@ -97,50 +97,13 @@
         <p class="hero__lede">Type five rough bullets. Quillmarc adds your live numbers, writes the update and sends it from your own domain.</p>
 
         <div class="join" id="join">
-          <form class="join__form" novalidate>
-            <div class="join__step join__step--one">
-              <label class="join__label" for="email">Your work email</label>
-              <div class="join__row">
-                <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254" placeholder="you@company.com" aria-describedby="join-legal">
-                <button class="btn btn--lg" type="submit" data-step="one">Join the waitlist<svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
-              </div>
-              <p class="field__error" id="email-error" hidden></p>
+          <form class="join__form join__form--hero" novalidate>
+            <label class="join__label" for="hero-email">Your work email</label>
+            <div class="join__row">
+              <input id="hero-email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254" placeholder="you@company.com" aria-describedby="hero-email-error join-legal">
+              <button class="btn btn--lg" type="submit">Join the waitlist<svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
             </div>
-
-            <div class="join__step join__step--two" hidden>
-              <p class="join__hello">Three quick answers so we invite the right founders first.</p>
-              <div class="field">
-                <label for="company">Company name</label>
-                <input id="company" name="company" type="text" autocomplete="organization" required maxlength="120">
-                <p class="field__error" id="company-error" hidden></p>
-              </div>
-              <fieldset class="field">
-                <legend>How many investors do you update?</legend>
-                <div class="chips">
-                  <label><input type="radio" name="investor_count" value="1-10" required><span>1–10</span></label>
-                  <label><input type="radio" name="investor_count" value="11-30"><span>11–30</span></label>
-                  <label><input type="radio" name="investor_count" value="31-100"><span>31–100</span></label>
-                  <label><input type="radio" name="investor_count" value="100+"><span>100+</span></label>
-                </div>
-                <p class="field__error" id="investor_count-error" hidden></p>
-              </fieldset>
-              <fieldset class="field">
-                <legend>How do you send updates today?</legend>
-                <div class="chips">
-                  <label><input type="radio" name="current_method" value="visible" required><span>Visible.vc</span></label>
-                  <label><input type="radio" name="current_method" value="plain_email"><span>Plain email</span></label>
-                  <label><input type="radio" name="current_method" value="other"><span>Other tool</span></label>
-                  <label><input type="radio" name="current_method" value="not_sending"><span>Not sending</span></label>
-                </div>
-                <p class="field__error" id="current_method-error" hidden></p>
-              </fieldset>
-              <div class="hp" aria-hidden="true">
-                <label for="qm-hp">Leave this field empty</label>
-                <input id="qm-hp" name="qm_hp" type="text" tabindex="-1" autocomplete="off">
-              </div>
-              <button class="btn btn--lg btn--block" type="submit" data-step="two"><span class="btn__label">Join the waitlist</span></button>
-              <p class="form__status" role="status" aria-live="polite"></p>
-            </div>
+            <p class="field__error" id="hero-email-error" hidden></p>
           </form>
 
           <p class="join__legal" id="join-legal">No card needed. One email when your invite is ready. <a href="/privacy">Privacy</a> and <a href="/terms">terms</a>.</p>
@@ -621,6 +584,119 @@
     </div>
     <div class="foot__giant" aria-hidden="true"><svg><use href="#qm-word"/></svg></div>
   </footer>
+
+  <dialog class="modal" id="join-modal" aria-labelledby="modal-title">
+    <button class="modal__close" type="button" data-close aria-label="Close">
+      <svg viewBox="0 0 16 16" aria-hidden="true"><path d="M4 4l8 8M12 4l-8 8" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>
+    </button>
+
+    <div class="modal__view modal__form">
+      <h2 class="modal__title" id="modal-title">Join the waitlist</h2>
+      <form class="join__form" novalidate>
+        <div class="join__step join__step--one">
+          <label class="join__label" for="email">Your work email</label>
+          <div class="join__row">
+            <input id="email" name="email" type="email" autocomplete="email" inputmode="email" required maxlength="254" placeholder="you@company.com" aria-describedby="email-error join-legal">
+            <button class="btn btn--lg" type="submit" data-step="one">Continue<svg aria-hidden="true"><use href="#i-arrow"/></svg></button>
+          </div>
+          <p class="field__error" id="email-error" hidden></p>
+        </div>
+
+        <div class="join__step join__step--two" hidden>
+          <p class="join__hello">Three quick answers so we invite the right founders first.</p>
+          <div class="field">
+            <label for="company">Company name</label>
+            <input id="company" name="company" type="text" autocomplete="organization" required maxlength="120">
+            <p class="field__error" id="company-error" hidden></p>
+          </div>
+          <fieldset class="field">
+            <legend>How many investors do you update?</legend>
+            <div class="chips">
+              <label><input type="radio" name="investor_count" value="1-10" required><span>1–10</span></label>
+              <label><input type="radio" name="investor_count" value="11-30"><span>11–30</span></label>
+              <label><input type="radio" name="investor_count" value="31-100"><span>31–100</span></label>
+              <label><input type="radio" name="investor_count" value="100+"><span>100+</span></label>
+            </div>
+            <p class="field__error" id="investor_count-error" hidden></p>
+          </fieldset>
+          <fieldset class="field">
+            <legend>How do you send updates today?</legend>
+            <div class="chips">
+              <label><input type="radio" name="current_method" value="visible" required><span>Visible.vc</span></label>
+              <label><input type="radio" name="current_method" value="plain_email"><span>Plain email</span></label>
+              <label><input type="radio" name="current_method" value="other"><span>Other tool</span></label>
+              <label><input type="radio" name="current_method" value="not_sending"><span>Not sending</span></label>
+            </div>
+            <p class="field__error" id="current_method-error" hidden></p>
+          </fieldset>
+          <div class="hp" aria-hidden="true">
+            <label for="qm-hp">Leave this field empty</label>
+            <input id="qm-hp" name="qm_hp" type="text" tabindex="-1" autocomplete="off">
+          </div>
+          <button class="btn btn--lg btn--block" type="submit" data-step="two"><span class="btn__label">Join the waitlist</span></button>
+          <p class="form__status" role="status" aria-live="polite"></p>
+        </div>
+      </form>
+      <p class="join__legal">No card needed. One email when your invite is ready. <a href="/privacy">Privacy</a> and <a href="/terms">terms</a>.</p>
+    </div>
+
+    <div class="modal__done" hidden>
+      <span class="thanks__icon" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
+      <h2 class="modal__title" data-done="title" tabindex="-1">You are on the list.</h2>
+      <p class="thanks__lede" data-done="lede">Your spot is saved. We invite founders in waves, and you will hear from us when yours is ready.</p>
+      <p class="thanks__email" data-done="emailed" hidden>We sent a short welcome email to <b data-done="email"></b>. If it is not in your inbox, check promotions or spam.</p>
+      <div class="founding thanks__founding" data-done="founding" hidden>
+        <p class="founding__t">Founding member price</p>
+        <p>You are one of the first 100 founders on the list. If you subscribe, you keep $29 a month for as long as you stay subscribed.</p>
+      </div>
+
+      <section class="thanks__card" data-done="questions" hidden aria-labelledby="done-q-title">
+        <h2 id="done-q-title">Two quick questions</h2>
+        <p class="thanks__hint">Optional. Your answers help us decide who to invite first and what to build first.</p>
+        <form class="answers" novalidate>
+          <fieldset class="field">
+            <legend>Your current MRR</legend>
+            <div class="chips chips--five">
+              <label><input type="radio" name="mrr_range" value="pre_revenue"><span>Pre-revenue</span></label>
+              <label><input type="radio" name="mrr_range" value="under_10k"><span>Under $10k</span></label>
+              <label><input type="radio" name="mrr_range" value="10k_50k"><span>$10k–$50k</span></label>
+              <label><input type="radio" name="mrr_range" value="50k_250k"><span>$50k–$250k</span></label>
+              <label><input type="radio" name="mrr_range" value="over_250k"><span>Over $250k</span></label>
+            </div>
+          </fieldset>
+          <div class="field">
+            <label for="pain">What is the most annoying part of your investor update today?</label>
+            <textarea id="pain" name="pain_point" rows="4" maxlength="1000" placeholder="For example: pulling the numbers, finding the time, knowing what to say"></textarea>
+          </div>
+          <button class="btn btn--lg" type="submit"><span class="btn__label">Save my answers</span></button>
+          <p class="form__status" role="status" aria-live="polite"></p>
+        </form>
+        <div class="answers__done" hidden>
+          <span class="thanks__icon thanks__icon--sm" aria-hidden="true"><svg><use href="#i-check"/></svg></span>
+          <p>Saved. Thank you. This shapes what we build first.</p>
+        </div>
+      </section>
+
+      <section class="thanks__card thanks__call" data-done="call" hidden aria-labelledby="done-call-title">
+        <div>
+          <h2 id="done-call-title">Have 15 minutes?</h2>
+          <p class="thanks__hint">Tell Jithu how you handle investor updates today. No pitch, just questions. It is the fastest way to get an early invite.</p>
+        </div>
+        <a class="btn btn--lg" data-done="call-link" href="#" target="_blank" rel="noopener">Book a 15 minute call<svg aria-hidden="true"><use href="#i-arrow"/></svg></a>
+      </section>
+
+      <section class="thanks__card thanks__share" aria-labelledby="done-share-title">
+        <div>
+          <h2 id="done-share-title">Know a founder who dreads their update?</h2>
+          <p class="thanks__hint">Send them the waitlist.</p>
+        </div>
+        <div class="share">
+          <input class="share__url" type="text" readonly aria-label="Link to share" data-done="share-url">
+          <button class="btn btn--quiet-outline share__btn" type="button" data-done="share">Copy link</button>
+        </div>
+      </section>
+    </div>
+  </dialog>
 
   <script src="/common.js"></script>
   <script src="/app.js"></script>
