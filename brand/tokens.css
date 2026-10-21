@@ -2,30 +2,36 @@
    Brand names first, then the role names every component uses. Components use roles only. */
 
 :root {
-  /* Brand palette, light */
-  --qm-paper: #F5F1E8;        /* surface: the ground */
-  --qm-paper-raised: #FBF9F4; /* raised: one tone step up */
-  --qm-ink: #16201C;
-  --qm-muted: #55605A;
-  --qm-green: #1D4A40;        /* brand deep green */
-  --qm-on-green: #F7F3EA;
-  --qm-hairline: #D8D0BE;     /* form fields, tables and product fragments only */
-  --qm-brass: #B8893A;        /* fills only, never text on light */
-  --qm-control: #868B82;      /* control borders: 3.1:1 on paper (was #8A8F86, 2.93:1) */
+  /* Sapphire Lounge palette, light */
+  --qm-ivory: #FAF8F5;        /* ground */
+  --qm-raised: #FFFFFF;       /* sheets, cards */
+  --qm-navy: #102542;         /* Midnight Navy: ink, and the deep stage fields */
+  --qm-muted: #4A5A72;        /* secondary text, 6.6:1 on ivory */
+  --qm-sapphire: #1E3A5F;     /* Sapphire: actions and links, 10.9:1 on ivory */
+  --qm-on-accent: #FAF8F5;
+  --qm-champagne: #D8C3A5;    /* tints and soft fills, never text on light */
+  --qm-hairline: #E8DFD0;     /* champagne hairline: fields, tables, product UI */
+  --qm-brass: #C79C5A;        /* Brass: the full stop and small fills, never text on light */
+  --qm-control: #8790A0;      /* control borders, 3.0:1 on ivory */
   --qm-error: #9B2C1F;
+  --qm-stage: #102542;        /* navy fields behind product and in closing panels */
+  --qm-on-stage: #FAF8F5;
 
   /* Roles */
-  --bg: var(--qm-paper);
-  --surface: var(--qm-paper-raised);
-  --ink: var(--qm-ink);
+  --bg: var(--qm-ivory);
+  --surface: var(--qm-raised);
+  --ink: var(--qm-navy);
   --muted: var(--qm-muted);
-  --accent: var(--qm-green);
-  --accent-ink: var(--qm-on-green);
+  --accent: var(--qm-sapphire);
+  --accent-ink: var(--qm-on-accent);
   --line: var(--qm-hairline);
   --brass: var(--qm-brass);
+  --champagne: var(--qm-champagne);
   --control: var(--qm-control);
   --error: var(--qm-error);
-  --focus: var(--qm-green);
+  --focus: var(--qm-sapphire);
+  --stage: var(--qm-stage);
+  --on-stage: var(--qm-on-stage);
 
   /* Type */
   --font-display: "Newsreader", "Iowan Old Style", Georgia, serif;
@@ -63,30 +69,36 @@
 
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme="light"]) {
-    --qm-paper: #0E1412;
-    --qm-paper-raised: #151C19;
-    --qm-ink: #EEE8DA;
-    --qm-muted: #A6AEA8;
-    --qm-green: #86BCAB;
-    --qm-on-green: #0E1412;
-    --qm-hairline: #2C3632;
-    --qm-brass: #D6AB5A;
-    --qm-control: #6B756F;
+    --qm-ivory: #0A1628;
+    --qm-raised: #102542;
+    --qm-navy: #FAF8F5;
+    --qm-muted: #A8B3C4;
+    --qm-sapphire: #D8C3A5;
+    --qm-on-accent: #102542;
+    --qm-champagne: #D8C3A5;
+    --qm-hairline: #22385A;
+    --qm-brass: #C79C5A;
+    --qm-control: #6B7C96;
     --qm-error: #F0A595;
+    --qm-stage: #1E3A5F;
+    --qm-on-stage: #FAF8F5;
     color-scheme: dark;
   }
 }
 
 :root[data-theme="dark"] {
-  --qm-paper: #0E1412;
-  --qm-paper-raised: #151C19;
-  --qm-ink: #EEE8DA;
-  --qm-muted: #A6AEA8;
-  --qm-green: #86BCAB;
-  --qm-on-green: #0E1412;
-  --qm-hairline: #2C3632;
-  --qm-brass: #D6AB5A;
-  --qm-control: #6B756F;
+  --qm-ivory: #0A1628;
+  --qm-raised: #102542;
+  --qm-navy: #FAF8F5;
+  --qm-muted: #A8B3C4;
+  --qm-sapphire: #D8C3A5;
+  --qm-on-accent: #102542;
+  --qm-champagne: #D8C3A5;
+  --qm-hairline: #22385A;
+  --qm-brass: #C79C5A;
+  --qm-control: #6B7C96;
   --qm-error: #F0A595;
+  --qm-stage: #1E3A5F;
+  --qm-on-stage: #FAF8F5;
   color-scheme: dark;
 }
