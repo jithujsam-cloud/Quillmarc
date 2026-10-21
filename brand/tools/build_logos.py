@@ -4,8 +4,9 @@ Run from the repo root:  python3 brand/tools/build_logos.py
 
 Two parts:
 - The wordmark (primary logo): "Quillmark" in Newsreader Regular, 72pt optical size,
-  outlined at 2000 units per em with -0.02em tracking (wordmark-path.txt), followed by a
-  brass square full stop.
+  outlined at 2000 units per em with -0.02em tracking (wordmark-path.txt, made by
+  outline_wordmark.py, which removes the dot of the "i"). A gold square takes the
+  dot's place.
 - The symbol: a pen-written Q. An outer circle minus a tilted inner ellipse gives the
   thick-thin stress of a broad nib; a tapered tail crosses the stroke and ends in the
   same square full stop (mark.json, on a 40-unit grid).
@@ -18,7 +19,7 @@ OUT = HERE.parents[1] / "assets" / "logo"
 WORD = (HERE / "wordmark-path.txt").read_text().strip()
 MARK = json.loads((HERE / "mark.json").read_text())
 WORD_W, CAP, XH, ASC, DESC = 8780.0, 1340.0, 852.0, 1470.0, 530.0
-DOT_K = 0.36  # full stop size as a share of x-height
+I_DOT = (2804.0, -1471.0, 268.0)  # the i dot's box in font units, from outline_wordmark.py
 
 INK, REVERSE, SAPPHIRE, NAVY, BRASS, PAPER = "#102542", "#FAF8F5", "#1E3A5F", "#102542", "#DDB040", "#FAF8F5"
 
@@ -51,15 +52,17 @@ def mark(ink, dot, tx=0.0, ty=0.0, s=1.0):
 
 
 def wordmark(ink, dot, cap):
-    """Returns (body, width, ascent, descent) with the baseline at y=0."""
+    """Returns (body, width, ascent, descent) with the baseline at y=0.
+
+    The dot of the "i" is replaced by the square full stop, centred where
+    Newsreader's own dot sits (I_DOT, in font units)."""
     s = cap / CAP
-    sq = XH * s * DOT_K
-    gap = cap * 0.06
+    x, y, size = I_DOT
     body = (
         f'<path transform="scale({s:.5f})" d="{WORD}" fill="{ink}"/>'
-        f'<rect x="{WORD_W * s + gap:.2f}" y="{-sq:.2f}" width="{sq:.2f}" height="{sq:.2f}" rx="{sq * 0.1:.2f}" fill="{dot}"/>'
+        f'<rect x="{x * s:.2f}" y="{y * s:.2f}" width="{size * s:.2f}" height="{size * s:.2f}" rx="{size * s * 0.1:.2f}" fill="{dot}"/>'
     )
-    return body, WORD_W * s + gap + sq, ASC * s, DESC * s * 0.8
+    return body, WORD_W * s, ASC * s, DESC * s * 0.8
 
 
 def write(name, content):
