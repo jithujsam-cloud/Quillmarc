@@ -14,6 +14,10 @@ Static pages plus three dependency-free Vercel functions. No build step.
 | `/api/answers` | Saves thank-you answers onto the same row, by one-time token |
 | `/config.js` | Public settings from env vars (served by `/api/config`) |
 
+## The app
+
+The founder app (Stripe metrics, editor, sending, tracking) is a separate Next.js project in `web/`. See `web/README.md`.
+
 ## Run locally
 
 ```sh

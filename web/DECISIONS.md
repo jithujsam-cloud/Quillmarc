@@ -1,0 +1,94 @@
+# Decisions: Quillmarc app
+
+Judgment calls made while building the MVP, October 21, 2026, each with a one-line reason.
+The marketing site's decisions live in `../DECISIONS.md`.
+
+## Project
+- **The repo held a static marketing site, not a Next.js project, so the app is a new Next.js app in `web/`.** The marketing site stays untouched and deploys as before; the app deploys as a second Vercel project with Root Directory `web`.
+- **Added `web` to the root `.vercelignore`.** The marketing deploy should not upload the app's source.
+- **Next.js 16.4 (App Router), React 19.2, Tailwind 4, TypeScript 5.9, Vitest 5.** `npm audit` flagged Next 15's bundled PostCSS and Vitest 3; the current majors fix that. TypeScript 7 and ESLint 10 were skipped as too new for the Next tooling.
+- **Remaining `npm audit` items are in ESLint's dev dependencies (braces).** They never ship to production and have no non-breaking fix.
+- **Next 16 renamed middleware to `src/proxy.ts`.** It refreshes the session cookie and sends signed-out visitors to `/login`.
+- **Stripe and Resend are called with `fetch`, not their SDKs.** Fewer dependencies, and tests can inject a fake `fetch`.
+- **Added only `@supabase/ssr`, `@supabase/supabase-js` and `server-only` as runtime dependencies.** Dev-only: `pg`, `tsx`, Playwright and axe for tests and the seed.
+- **Separate Supabase project from the waitlist.** The app's migrations live in `web/supabase/migrations`; mixing them with the waitlist table would couple two products.
+
+## Brand and UI
+- **Used the marketing site's current tokens (ivory, Midnight Navy, Sapphire, Gilt gold), not navy and green.** The site's own DECISIONS.md records the owner approved this palette after the green-era brief.
+- **Fonts: Newsreader (display), Hanken Grotesk (text), Geist Mono (figures), via `next/font`.** Same as the marketing site, self-hosted, no layout shift.
+- **Desktop layout follows the owner's mockup: sidebar with nav and Stripe status, editor on the left, live email preview on the right, top bar with Preview and Send.** Requested mid-build; phones keep a single column.
+- **Left out the mockup's MRR chart and Domain nav item.** History charts and own-domain sending are out of scope for this build.
+- **Emails stay light in dark mode.** Many mail apps force or ignore dark styles; a fixed light email reads the same everywhere.
+- **The email shows four headline figures; the hosted page shows all seven.** The email stays short; the page is the full update.
+
+## Auth
+- **Magic link with PKCE (`/auth/callback` exchanges the code), plus the `token_hash` flow.** Supabase's default, and the token-hash form works if the email template is customised later.
+- **Login rate limit: 10 per IP and 5 per email per 15 minutes, stored in Postgres.** In-memory limits do not work across serverless instances.
+- **Rate limits fail open if the database is down.** A database blip should not lock every founder out.
+
+## Data model and security
+- **Every table has `user_id` referencing `auth.users` with `on delete cascade`.** Simple RLS policies (`user_id = auth.uid()`) and "delete my data" is one call.
+- **Delete my data calls `auth.admin.deleteUser`.** The cascade removes profile, Stripe key, investors, updates, sends, events and suppressions immediately; a test proves it.
+- **The browser role gets column grants, not table grants.** Founders cannot read the encrypted key, write delivery records, clear an opt-out or set `test_sent_at` themselves; tests prove each.
+- **Sent updates are frozen by RLS (`status = 'draft'` on update).** What investors received cannot change afterwards.
+- **Added a `suppressions` table beside `investors.suppressed`.** A bounced address stays suppressed even if the investor is deleted and pasted in again.
+- **Hosted-page tokens are 32 random bytes (43 base64url characters), stored as-is.** 256 bits is unguessable; the email needs the raw token, and RLS hides it from other users.
+- **Stripe keys: AES-256-GCM, random 12-byte IV per key, stored as `v1:iv:tag:ciphertext`.** The version prefix allows key rotation later.
+- **One update per founder per month.** Picking a month that already has a draft opens it.
+- **Deleting an investor deletes their send history.** Simplest; the alternative is soft delete, which can come later.
+
+## Stripe
+- **Restricted keys only (`rk_live_` or `rk_test_`); `sk_` keys are refused outright.** A secret key always has full write access.
+- **Read check: one GET each for customers, subscriptions, prices, invoices and charges.**
+- **Write check: POST to update an object that does not exist (for example `cus_quillmarc_probe`) on seven resources. 403 means no write access; 404 means write access, so the key is refused.** It can never change anything. Not yet tried against a live Stripe key because none was available; verify with one key of each kind before onboarding founders.
+- **Stripe API version pinned to 2024-06-20, with `expand[]=data.discounts`.** Response shape cannot drift under us; the normaliser also reads newer shapes.
+- **Connect OAuth is an extension point in `src/lib/stripe/adapter.ts`, with no code.** Per the brief.
+- **Demo seed uses a `sample` connection method that returns fictional subscriptions.** Labelled "Sample data" on every screen, email and page that shows its figures.
+
+## Metrics
+- **All months in UTC.** One clear rule; founders in other zones see at most a few hours of difference at month edges.
+- **`active` and `past_due` count; `unpaid` is excluded with `incomplete`, `incomplete_expired` and `paused`.** Unpaid means revenue has stopped.
+- **Paused subscriptions are excluded from every month.** Stripe does not say when a pause began.
+- **A "once" discount lasts one billing interval.** It applies to one invoice.
+- **Main currency = most subscriptions counted this month or last.** Amounts in different currencies cannot be compared without exchange rates.
+- **Only five figures are editable; net new MRR and growth are always derived.** Fewer controls, and the figures cannot contradict each other.
+- **Month choices: this month (to date) and the 11 before it; default last month.** Founders usually report on the month just finished.
+
+## Editor and sending
+- **`/updates/new` picks the month, then the draft continues at `/updates/[id]/edit` in five steps.** The draft must exist to save edits between steps.
+- **Bullets are one textarea per group, one bullet per line, up to 10 per group and 500 characters each.**
+- **Test sends go to the founder's sign-in email and link to the founder-only preview.** A test should not create an investor token.
+- **The test gate does not reset when the draft is edited.** The brief asks for "a test has been sent for this update"; resetting would add friction for typo fixes.
+- **Send to investors needs a confirm step, and freezes the update.**
+- **Queue: one `sends` row per investor per update (unique pair), claimed with `FOR UPDATE SKIP LOCKED`, sent with idempotency key `send-<row id>`.** A crash at any point is retried without a second email; a test simulates a crash after the provider accepted.
+- **Rows stuck in "sending" for 2 minutes are reclaimed.** That is the crash window.
+- **Three attempts, then "failed". 600 ms between emails.** Stays under Resend's default rate limit.
+- **The queue runs right after Send (Next `after()`), and the status page keeps calling `/api/updates/[id]/process` while anything is queued.** Vercel has no long-running worker; this needs no extra service.
+- **Investors are re-checked just before each email.** Someone who opts out mid-send is skipped.
+- **"Send me a copy" is a separate email with key `copy-<update id>`, sent once after the queue drains.**
+- **Mock email provider unless `EMAIL_PROVIDER=resend`.** Tests and local runs can never send real email.
+- **Mock mode shows a "Simulate events" button on the status page, labelled as mock.** So the whole flow can be tried without Resend; it never appears when real email is on.
+
+## Tracking
+- **Reads are logged by a script on the hosted page after 1.5 seconds, not on the server render.** Link scanners fetch pages without running scripts, so they no longer count as reads.
+- **One read per investor per 30 minutes.** A reload is not a second read.
+- **The read endpoint answers 204 for any token.** It cannot be used to test whether a token exists.
+- **Opt-out from the email link needs a button press; the List-Unsubscribe header supports one-click POST (RFC 8058).** Scanners cannot unsubscribe people, and Gmail and Yahoo get the one-click they require.
+- **Transient bounces do not suppress.** A full mailbox is not a reason to stop forever.
+- **Events for test sends and founder copies are ignored.** They have no sends row.
+- **Added "failed" and "skipped" to the status list.** The table must be honest when an email never went out.
+- **Status order: opted out, marked as spam, bounced, read, opened, delivered, sent, queued.**
+- **"Last event" is the newest real event, or the queue time if nothing happened yet.**
+- **Webhook rate limit: 600 per minute per IP.** Generous for Resend bursts, still a cap.
+- **A webhook storage error returns 500.** Resend then retries; the svix-id makes the retry safe.
+
+## Pages
+- **Added `/investors` to manage the list after onboarding, and `/updates/[id]/preview` for the founder.** The brief requires an investor list and a hosted-page preview.
+- **Wrote app-specific `/privacy` and `/terms`.** The marketing site's pages cover only the waitlist and say so.
+- **App pages are `noindex`; hosted update pages also send `X-Robots-Tag: noindex` and `Referrer-Policy: no-referrer`.** Private links should not leak into search or referrer logs. This is why Lighthouse SEO reads 60 on those pages.
+- **Reply-to must pass a format check, must not be a no-reply address, and its domain must accept mail (MX, or A as fallback).** "Must be a real inbox" cannot be proved without sending, so this rejects the common mistakes.
+
+## Testing
+- **Integration tests run against a real Postgres plus PostgREST, started by the test setup, with a small Supabase stand-in for `auth`.** Docker was not available; this tests the real SQL, RLS and the real supabase-js calls.
+- **PostgREST is downloaded once into `.cache/bin` (Linux x64).** Tests skip with a message where that is not possible.
+- **The end-to-end test signs in by writing the session cookie, not by email.** The stand-in has no mail server; the magic link itself is Supabase's code.
