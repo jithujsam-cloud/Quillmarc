@@ -87,12 +87,13 @@ p, li { text-wrap: pretty; }
 .nav__links { display: flex; gap: 4px; margin: 0 auto; max-width: 0; opacity: 0; overflow: hidden; visibility: hidden; white-space: nowrap; transition: max-width 600ms cubic-bezier(0.22, 1, 0.36, 1), opacity 300ms ease, visibility 0s linear 300ms; }
 .nav__links a { padding: 8px 12px; border-radius: var(--r-control); font-size: 15px; color: var(--muted); transition: color var(--t-hover) ease, background-color var(--t-hover) ease; }
 .nav__links a:hover { color: var(--ink); background: var(--surface); }
+.nav .btn--sm { border-radius: 999px; padding: 0 18px; }
 .nav__end { display: flex; align-items: center; gap: 8px; margin-left: auto; }
 .nav__links ~ .nav__end { margin-left: 0; }
 
 /* Past the hero's first screen the bar becomes a floating pill with the menu */
 .nav.is-scrolled .nav__inner {
-  max-width: 880px; padding: 0 10px 0 22px;
+  max-width: min(880px, calc(100% - 2 * var(--margin))); padding: 0 10px 0 22px;
   background: color-mix(in srgb, var(--bg) 82%, transparent);
   backdrop-filter: saturate(160%) blur(16px); -webkit-backdrop-filter: saturate(160%) blur(16px);
   box-shadow: 0 0 0 1px var(--line), var(--shadow-md);
