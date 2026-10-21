@@ -20,7 +20,7 @@ MARK = json.loads((HERE / "mark.json").read_text())
 WORD_W, CAP, XH, ASC, DESC = 8780.0, 1340.0, 852.0, 1470.0, 530.0
 DOT_K = 0.36  # full stop size as a share of x-height
 
-INK, REVERSE, SAPPHIRE, NAVY, BRASS, PAPER = "#102542", "#FAF8F5", "#1E3A5F", "#102542", "#C79C5A", "#FAF8F5"
+INK, REVERSE, SAPPHIRE, NAVY, BRASS, PAPER = "#102542", "#FAF8F5", "#1E3A5F", "#102542", "#DDB040", "#FAF8F5"
 
 # (ink, full stop) per colourway
 WAYS = {
@@ -101,7 +101,7 @@ x, y, q = MARK["sq"]
 write(
     "favicon.svg",
     '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 40 40" width="32" height="32">'
-    "<style>.i{fill:#102542}.d{fill:#C79C5A}@media (prefers-color-scheme: dark){.i{fill:#FAF8F5}.d{fill:#C79C5A}}</style>"
+    "<style>.i{fill:#102542}.d{fill:#DDB040}@media (prefers-color-scheme: dark){.i{fill:#FAF8F5}.d{fill:#DDB040}}</style>"
     f'<path class="i" fill-rule="evenodd" d="{MARK["ring"]}"/><path class="i" d="{MARK["tail"]}"/>'
     f'<rect class="d" x="{x}" y="{y}" width="{q}" height="{q}" rx="0.5"/></svg>\n',
 )

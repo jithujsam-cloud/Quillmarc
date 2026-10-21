@@ -11,7 +11,7 @@
   --qm-on-accent: #FAF8F5;
   --qm-champagne: #D8C3A5;    /* tints and soft fills, never text on light */
   --qm-hairline: #E8DFD0;     /* champagne hairline: fields, tables, product UI */
-  --qm-brass: #C79C5A;        /* Brass: the full stop and small fills, never text on light */
+  --qm-brass: #DDB040;        /* Gilt gold: the full stop, fills, and text or buttons on navy only (7.6:1) */
   --qm-control: #8790A0;      /* control borders, 3.0:1 on ivory */
   --qm-error: #9B2C1F;
   --qm-stage: #102542;        /* navy fields behind product and in closing panels */
@@ -73,11 +73,11 @@
     --qm-raised: #102542;
     --qm-navy: #FAF8F5;
     --qm-muted: #A8B3C4;
-    --qm-sapphire: #D8C3A5;
+    --qm-sapphire: #DDB040;
     --qm-on-accent: #102542;
     --qm-champagne: #D8C3A5;
     --qm-hairline: #22385A;
-    --qm-brass: #C79C5A;
+    --qm-brass: #DDB040;
     --qm-control: #6B7C96;
     --qm-error: #F0A595;
     --qm-stage: #1E3A5F;
@@ -91,11 +91,11 @@
   --qm-raised: #102542;
   --qm-navy: #FAF8F5;
   --qm-muted: #A8B3C4;
-  --qm-sapphire: #D8C3A5;
+  --qm-sapphire: #DDB040;
   --qm-on-accent: #102542;
   --qm-champagne: #D8C3A5;
   --qm-hairline: #22385A;
-  --qm-brass: #C79C5A;
+  --qm-brass: #DDB040;
   --qm-control: #6B7C96;
   --qm-error: #F0A595;
   --qm-stage: #1E3A5F;

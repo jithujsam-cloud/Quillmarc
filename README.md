@@ -1,6 +1,6 @@
 # Quillmark waitlist
 
-Static landing page and brand guidelines for Quillmark (working name): monthly investor updates written from live Stripe data. Palette: Sapphire Lounge (Midnight Navy #102542, Sapphire #1E3A5F, Champagne #D8C3A5, Ivory #FAF8F5, Brass #C79C5A).
+Static landing page and brand guidelines for Quillmark (working name): monthly investor updates written from live Stripe data. Palette: Sapphire Lounge (Midnight Navy #102542, Sapphire #1E3A5F, Champagne #D8C3A5, Ivory #FAF8F5, Gilt gold #DDB040).
 
 No build step. `index.html`, `styles.css`, `app.js`, `config.js`, `brand/` and `assets/` deploy as-is.
 
