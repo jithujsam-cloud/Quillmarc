@@ -69,6 +69,23 @@
     }, { passive: true });
   }
 
+  // Feature tile: the finished sentence writes itself in when the tile scrolls into view
+  var tf = $(".transform"), tw = tf && $("[data-write]", tf);
+  if (tw && !reduced && "IntersectionObserver" in window) {
+    var ws = tw.textContent.trim().split(/\s+/);
+    tw.textContent = "";
+    ws.forEach(function (w, i) {
+      var sp = document.createElement("span");
+      sp.className = "tw"; sp.style.setProperty("--k", i); sp.textContent = w;
+      tw.appendChild(sp);
+      if (i < ws.length - 1) tw.appendChild(document.createTextNode(" "));
+    });
+    var wio = new IntersectionObserver(function (en) {
+      if (en[0].isIntersecting) { tf.classList.add("is-written"); wio.disconnect(); }
+    }, { threshold: 0.6 });
+    wio.observe(tf);
+  }
+
   // FAQ: answers open and close with a height animation instead of snapping
   $$(".faq details").forEach(function (d) {
     var sum = $("summary", d), anim = null, EASE = "cubic-bezier(0.22, 1, 0.36, 1)";
