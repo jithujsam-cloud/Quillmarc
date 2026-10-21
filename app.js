@@ -23,10 +23,13 @@
 
   // Hero entrance, in reading order
   $$(".rise").forEach(function (el, i) { el.style.setProperty("--i", i); });
+  // The "waking up" screen stays for at least 900ms so it reads as intentional, then the curtain lifts and the hero rises
   function loaded() { root.classList.add("is-loaded"); }
+  var wakeMin = reduced ? 0 : 900, wakeAt = Math.max(0, wakeMin - (performance.now ? performance.now() : 0));
+  function release() { setTimeout(loaded, wakeAt); }
   if (document.fonts && document.fonts.ready) {
-    Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 600); })]).then(loaded);
-  } else { loaded(); }
+    Promise.race([document.fonts.ready, new Promise(function (r) { setTimeout(r, 1500); })]).then(release);
+  } else { release(); }
 
   // Section reveals: the parts of each section arrive in order, once
   $$("section").forEach(function (s) { $$(".reveal", s).forEach(function (el, i) { el.style.setProperty("--i", i % 4); }); });
