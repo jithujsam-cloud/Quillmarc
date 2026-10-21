@@ -6,20 +6,20 @@
   var $ = function (s, el) { return (el || document).querySelector(s); };
   var $$ = function (s, el) { return Array.prototype.slice.call((el || document).querySelectorAll(s)); };
 
-  // Theme
-  $(".theme").addEventListener("click", function () {
-    var set = root.getAttribute("data-theme");
-    var dark = set ? set === "dark" : window.matchMedia("(prefers-color-scheme: dark)").matches;
-    var next = dark ? "light" : "dark";
-    root.setAttribute("data-theme", next);
-    try { localStorage.setItem("qm-theme", next); } catch (e) {}
-  });
+  var cfg = window.QUILLMARC_CONFIG || {};
+  var track = window.qmTrack || function () {};
 
-  // Nav hairline once scrolled
-  var nav = $(".nav");
-  function onScroll() { nav.classList.toggle("is-scrolled", window.scrollY > 8); }
-  window.addEventListener("scroll", onScroll, { passive: true });
-  onScroll();
+  // Headline test: the variant is chosen by the inline script under the h1, before first paint
+  var variant = root.getAttribute("data-variant") || "a";
+
+  // Optional founder photo, from FOUNDER_PHOTO_URL
+  var photo = $(".builder__photo");
+  if (photo && cfg.founderPhoto) {
+    var img = new Image();
+    img.alt = "Jithu Jobin Sam";
+    img.onload = function () { photo.innerHTML = ""; photo.appendChild(img); photo.classList.add("has-photo"); photo.removeAttribute("aria-hidden"); };
+    img.src = cfg.founderPhoto;
+  }
 
   // Hero entrance, in reading order
   $$(".rise").forEach(function (el, i) { el.style.setProperty("--i", i); });
@@ -87,6 +87,7 @@
       cross.setAttribute("x1", p[0]); cross.setAttribute("x2", p[0]);
       hot.setAttribute("cx", p[0]); hot.setAttribute("cy", p[1]);
       tip.style.left = (p[0] / w * 100) + "%"; tip.style.top = p[1] + "px";
+      tip.style.transform = "translate(" + (i === data.length - 1 ? "-100%" : i === 0 ? "0" : "-50%") + ", -110%)";
       tip.innerHTML = data[i][0] + "<b>" + money(data[i][1]) + "</b>";
     }
     host.addEventListener("pointermove", function (e) {
@@ -220,24 +221,22 @@
   });
   yours.addEventListener("input", function () { render(yourMonth(), true); });
 
-  // Waitlist: email first, then three short questions, then one insert into Supabase
-  var form = $(".join__form"), stepOne = $(".join__step--one"), stepTwo = $(".join__step--two");
-  var joined = $(".joined"), status = $(".form__status"), submitTwo = $('[data-step="two"]');
-  var config = window.QUILLMARC_CONFIG || {};
+  // Waitlist: email first, then three short questions, then one request to /api/join
+  var form = $(".join__form"), stepTwo = $(".join__step--two");
+  var status = $(".form__status"), submitTwo = $('[data-step="two"]');
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   var messages = {
     email: "Enter a work email, like you@company.com.",
     company: "Enter your company name.",
-    investor_count: "Choose how many investors you have.",
+    investor_count: "Choose how many investors you update.",
     current_method: "Choose how you send updates today."
   };
   function host(name) { var t = form.elements[name]; return t && t.length && !t.tagName ? t[0].closest("fieldset") : t; }
   function setError(name, msg) {
-    var el = document.getElementById(name + "-error"), h = name === "email" ? $(".join__row") : host(name);
+    var el = document.getElementById(name + "-error"), target = host(name);
     el.textContent = msg || ""; el.hidden = !msg;
-    var target = name === "email" ? form.elements.email : h;
     if (msg) { target.setAttribute("aria-invalid", "true"); target.setAttribute("aria-describedby", el.id); }
-    else { target.removeAttribute("aria-invalid"); target.removeAttribute("aria-describedby"); }
+    else { target.removeAttribute("aria-invalid"); if (name !== "email") target.removeAttribute("aria-describedby"); else target.setAttribute("aria-describedby", "join-legal"); }
   }
   function read() {
     return {
@@ -257,41 +256,38 @@
     return bad;
   }
   function focusField(n) { var el = form.elements[n]; (el.length && !el.tagName ? el[0] : el).focus(); }
-  form.addEventListener("input", function (e) {
-    var n = e.target.name;
-    if (messages[n] && !document.getElementById(n + "-error").hidden) check([n]);
+  ["input", "change"].forEach(function (type) {
+    form.addEventListener(type, function (e) {
+      var n = e.target.name;
+      if (messages[n] && !document.getElementById(n + "-error").hidden) check([n]);
+    });
   });
-  form.addEventListener("change", function (e) {
-    var n = e.target.name;
-    if (messages[n] && !document.getElementById(n + "-error").hidden) check([n]);
+  var started = false;
+  form.addEventListener("focusin", function () {
+    if (started) return;
+    started = true;
+    track("Form Start", { variant: variant });
   });
 
   function openStepTwo() {
     stepTwo.hidden = false;
     stepTwo.style.animation = reduced ? "none" : "settle 600ms var(--ease-out) both";
-    $(".join__row .btn").innerHTML = "Change email";
-    $(".join__row .btn").classList.add("btn--quiet");
+    var first = $(".join__row .btn");
+    first.innerHTML = "Change email";
+    first.classList.add("btn--quiet");
     form.elements.company.focus({ preventScroll: true });
   }
-  function busy(on) { submitTwo.disabled = on; $(".btn__label", submitTwo).textContent = on ? "Sending" : "Request my invite"; }
-  function done(email) {
-    $(".joined__email").textContent = email;
-    form.hidden = true; joined.hidden = false;
-    $(".joined__title").focus({ preventScroll: true });
+  function busy(on) { submitTwo.disabled = on; $(".btn__label", submitTwo).textContent = on ? "Sending" : "Join the waitlist"; }
+  function fail(msg) {
+    var contact = cfg.contactEmail ? " If it keeps happening, email " + cfg.contactEmail + "." : "";
+    status.textContent = msg + contact;
+    busy(false);
   }
-  function save(data) {
-    if (!config.supabaseUrl || !config.supabaseAnonKey) return Promise.reject(new Error("not_configured"));
-    var body = Object.assign({}, data, { referrer: document.referrer ? document.referrer.slice(0, 500) : null });
-    return fetch(config.supabaseUrl.replace(/\/$/, "") + "/rest/v1/waitlist", {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "apikey": config.supabaseAnonKey, "Authorization": "Bearer " + config.supabaseAnonKey, "Prefer": "return=minimal" },
-      body: JSON.stringify(body)
-    }).then(function (res) {
-      // 409 is a repeat email: already on the list, which counts as success.
-      if (res.ok || res.status === 409) return;
-      return res.text().then(function (t) { if (/23505|duplicate key/i.test(t)) return; throw new Error("http_" + res.status); });
-    });
+  function finish(result, email) {
+    try { sessionStorage.setItem("qm-signup", JSON.stringify({ status: result.status, token: result.token || null, founding: !!result.founding, emailed: !!result.emailed, email: email })); } catch (e) {}
+    location.href = "/thanks";
   }
+
   form.addEventListener("submit", function (e) {
     e.preventDefault();
     var which = e.submitter && e.submitter.dataset.step;
@@ -303,23 +299,31 @@
       return;
     }
     status.textContent = "";
-    if (form.elements.website.value) { done(read().email); return; } // honeypot
     var bad = check(["email", "company", "investor_count", "current_method"]);
     if (bad) { focusField(bad); return; }
-    var data = read();
-    busy(true);
-    save(data).then(function () { done(data.email); }).catch(function (err) {
-      if (err && err.message === "not_configured") console.warn("Quillmarc: set supabaseUrl and supabaseAnonKey in config.js to store submissions.");
-      status.textContent = "That did not go through. Please check your connection and try again.";
-      busy(false);
+    var data = Object.assign(read(), window.qmAttribution ? window.qmAttribution() : {}, {
+      variant: variant,
+      hp: form.elements.qm_hp.value
     });
+    busy(true);
+    fetch("/api/join", { method: "POST", headers: { "Content-Type": "application/json" }, body: JSON.stringify(data) })
+      .then(function (res) { return res.json().catch(function () { return { status: "error" }; }).then(function (j) { j.http = res.status; return j; }); })
+      .then(function (r) {
+        if (r.status === "ok" || r.status === "exists") {
+          track("Signup", { variant: variant, investors: data.investor_count, tool: data.current_method, result: r.status });
+          return finish(r, data.email);
+        }
+        if (r.status === "invalid" && r.field && messages[r.field]) { setError(r.field, messages[r.field]); focusField(r.field); return busy(false); }
+        if (r.status === "rate_limited") return fail("Too many tries from this connection. Please wait a few minutes and try again.");
+        fail("That did not go through on our side. Please try again in a minute.");
+      })
+      .catch(function () { fail("We could not reach the server. Check your connection and try again."); });
   });
 
   // Every "Join the waitlist" leads back to the one form at the top
   function goToForm(prefill) {
     $("#join").scrollIntoView({ behavior: reduced ? "auto" : "smooth", block: "center" });
     setTimeout(function () {
-      if (!joined.hidden) return;
       if (prefill && EMAIL_RE.test(prefill.trim())) {
         form.elements.email.value = prefill.trim();
         setError("email", "");

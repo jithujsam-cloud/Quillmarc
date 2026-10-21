@@ -3,4 +3,9 @@
 skills-lock.json
 supabase
 brand/tools
+scripts
 README.md
+AUDIT.md
+DECISIONS.md
+.env.example
+.env.local

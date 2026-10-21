@@ -1,2 +1,7 @@
 User-agent: *
+Allow: /
 Disallow: /brand
+Disallow: /thanks
+Disallow: /api/
+
+Sitemap: https://quillmarc.vercel.app/sitemap.xml

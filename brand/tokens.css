@@ -16,9 +16,8 @@
   --qm-error: #9B2C1F;
   --qm-stage: #102542;        /* navy fields behind product and in closing panels */
   --qm-on-stage: #FAF8F5;
-  /* Dot grid for navy fields: pale gold points, 22px apart. A paler gold than --brass,
-     because saturated gold at low opacity turns olive against navy. */
-  --dots: radial-gradient(circle at 1.5px 1.5px, rgba(236, 206, 128, 0.32) 1.2px, transparent 1.8px);
+  /* Dot grid for navy fields: faint off-white points, 22px apart */
+  --dots: radial-gradient(circle at 1px 1px, rgba(250, 248, 245, 0.12) 1px, transparent 0);
   --dots-size: 22px 22px;
 
   /* Roles */

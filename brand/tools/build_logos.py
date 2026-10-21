@@ -149,7 +149,7 @@ write(
 
 # Inline the same wordmark into the site and the brand page, so the page logo never drifts from the files
 sym, _ = inline_symbol()
-for page in (HERE.parents[1] / "index.html", HERE.parents[1] / "brand" / "index.html"):
+for page in [HERE.parents[1] / n for n in ("index.html", "thanks.html", "privacy.html", "terms.html", "404.html")] + [HERE.parents[1] / "brand" / "index.html"]:
     html = page.read_text()
     html, n = re.subn(r'<symbol id="qm-word".*?</symbol>', lambda m: sym, html, flags=re.S)
     if n == 1:

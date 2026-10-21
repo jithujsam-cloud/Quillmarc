@@ -1,2 +1,5 @@
 .taste-skill/
 __pycache__/
+.env.local
+.env
+node_modules/
