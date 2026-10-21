@@ -467,9 +467,8 @@ fieldset[aria-invalid="true"] .chips span { border-color: var(--error); }
 .compare__row [role="rowheader"] { font: 400 20px/1.3 var(--font-display); letter-spacing: -0.01em; }
 .compare__row > .compare__us { background: var(--tint); color: var(--ink); display: flex; gap: 12px; align-items: flex-start; }
 .compare__us svg { flex: none; width: 20px; height: 20px; margin-top: 2px; color: var(--accent); }
-.compare__row--head > span { padding-top: 18px; padding-bottom: 18px; font: 600 14px/1.3 var(--font-text); color: var(--muted); }
-.compare__row--head > .compare__us { color: var(--accent); align-items: center; }
-.compare__row--head .compare__us svg { width: 22px; height: 22px; margin: 0; color: var(--ink); }
+.compare__row--head > span { padding-top: 18px; padding-bottom: 18px; font: 600 15px/1.3 var(--font-text); color: var(--ink); }
+.compare__row--head > .compare__us { color: var(--accent); }
 .compare sup a { color: var(--accent); text-decoration: none; padding: 0 2px; }
 .compare__note { margin-top: 16px; font-size: 14px; color: var(--muted); max-width: 70ch; }
 .compare__note a { color: inherit; text-decoration: underline; text-underline-offset: 3px; }
