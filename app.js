@@ -114,7 +114,8 @@
   function finishStage() { words.forEach(function (w) { w.classList.add("on"); }); }
   if (reduced) { finishStage(); }
   else {
-    var texts = bullets.map(function (b) { var t = b.textContent; b.textContent = ""; return t; });
+    // Each bullet keeps its finished height while it types, so nothing below it jumps
+    var texts = bullets.map(function (b) { var t = b.textContent; b.style.minHeight = b.offsetHeight + "px"; b.textContent = ""; return t; });
     $$(".stage .num[data-count]").forEach(function (el) {
       var to = +el.dataset.count, pre = el.dataset.prefix || "", t0 = null;
       el.textContent = pre + "0";
