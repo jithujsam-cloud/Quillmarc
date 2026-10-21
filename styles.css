@@ -546,9 +546,10 @@ fieldset[aria-invalid="true"] .chips span { border-color: var(--error); }
 
 .foot { padding: clamp(72px, 8vw, 112px) 0 40px; }
 .foot__inner { display: grid; grid-template-columns: 1fr auto; gap: 24px 48px; align-items: start; }
-.foot__logo { width: 122px; height: 28px; color: var(--ink); }
-.foot__brand p { margin-top: 12px; color: var(--muted); font-size: 15px; }
-.foot__links { display: flex; flex-wrap: wrap; gap: 6px 24px; font-size: 15px; }
+.foot__logo { width: 210px; height: 48px; color: var(--ink); }
+.foot__line { margin-top: 22px; max-width: 22em; font: 400 clamp(22px, 2.2vw, 28px)/1.25 var(--font-display); letter-spacing: -0.015em; color: var(--ink); text-wrap: balance; }
+.foot__sub { margin-top: 10px; max-width: 34em; color: var(--muted); font-size: 15px; }
+.foot__links { display: flex; flex-wrap: wrap; gap: 6px 24px; font-size: 15px; align-self: end; padding-bottom: 6px; }
 .foot__links a { color: var(--muted); transition: color var(--t-hover) ease; }
 .foot__links a:hover { color: var(--ink); }
 .foot__small { grid-column: 1 / -1; padding-top: 24px; border-top: 1px solid var(--line); font-size: 13px; color: var(--muted); }
