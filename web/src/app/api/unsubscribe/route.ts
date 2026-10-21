@@ -1,3 +1,4 @@
+import { env } from "@/lib/env";
 import { NextResponse, type NextRequest } from "next/server";
 import { adminClient } from "@/lib/supabase/admin";
 import { optOut } from "@/lib/tracking";
@@ -15,6 +16,6 @@ export async function POST(request: NextRequest) {
 // A person who opens the header link in a browser gets the confirm page.
 export async function GET(request: NextRequest) {
   const token = request.nextUrl.searchParams.get("token") ?? "";
-  const url = new URL(isWellFormedToken(token) ? `/u/${token}/stop` : "/", request.nextUrl.origin);
+  const url = new URL(isWellFormedToken(token) ? `/u/${token}/stop` : "/", env.appUrl());
   return NextResponse.redirect(url);
 }

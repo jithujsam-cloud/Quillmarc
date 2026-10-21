@@ -1,3 +1,4 @@
+import { env } from "@/lib/env";
 import { NextResponse, type NextRequest } from "next/server";
 import type { EmailOtpType } from "@supabase/supabase-js";
 import { createUserClient } from "@/lib/supabase/server";
@@ -14,5 +15,5 @@ export async function GET(request: NextRequest) {
   if (code) ok = !(await supabase.auth.exchangeCodeForSession(code)).error;
   else if (tokenHash && type) ok = !(await supabase.auth.verifyOtp({ token_hash: tokenHash, type })).error;
 
-  return NextResponse.redirect(new URL(ok ? "/dashboard" : "/login?error=link", url.origin));
+  return NextResponse.redirect(new URL(ok ? "/dashboard" : "/login?error=link", env.appUrl()));
 }

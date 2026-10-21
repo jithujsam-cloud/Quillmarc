@@ -9,6 +9,7 @@ import { randomBytes } from "node:crypto";
 import fs from "node:fs";
 import path from "node:path";
 import { makeSession, startStack } from "./lib/stack.mjs";
+import { FAKE, startFakeStripe } from "./lib/fake-stripe.mjs";
 
 const root = path.resolve(import.meta.dirname, "..");
 const port = Number(process.env.PORT ?? 3100);
@@ -19,6 +20,8 @@ if (!stack) {
   console.error("Could not start the local stack. It needs Postgres server binaries and PostgREST (downloaded on first run, Linux x64).");
   process.exit(1);
 }
+
+const fakeStripe = await startFakeStripe(55436);
 
 const env = {
   ...process.env,
@@ -33,6 +36,11 @@ const env = {
   CONTACT_EMAIL: "privacy@example.test",
   EMAIL_PROVIDER: "mock",
   SEED_USER_EMAIL: "demo@example.com",
+  // Connect with Stripe against the fake Stripe above. Never set these two bases in production.
+  STRIPE_CONNECT_CLIENT_ID: FAKE.clientId,
+  STRIPE_SECRET_KEY: FAKE.secretKey,
+  STRIPE_CONNECT_BASE: "http://127.0.0.1:55436/oauth",
+  STRIPE_API_BASE: "http://127.0.0.1:55436/v1",
 };
 
 // Async on purpose: the gateway runs in this process and must keep serving while the seed calls it.
@@ -52,6 +60,7 @@ console.log(`\nApp: ${appUrl}  (mock email, sample Stripe data)\nSession for the
 
 const stop = async () => {
   next.kill();
+  fakeStripe.close();
   await stack.stop();
   process.exit(0);
 };

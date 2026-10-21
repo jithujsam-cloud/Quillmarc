@@ -8,6 +8,7 @@ import { env } from "../env";
 import { parseInvestorList } from "../investors";
 import { domainAcceptsMail } from "../mx";
 import { validateRestrictedKey } from "../stripe/restricted-key";
+import { deauthorize } from "../stripe/connect";
 import { adminClient } from "../supabase/admin";
 import { rateLimit } from "../rate-limit";
 import { cleanText, isEmail, isNoReplyAddress, isUuid, normalizeEmail } from "../validate";
@@ -30,12 +31,15 @@ export async function connectStripe(_prev: FormState, form: FormData): Promise<F
   const check = await validateRestrictedKey(key);
   if (!check.ok) return { error: check.error };
 
+  await revokeConnect(user.id);
   const { error } = await adminClient()
     .from("stripe_connections")
     .upsert(
       {
         user_id: user.id,
         method: "restricted_key",
+        stripe_account_id: null,
+        account_name: null,
         encrypted_key: encrypt(key, env.encryptionKey()),
         key_mode: check.mode,
         key_last4: check.last4,
@@ -50,9 +54,17 @@ export async function connectStripe(_prev: FormState, form: FormData): Promise<F
   redirect(safeNext(form.get("next"), "/onboarding?step=2"));
 }
 
+/** If the founder linked Stripe with Connect, revoke Quillmarc's access on Stripe's side too. */
+async function revokeConnect(userId: string): Promise<void> {
+  const cfg = env.stripeConnect();
+  const { data } = await adminClient().from("stripe_connections").select("method, stripe_account_id").eq("user_id", userId).maybeSingle();
+  if (cfg && data?.method === "oauth" && data.stripe_account_id) await deauthorize(cfg, data.stripe_account_id);
+}
+
 export async function disconnectStripe(): Promise<void> {
   const { user } = await requireUser();
-  // Deletes the row, and with it the encrypted key.
+  await revokeConnect(user.id);
+  // Deletes the row, and with it the encrypted key or the account id.
   await adminClient().from("stripe_connections").delete().eq("user_id", user.id);
   revalidatePath("/", "layout");
   redirect("/settings?done=disconnected");
@@ -122,6 +134,7 @@ export async function saveSender(_prev: FormState, form: FormData): Promise<Form
 export async function deleteAccount(_prev: FormState, form: FormData): Promise<FormState> {
   const { supabase, user } = await requireUser();
   if (String(form.get("confirm") ?? "").trim().toUpperCase() !== "DELETE") return { error: "Type DELETE to confirm." };
+  await revokeConnect(user.id);
   // Deleting the auth user cascades to every table: profile, Stripe key, investors, updates, sends, events, suppressions.
   const { error } = await adminClient().auth.admin.deleteUser(user.id);
   if (error) return { error: "Could not delete your data. Try again, or email us." };

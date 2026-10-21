@@ -4,9 +4,10 @@ import type { BillingSource } from "./adapter";
 import { normalizeSubscription } from "./normalize";
 import type { BillingData, NormalizedSubscription } from "./types";
 
-const API = "https://api.stripe.com/v1";
+// STRIPE_API_BASE is for the local test stack only. Leave it unset everywhere else.
+export const API = process.env.STRIPE_API_BASE ?? "https://api.stripe.com/v1";
 // Pinned so the response shape does not change under us.
-const STRIPE_VERSION = "2024-06-20";
+export const STRIPE_VERSION = "2024-06-20";
 const MAX_PAGES = 100;
 
 export type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
@@ -85,6 +86,30 @@ export async function validateRestrictedKey(raw: string, fetchImpl: FetchLike = 
   return format;
 }
 
+/**
+ * Read every subscription. `key` is a restricted key, or the platform key when `account` is set
+ * (Stripe Connect). With `account`, Stripe limits the request to what the founder granted: read_only.
+ */
+export async function fetchSubscriptions(opts: { key: string; account?: string; fetchImpl?: FetchLike; kind: StripeFetchError["kind"] }): Promise<BillingData> {
+  const fetchImpl = opts.fetchImpl ?? fetch;
+  const h: Record<string, string> = { Authorization: `Bearer ${opts.key}`, "Stripe-Version": STRIPE_VERSION };
+  if (opts.account) h["Stripe-Account"] = opts.account;
+  const subscriptions: NormalizedSubscription[] = [];
+  let startingAfter: string | null = null;
+  for (let page = 0; page < MAX_PAGES; page++) {
+    const params = new URLSearchParams({ limit: "100", status: "all" });
+    params.append("expand[]", "data.discounts");
+    if (startingAfter) params.set("starting_after", startingAfter);
+    const res = await fetchImpl(`${API}/subscriptions?${params}`, { headers: h });
+    if (!res.ok) throw new StripeFetchError(res.status, opts.kind);
+    const body = (await res.json()) as { data: Record<string, unknown>[]; has_more: boolean };
+    for (const s of body.data) subscriptions.push(normalizeSubscription(s));
+    if (!body.has_more || body.data.length === 0) break;
+    startingAfter = String(body.data[body.data.length - 1].id);
+  }
+  return { subscriptions, sample: false };
+}
+
 export class RestrictedKeySource implements BillingSource {
   method = "restricted_key" as const;
 
@@ -93,30 +118,22 @@ export class RestrictedKeySource implements BillingSource {
     private readonly fetchImpl: FetchLike = fetch,
   ) {}
 
-  async fetchBillingData(): Promise<BillingData> {
-    const subscriptions: NormalizedSubscription[] = [];
-    let startingAfter: string | null = null;
-    for (let page = 0; page < MAX_PAGES; page++) {
-      const params = new URLSearchParams({ limit: "100", status: "all" });
-      params.append("expand[]", "data.discounts");
-      if (startingAfter) params.set("starting_after", startingAfter);
-      const res = await this.fetchImpl(`${API}/subscriptions?${params}`, { headers: headers(this.key) });
-      if (!res.ok) throw new StripeFetchError(res.status);
-      const body = (await res.json()) as { data: Record<string, unknown>[]; has_more: boolean };
-      for (const s of body.data) subscriptions.push(normalizeSubscription(s));
-      if (!body.has_more || body.data.length === 0) break;
-      startingAfter = String(body.data[body.data.length - 1].id);
-    }
-    return { subscriptions, sample: false };
+  fetchBillingData(): Promise<BillingData> {
+    return fetchSubscriptions({ key: this.key, fetchImpl: this.fetchImpl, kind: "key" });
   }
 }
 
 /** Carries only the HTTP status, never the response body. */
 export class StripeFetchError extends Error {
-  constructor(public readonly status: number) {
+  constructor(
+    public readonly status: number,
+    public readonly kind: "key" | "connect" = "key",
+  ) {
     super(
-      status === 401
-        ? "Stripe no longer accepts this key. Connect Stripe again in Settings."
+      status === 401 || (kind === "connect" && status === 403)
+        ? kind === "connect"
+          ? "Stripe access was removed. Connect Stripe again in Settings."
+          : "Stripe no longer accepts this key. Connect Stripe again in Settings."
         : status === 403
           ? "This key is missing a read permission. Check the key's permissions in Stripe."
           : "Stripe returned an error. Try again in a minute.",

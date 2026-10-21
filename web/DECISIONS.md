@@ -42,7 +42,15 @@ The marketing site's decisions live in `../DECISIONS.md`.
 - **Read check: one GET each for customers, subscriptions, prices, invoices and charges.**
 - **Write check: POST to update an object that does not exist (for example `cus_quillmarc_probe`) on seven resources. 403 means no write access; 404 means write access, so the key is refused.** It can never change anything. Not yet tried against a live Stripe key because none was available; verify with one key of each kind before onboarding founders.
 - **Stripe API version pinned to 2024-06-20, with `expand[]=data.discounts`.** Response shape cannot drift under us; the normaliser also reads newer shapes.
-- **Connect OAuth is an extension point in `src/lib/stripe/adapter.ts`, with no code.** Per the brief.
+- **Connect with Stripe (OAuth, `read_only` scope) is built, beside the pasted key.** The owner asked for the full Stripe connection; one click is easier for founders than making a restricted key.
+- **Connect stores only the account id, never Stripe's tokens.** Requests use the platform key plus a `Stripe-Account` header, and Stripe holds them to read only.
+- **A grant with any scope but `read_only` is refused.**
+- **The OAuth state is a random token in a 10-minute httpOnly cookie, tied to the signed-in founder.** A stranger cannot link their Stripe account to someone else's Quillmarc account.
+- **Disconnect, switching to a key, and delete all revoke Connect access on Stripe's side too.**
+- **The button shows only when `STRIPE_CONNECT_CLIENT_ID` and `STRIPE_SECRET_KEY` are set.** Without them the app falls back to the pasted key, so nothing breaks before Connect is set up.
+- **`STRIPE_API_BASE` and `STRIPE_CONNECT_BASE` exist for the local test stack's fake Stripe only.** The browser test runs the full Connect round trip without touching Stripe.
+- **Every redirect uses `APP_URL`, not the request's host.** The host can differ from `APP_URL` (localhost versus 127.0.0.1, or a Vercel alias), and the sign-in cookie belongs to `APP_URL`.
+- **The restricted-key check was run against a real Stripe sandbox key on October 21: five reads returned 200, seven write probes returned 403, and the key was accepted.** The key was used in memory only, never written to the repo.
 - **Demo seed uses a `sample` connection method that returns fictional subscriptions.** Labelled "Sample data" on every screen, email and page that shows its figures.
 
 ## Metrics

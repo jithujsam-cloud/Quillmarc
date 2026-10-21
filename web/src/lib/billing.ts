@@ -5,6 +5,7 @@ import { calculateMetrics, type MetricsResult } from "./metrics";
 import type { BillingSource } from "./stripe/adapter";
 import { RestrictedKeySource, StripeFetchError } from "./stripe/restricted-key";
 import { SampleSource } from "./stripe/sample";
+import { ConnectAccountSource } from "./stripe/connect";
 import { adminClient } from "./supabase/admin";
 
 export class NotConnectedError extends Error {
@@ -15,9 +16,14 @@ export class NotConnectedError extends Error {
 }
 
 async function billingSourceFor(userId: string): Promise<BillingSource> {
-  const { data } = await adminClient().from("stripe_connections").select("method, encrypted_key").eq("user_id", userId).maybeSingle();
+  const { data } = await adminClient().from("stripe_connections").select("method, encrypted_key, stripe_account_id").eq("user_id", userId).maybeSingle();
   if (!data) throw new NotConnectedError();
   if (data.method === "sample") return new SampleSource();
+  if (data.method === "oauth") {
+    const connect = env.stripeConnect();
+    if (!connect || !data.stripe_account_id) throw new NotConnectedError();
+    return new ConnectAccountSource(connect.secretKey, data.stripe_account_id);
+  }
   if (!data.encrypted_key) throw new NotConnectedError();
   return new RestrictedKeySource(decrypt(data.encrypted_key, env.encryptionKey()));
 }

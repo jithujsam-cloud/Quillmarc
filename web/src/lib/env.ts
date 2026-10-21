@@ -17,6 +17,11 @@ export const env = {
   contactEmail: () => process.env.CONTACT_EMAIL ?? "",
   resendApiKey: () => required("RESEND_API_KEY"),
   resendWebhookSecret: () => required("RESEND_WEBHOOK_SECRET"),
+  /** Stripe Connect is on only when both are set. Otherwise founders paste a restricted key. */
+  stripeConnect: () =>
+    process.env.STRIPE_CONNECT_CLIENT_ID && process.env.STRIPE_SECRET_KEY
+      ? { clientId: process.env.STRIPE_CONNECT_CLIENT_ID, secretKey: process.env.STRIPE_SECRET_KEY, redirectUri: `${required("APP_URL").replace(/\/+$/, "")}/api/stripe/callback` }
+      : null,
   /** Real email goes out only when EMAIL_PROVIDER is exactly "resend". Anything else uses the mock. */
   emailProvider: (): "resend" | "mock" => (process.env.EMAIL_PROVIDER === "resend" ? "resend" : "mock"),
 };

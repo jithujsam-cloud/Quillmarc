@@ -14,7 +14,8 @@ export interface ProfileRow {
 export interface StripeConnectionRow {
   id: string;
   user_id: string;
-  method: "restricted_key" | "sample";
+  method: "restricted_key" | "sample" | "oauth";
+  account_name: string | null;
   key_mode: "test" | "live" | null;
   key_last4: string | null;
   status: "connected" | "error";

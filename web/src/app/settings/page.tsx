@@ -1,7 +1,9 @@
 import type { Metadata } from "next";
 import { AppShell } from "@/components/app-shell";
 import { SenderForm } from "@/components/forms/sender-form";
-import { StripeKeyForm } from "@/components/forms/stripe-key-form";
+import { connectionLabel, StripeConnectPanel } from "@/components/forms/stripe-connect-panel";
+import { env } from "@/lib/env";
+import { connectMessage } from "@/lib/stripe/connect-messages";
 import { requireUser } from "@/lib/auth";
 import { disconnectStripe } from "@/lib/actions/setup";
 import { formatDateTime } from "@/lib/format";
@@ -10,10 +12,11 @@ import { DeleteForm } from "./delete-form";
 
 export const metadata: Metadata = { title: "Settings" };
 
-export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ done?: string }> }) {
+export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ done?: string; stripe?: string }> }) {
   const { supabase, user } = await requireUser();
   const { profile, connection } = await getSetupState(supabase, user.id);
-  const { done } = await searchParams;
+  const { done, stripe } = await searchParams;
+  const connectAvailable = Boolean(env.stripeConnect());
 
   return (
     <AppShell>
@@ -40,31 +43,30 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         )}
         {connection ? (
           <div className="mt-4 space-y-4">
+            {connectMessage(stripe) && (
+              <p className={connectMessage(stripe)!.ok ? "text-ok" : "error"} role="status">
+                {connectMessage(stripe)!.text}
+              </p>
+            )}
             <p>
-              {connection.method === "sample" ? (
-                "Connected to sample data from the demo seed."
-              ) : (
-                <>
-                  Connected with a {connection.key_mode === "test" ? "test mode" : "live"} restricted key ending <span className="num">{connection.key_last4}</span>.
-                </>
-              )}
+              {connectionLabel(connection)}
               {connection.last_checked_at && <> Last read {formatDateTime(connection.last_checked_at)}.</>}
             </p>
             {connection.status === "error" && <p className="notice">{connection.last_error}</p>}
             <form action={disconnectStripe}>
               <button className="btn btn-secondary">Disconnect Stripe</button>
             </form>
-            <p className="hint">Disconnecting deletes the stored key at once. Sent updates stay as they are.</p>
+            <p className="hint">Disconnecting removes Quillmarc&apos;s access at once: the stored key is deleted, or the Stripe Connect link is revoked. Sent updates stay as they are.</p>
             <details>
-              <summary className="cursor-pointer text-accent">Replace the key</summary>
+              <summary className="cursor-pointer text-accent">Connect a different Stripe account</summary>
               <div className="mt-4">
-                <StripeKeyForm next="/settings" />
+                <StripeConnectPanel from="settings" connectAvailable={connectAvailable} next="/settings" />
               </div>
             </details>
           </div>
         ) : (
           <div className="mt-4">
-            <StripeKeyForm next="/settings" />
+            <StripeConnectPanel from="settings" connectAvailable={connectAvailable} code={stripe} next="/settings" />
           </div>
         )}
       </section>

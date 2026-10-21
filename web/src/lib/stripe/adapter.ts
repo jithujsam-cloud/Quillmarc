@@ -4,12 +4,11 @@
 // Methods:
 //   restricted_key  Phase 1. The founder pastes a read-only restricted key. (restricted-key.ts)
 //   sample          Labeled demo data for the seed account. (sample.ts)
-//   oauth           Later: Stripe Connect with the read_only scope. Add a source here that
-//                   holds the connected account id and calls the API with the platform key
-//                   plus a Stripe-Account header. Nothing else needs to change.
+//   oauth           Stripe Connect with the read_only scope. The founder clicks "Connect with
+//                   Stripe" and approves on Stripe's page. (connect.ts)
 import type { BillingData } from "./types";
 
-export type ConnectionMethod = "restricted_key" | "sample";
+export type ConnectionMethod = "restricted_key" | "sample" | "oauth";
 
 export interface BillingSource {
   method: ConnectionMethod;

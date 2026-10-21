@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { redirect } from "next/navigation";
 import { AppShell } from "@/components/app-shell";
-import { StripeKeyForm } from "@/components/forms/stripe-key-form";
+import { connectionLabel, StripeConnectPanel } from "@/components/forms/stripe-connect-panel";
+import { env } from "@/lib/env";
 import { InvestorPasteForm } from "@/components/forms/investor-paste-form";
 import { SenderForm } from "@/components/forms/sender-form";
 import { requireUser } from "@/lib/auth";
@@ -12,10 +13,11 @@ export const metadata: Metadata = { title: "Set up" };
 
 const STEPS = ["Connect Stripe", "Add investors", "Sender details"] as const;
 
-export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ step?: string }> }) {
+export default async function OnboardingPage({ searchParams }: { searchParams: Promise<{ step?: string; stripe?: string }> }) {
   const { supabase, user } = await requireUser();
   const state = await getSetupState(supabase, user.id);
-  const requested = Number((await searchParams).step);
+  const sp = await searchParams;
+  const requested = Number(sp.step);
   const step = ([1, 2, 3].includes(requested) ? requested : state.nextStep ?? 1) as 1 | 2 | 3;
   if (!requested && state.nextStep === null) redirect("/dashboard");
 
@@ -45,19 +47,19 @@ export default async function OnboardingPage({ searchParams }: { searchParams: P
         {step === 1 &&
           (state.connection ? (
             <div className="space-y-4">
-              <p>
-                Stripe is connected{state.connection.method === "sample" ? " with sample data" : state.connection.key_last4 ? <> with the key ending <span className="num">{state.connection.key_last4}</span></> : ""}.
-              </p>
+              {sp.stripe === "connected" && <p className="text-ok" role="status">Stripe is connected.</p>}
+              <p>{connectionLabel(state.connection)}</p>
               <Link href="/onboarding?step=2" className="btn">
                 Continue
               </Link>
             </div>
           ) : (
-            <StripeKeyForm next="/onboarding?step=2" />
+            <StripeConnectPanel from="onboarding" connectAvailable={Boolean(env.stripeConnect())} code={sp.stripe} next="/onboarding?step=2" />
           ))}
 
         {step === 2 && (
           <div className="space-y-6">
+            {sp.stripe === "connected" && <p className="text-ok" role="status">Stripe is connected with read-only access.</p>}
             {state.investorCount > 0 && (
               <p>
                 You have <span className="num">{state.investorCount}</span> {state.investorCount === 1 ? "investor" : "investors"}.{" "}
