@@ -3,7 +3,7 @@
 // example.com, and one sent update from two months ago with sample delivery events.
 //
 // Usage:  SEED_USER_EMAIL=you@yourdomain.com npm run seed
-// Needs NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY (from .env.local or the shell).
+// Reads NEXT_PUBLIC_SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY from .env.local.
 // Safe to run twice: it reuses the user and skips what already exists.
 import { createClient } from "@supabase/supabase-js";
 import { randomBytes } from "node:crypto";
