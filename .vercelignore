@@ -1,12 +1,13 @@
-.claude
-.taste-skill
-skills-lock.json
-supabase
-brand/tools
-scripts
-README.md
-AUDIT.md
-DECISIONS.md
-.env.example
-.env.local
-web
+# Applies to every Vercel project built from this repo, including the app in web/.
+# Leading slashes keep these to the marketing site's top level, so web/ is never stripped.
+/.claude
+/.taste-skill
+/skills-lock.json
+/supabase
+/brand/tools
+/scripts
+/README.md
+/AUDIT.md
+/DECISIONS.md
+/.env.example
+/.env.local

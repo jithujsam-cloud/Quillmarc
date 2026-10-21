@@ -5,7 +5,7 @@ The marketing site's decisions live in `../DECISIONS.md`.
 
 ## Project
 - **The repo held a static marketing site, not a Next.js project, so the app is a new Next.js app in `web/`.** The marketing site stays untouched and deploys as before; the app deploys as a second Vercel project with Root Directory `web`.
-- **Added `web` to the root `.vercelignore`.** The marketing deploy should not upload the app's source.
+- **The root `.vercelignore` uses leading slashes, and the marketing site redirects `/web/*` to `/`.** Vercel applies the root `.vercelignore` to every project in the repo, so ignoring `web` there emptied the app's build; the redirect keeps the app's source off the marketing site.
 - **Next.js 16.4 (App Router), React 19.2, Tailwind 4, TypeScript 5.9, Vitest 5.** `npm audit` flagged Next 15's bundled PostCSS and Vitest 3; the current majors fix that. TypeScript 7 and ESLint 10 were skipped as too new for the Next tooling.
 - **Remaining `npm audit` items are in ESLint's dev dependencies (braces).** They never ship to production and have no non-breaking fix.
 - **Next 16 renamed middleware to `src/proxy.ts`.** It refreshes the session cookie and sends signed-out visitors to `/login`.
