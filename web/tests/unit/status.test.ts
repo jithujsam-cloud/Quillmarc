@@ -41,6 +41,9 @@ describe("deriveStatus", () => {
     expect(r.status).toBe("sent");
     expect(r.delayed).toBe(true);
     expect(r.lastEventAt).toBe("2026-10-02T09:05:00.000Z");
+    // A row created after its events (seeded or re-queued) still shows the event time.
+    expect(d([ev("delivered", "2026-10-02T09:00:03Z")], { createdAt: "2026-10-20T00:00:00Z" }).lastEventAt).toBe("2026-10-02T09:00:03.000Z");
+    expect(d([], { sendStatus: "queued", sentAt: null }).lastEventAt).toBe("2026-10-02T08:59:00.000Z");
   });
 });
 

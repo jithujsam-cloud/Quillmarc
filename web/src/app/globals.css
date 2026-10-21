@@ -17,6 +17,9 @@
   --warn-bg: #FBF1D6;
   --warn-ink: #5C4209;
   --tint: #F1EBDD;
+  --stack-display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
+  --stack-sans: var(--font-hanken), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --stack-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
   color-scheme: light;
 }
 
@@ -71,28 +74,30 @@
   --color-error: var(--error);
   --color-ok: var(--ok);
   --color-tint: var(--tint);
-  --font-display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
-  --font-sans: var(--font-hanken), system-ui, -apple-system, "Segoe UI", sans-serif;
-  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+  --font-display: var(--stack-display);
+  --font-sans: var(--stack-sans);
+  --font-mono: var(--stack-mono);
 }
 
 html { background: var(--bg); }
 body {
   background: var(--bg);
   color: var(--ink);
-  font-family: var(--font-sans);
+  font-family: var(--stack-sans);
   font-size: 17px;
   line-height: 1.55;
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
 }
-h1, h2, h3 { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; line-height: 1.15; text-wrap: balance; }
+h1, h2, h3 { font-family: var(--stack-display); font-weight: 400; letter-spacing: -0.01em; line-height: 1.15; text-wrap: balance; }
 p, li { text-wrap: pretty; }
-a { color: var(--accent); text-underline-offset: 3px; }
+@layer base {
+  a { color: var(--accent); text-decoration: underline; text-underline-offset: 3px; }
+}
 ::selection { background: var(--accent); color: var(--accent-ink); }
 :focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
 
-.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.num { font-family: var(--stack-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 .skip { position: absolute; left: 16px; top: -60px; z-index: 50; background: var(--accent); color: var(--accent-ink); padding: 10px 16px; border-radius: 6px; }
 .skip:focus { top: 12px; }
 
@@ -100,7 +105,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
 .btn {
   display: inline-flex; align-items: center; justify-content: center; gap: 8px;
   min-height: 44px; padding: 0 18px;
-  font: 500 16px/1 var(--font-sans); white-space: nowrap; text-decoration: none;
+  font: 500 16px/1 var(--stack-sans); white-space: nowrap; text-decoration: none;
   color: var(--accent-ink); background: var(--accent);
   border: 1px solid var(--accent); border-radius: 8px; cursor: pointer;
   transition: filter 200ms ease, transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
@@ -121,7 +126,7 @@ a { color: var(--accent); text-underline-offset: 3px; }
   width: 100%; min-height: 44px; padding: 10px 12px;
   background: var(--surface); color: var(--ink);
   border: 1px solid var(--control); border-radius: 8px;
-  font: 400 16px/1.4 var(--font-sans);
+  font: 400 16px/1.4 var(--stack-sans);
 }
 textarea.field { min-height: 120px; resize: vertical; }
 .field:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }

@@ -34,7 +34,7 @@ test("founder sends an update and sees statuses", async ({ page, context }) => {
 
   // Preview.
   await expect(page.getByRole("heading", { name: "Preview" })).toBeVisible();
-  const email = page.frameLocator('iframe[title="Email preview"]');
+  const email = page.frameLocator('iframe[title="Email preview"]:visible');
   await expect(email.getByText("Closed our largest annual plan")).toBeVisible();
   await expect(email.getByText("Adjusted by founder")).toBeVisible();
   await page.getByRole("link", { name: "Continue" }).click();
@@ -75,10 +75,12 @@ test("founder sends an update and sees statuses", async ({ page, context }) => {
 test("hosted page logs a read, and the investor can opt out", async ({ page, context, request }) => {
   const saved = await signIn(context);
   const admin = createClient(saved.supabaseUrl, saved.serviceKey, { auth: { persistSession: false } });
-  // The seeded August update: pick an investor who has not read it yet.
-  const { data: sends } = await admin.from("sends").select("id, token, investor_name, update_id").order("investor_name");
-  const target = sends![0];
-  const before = await admin.from("events").select("id", { count: "exact", head: true }).eq("send_id", target.id).eq("type", "read");
+  // Pick an investor with no read yet, so the read we expect is the one this test causes.
+  const { data: sends } = await admin.from("sends").select("id, token, investor_name, update_id").eq("status", "sent").order("investor_name");
+  const { data: reads } = await admin.from("events").select("send_id").eq("type", "read");
+  const readIds = new Set((reads ?? []).map((r) => r.send_id));
+  const target = sends!.find((s) => !readIds.has(s.id))!;
+  const before = { count: 0 };
 
   // A fresh browser with no session, like an investor.
   const investor = await context.browser()!.newContext();

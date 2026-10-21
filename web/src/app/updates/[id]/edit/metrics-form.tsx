@@ -11,6 +11,8 @@ export interface EditableFigure extends Figure {
   /** The current value, same unit. */
   currentInput: string;
   calculatedDisplay: string;
+  /** A short line under the figure, like the change versus last month. */
+  sub?: string;
 }
 
 export function MetricsForm({ id, figures }: { id: string; figures: EditableFigure[] }) {
@@ -21,26 +23,27 @@ export function MetricsForm({ id, figures }: { id: string; figures: EditableFigu
   return (
     <form action={action} className="space-y-4" noValidate>
       <input type="hidden" name="id" value={id} />
-      <ul className="space-y-3">
+      <ul className="grid gap-3 sm:grid-cols-2">
         {figures.map((f) => {
           const open = editing[f.key] || Boolean(fe[f.key]);
           return (
-            <li key={f.key} className="card p-4 sm:p-5">
-              <div className="flex flex-wrap items-start justify-between gap-3">
-                <div>
-                  <p className="text-[15px] text-muted">{f.label}</p>
-                  <p className="num mt-1 text-3xl">{f.display}</p>
-                  <div className="mt-2 flex flex-wrap gap-2">
-                    {f.adjusted && <span className="badge">Adjusted by founder</span>}
-                    {f.estimated && <span className="badge badge-quiet">Estimated</span>}
-                  </div>
-                </div>
+            <li key={f.key} className={`card p-4 ${open ? "sm:col-span-2" : ""}`}>
+              <div className="flex min-h-9 items-center justify-between gap-3">
+                <p className="text-[15px] text-muted">{f.label}</p>
                 {f.editable && !open && (
                   <button type="button" className="btn btn-secondary btn-sm" onClick={() => setEditing((e) => ({ ...e, [f.key]: true }))} aria-label={`Edit ${f.label}`}>
                     Edit
                   </button>
                 )}
               </div>
+              <p className="num text-[28px] leading-tight">{f.display}</p>
+              {f.sub && <p className="num mt-1 text-[14px] text-muted">{f.sub}</p>}
+              {(f.adjusted || f.estimated) && (
+                <div className="mt-2 flex flex-wrap gap-2">
+                  {f.adjusted && <span className="badge">Adjusted by founder</span>}
+                  {f.estimated && <span className="badge badge-quiet">Estimated</span>}
+                </div>
+              )}
               {f.editable && open && (
                 <div className="mt-4">
                   <label htmlFor={`adj-${f.key}`} className="label">

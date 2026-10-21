@@ -47,7 +47,8 @@ const ms = (iso: string) => new Date(iso).getTime();
 export function deriveStatus(input: StatusInput): DerivedStatus {
   const has = (t: EventType) => input.events.some((e) => e.type === t);
   const times = input.events.map((e) => ms(e.occurredAt));
-  const latest = Math.max(ms(input.createdAt), input.sentAt ? ms(input.sentAt) : 0, ...times);
+  // The newest real event. Queue time only when nothing has happened yet.
+  const latest = times.length || input.sentAt ? Math.max(input.sentAt ? ms(input.sentAt) : 0, ...times) : ms(input.createdAt);
 
   const deliveredAt = input.events.filter((e) => e.type === "delivered").map((e) => ms(e.occurredAt));
   const opens = input.events.filter((e) => e.type === "opened").map((e) => ms(e.occurredAt));

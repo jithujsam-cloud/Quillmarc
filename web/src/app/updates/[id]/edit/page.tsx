@@ -54,12 +54,45 @@ export default async function EditUpdatePage({ params, searchParams }: { params:
   }));
   const recipientCount = recipients.filter((r) => r.checked && !r.blocked).length;
 
-  return (
-    <AppShell>
-      <p className="hint">
-        <Link href="/dashboard">Updates</Link> / Draft
+  const from = `${content.founderName} via Quillmarc <updates@${env.sendingDomain()}>`;
+  const previewEmail = renderUpdateEmail(content, { greetingName: "[first name]", readUrl: `${env.appUrl()}/updates/${update.id}/preview`, unsubscribeUrl: "#" });
+  const previewPane = (
+    <div className="card overflow-hidden">
+      <dl className="grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 border-b border-line px-4 py-3 text-[15px]">
+        <dt className="text-muted">From</dt>
+        <dd className="truncate">{from}</dd>
+        <dt className="text-muted">Subject</dt>
+        <dd>{previewEmail.subject}</dd>
+      </dl>
+      <iframe title="Email preview" sandbox="" className="h-[640px] w-full bg-[#FAF7EF] lg:h-[calc(100dvh-220px)]" srcDoc={previewEmail.html} />
+    </div>
+  );
+
+  const topBar = (
+    <div className="mx-auto flex w-full max-w-6xl flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6 lg:px-10">
+      <p className="text-[15px] text-muted">
+        <Link href="/dashboard">Updates</Link> / <span className="text-ink">{content.monthLabel}</span>
       </p>
-      <h1 className="mt-2 text-4xl">{content.monthLabel}</h1>
+      <div className="flex flex-wrap items-center gap-3">
+        <span className="hidden items-center gap-2 text-[14px] text-muted sm:inline-flex">
+          <span aria-hidden="true" className="size-1.5 rounded-full bg-ok" />
+          Draft saved
+        </span>
+        <Link href={`/updates/${update.id}/preview`} className="btn btn-secondary btn-sm no-underline">
+          Preview
+        </Link>
+        <Link href={`/updates/${update.id}/edit?step=send`} className="btn btn-sm no-underline">
+          Send to {recipientCount} {recipientCount === 1 ? "investor" : "investors"}
+        </Link>
+      </div>
+    </div>
+  );
+
+  return (
+    <AppShell width="full" topBar={topBar}>
+      <div className="lg:grid lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:gap-10">
+      <div>
+      <h1 className="text-4xl">{content.monthLabel}</h1>
       {m?.monthToDate && <p className="mt-2 text-muted">This month is still running. The numbers are month to date.</p>}
 
       <nav aria-label="Update steps" className="mt-6">
@@ -133,17 +166,8 @@ export default async function EditUpdatePage({ params, searchParams }: { params:
               This is the email, with a sample greeting. The button opens each investor&apos;s own page.{" "}
               <Link href={`/updates/${update.id}/preview`}>See the hosted page</Link>.
             </p>
-            <div className="card mt-6 overflow-hidden">
-              <p className="border-b border-line px-4 py-3 text-[15px]">
-                <span className="text-muted">Subject:</span> {renderUpdateEmail(content, { greetingName: "", readUrl: "" }).subject}
-              </p>
-              <iframe
-                title="Email preview"
-                sandbox=""
-                className="h-[640px] w-full bg-[#FAF7EF]"
-                srcDoc={renderUpdateEmail(content, { greetingName: "[first name]", readUrl: `${env.appUrl()}/updates/${update.id}/preview`, unsubscribeUrl: "#" }).html}
-              />
-            </div>
+            <div className="mt-6 lg:hidden">{previewPane}</div>
+            <p className="mt-6 hidden text-muted lg:block">The email is shown on the right.</p>
             <Link href={`/updates/${update.id}/edit?step=recipients`} className="btn mt-6">
               Continue
             </Link>
@@ -173,6 +197,14 @@ export default async function EditUpdatePage({ params, searchParams }: { params:
         <input type="hidden" name="id" value={update.id} />
         <button className="link-btn text-[15px]">Delete this draft</button>
       </form>
+      </div>
+      <aside aria-label="Live preview" className="hidden lg:block">
+        <div className="sticky top-24">
+          <p className="mb-3 text-[14px] font-medium text-muted">Preview</p>
+          {previewPane}
+        </div>
+      </aside>
+      </div>
     </AppShell>
   );
 }
@@ -187,8 +219,12 @@ function editableFigures(update: UpdateRow): EditableFigure[] {
   return figures(m, update.adjustments_json).map((f) => {
     const editable = (EDITABLE_KEYS as string[]).includes(f.key);
     const calc = calculated.find((c) => c.key === f.key)!;
+    const byKey = (k: string) => figures(m, update.adjustments_json).find((x) => x.key === k)!;
+    const sub =
+      f.key === "mrr" ? `${byKey("growthPercent").display} vs last month` : f.key === "netNewMrr" ? `Last month ${byKey("previousMrr").display}` : f.key === "customers" ? `+${byKey("newCustomers").display} new, ${byKey("churnedCustomers").display} churned` : undefined;
     return {
       ...f,
+      sub,
       editable,
       calculatedDisplay: calc.display,
       calculatedInput: editable ? toInput(f.key as EditableKey, m[f.key as EditableKey], m.currency) : "",
