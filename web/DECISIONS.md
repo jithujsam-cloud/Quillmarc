@@ -15,10 +15,10 @@ The marketing site's decisions live in `../DECISIONS.md`.
 
 ## Brand and UI
 - **Rebuilt every screen with the taste skill's app-screen rules (October 21, owner's request: "the overall UI does not look good").** Style dealt: accent ladder (seed 1271542462), with Quillmarc's own palette kept.
-- **Accent ladder: Sapphire at full strength only on small marks** (the one filled button style, the read marks, the active nav icon); its pale tints carry areas. Gilt gold stays in the logo only. The skill bans a second accent family.
+- **Accent ladder: Sapphire at full strength only on small marks** (the one filled button style, the read marks, the active nav icon); its pale tints carry areas. Gilt gold is the accent in dark, as on the landing page. The skill bans a second accent family.
 - **Shell: ruled T-frame.** A 232px sidebar (wordmark, company, nav, Stripe status, account) and a 64px top bar (breadcrumb, this screen's actions, theme switch) on one ground, divided by 1px rules. On phones the sidebar folds into a full-screen menu.
 - **Light, dark and match-system, switchable from the top bar, Settings and the investor page.** Saved per device in `localStorage` (same key as the marketing site) and set before first paint, so there is no flash.
-- **Dark is a true neutral dark, not navy.** The skill's study found navy or slate dark themes read as templates; elevation is by lightness steps.
+- **The app uses the landing page's colours (October 21, owner's request: "the web app isn't following the same design colours as the landing page").** Ivory ground, champagne hairlines and Midnight Navy ink in light; the brand's deep navy with Gilt gold as the accent in dark, as in `brand/tokens.css`. This replaces the earlier cool-grey light theme and neutral-black dark theme.
 - **One grotesk (Hanken Grotesk) for the app, with tabular figures. Newsreader (serif) has one job: the letter investors read.** Geist Mono dropped: the skill allows monospace only for IDs or code, and mono commas looked wide at large sizes.
 - **App titles are 24px nouns with a one-line finding underneath** ("August: 2 of 6 investors read it"), not display headlines.
 - **Signature element: the read strip.** One mark per investor, Sapphire at three intensities (read, opened, delivered), so "who read it" is seen at a glance on the dashboard and the status page.
