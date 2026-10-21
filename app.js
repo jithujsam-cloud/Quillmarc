@@ -40,6 +40,22 @@
     reveals.forEach(function (el) { el.classList.add("is-in"); });
   }
 
+  // Scroll motion: a progress bar, and the hero product drifts slower than the page
+  if (!reduced) {
+    var bar = document.createElement("div");
+    bar.className = "progress"; bar.setAttribute("aria-hidden", "true");
+    document.body.appendChild(bar);
+    var heroStage = $(".hero .stage"), ticking = false;
+    function onScroll() {
+      ticking = false;
+      var y = window.scrollY, max = root.scrollHeight - window.innerHeight;
+      bar.style.setProperty("--p", max > 0 ? Math.min(1, y / max).toFixed(4) : 0);
+      if (heroStage && y < window.innerHeight * 1.5) heroStage.style.translate = "0 " + (y * 0.08).toFixed(1) + "px";
+    }
+    window.addEventListener("scroll", function () { if (!ticking) { ticking = true; requestAnimationFrame(onScroll); } }, { passive: true });
+    onScroll();
+  }
+
   // The product stage is drawn at 1088px and scaled to fit, like a screenshot that stays sharp
   var stage = $(".stage");
   function fitStage() {

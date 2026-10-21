@@ -778,10 +778,45 @@ html.modal-open { overflow: hidden; }
 
 /* Motion */
 
-.js .rise { opacity: 0; transform: translateY(16px); }
-.js .is-loaded .rise, .js.is-loaded .rise { opacity: 1; transform: none; transition: opacity 900ms ease, transform 1100ms var(--ease-out); transition-delay: calc(var(--i, 0) * 90ms); }
-.js .reveal { opacity: 0; transform: translateY(24px); }
-.js .reveal.is-in { opacity: 1; transform: none; transition: opacity 800ms ease, transform 1000ms var(--ease-out); transition-delay: calc(var(--i, 0) * 80ms); }
+/* Springs: a linear() curve that overshoots and settles, with a bezier fallback */
+:root {
+  --spring: cubic-bezier(0.34, 1.4, 0.64, 1);
+  --spring-soft: cubic-bezier(0.22, 1.2, 0.36, 1);
+}
+@supports (transition-timing-function: linear(0, 1)) {
+  :root {
+    --spring: linear(0, 0.009, 0.035 2.1%, 0.141 4.4%, 0.723 12.9%, 0.938 16.7%, 1.017 19.7%, 1.077 22.8%, 1.121 26.2%, 1.149 30.2%, 1.159 34.8%, 1.134 41.5%, 1.056 51%, 1.016 56.5%, 0.994 62.7%, 0.987 70%, 0.998 85%, 1);
+    --spring-soft: linear(0, 0.006, 0.025 2.8%, 0.101 6.1%, 0.539 18.9%, 0.721 25.3%, 0.849 31.5%, 0.937 38.1%, 0.968 41.8%, 0.991 45.7%, 1.006 50.1%, 1.015 55%, 1.017 63.9%, 1.001);
+  }
+}
+
+.js .rise { opacity: 0; transform: translateY(24px) scale(0.98); filter: blur(8px); }
+.js .is-loaded .rise, .js.is-loaded .rise {
+  opacity: 1; transform: none; filter: none;
+  transition: opacity 700ms ease, transform 1300ms var(--spring-soft), filter 700ms ease, translate 120ms linear;
+  transition-delay: calc(var(--i, 0) * 90ms), calc(var(--i, 0) * 90ms), calc(var(--i, 0) * 90ms), 0ms;
+}
+.js .reveal { opacity: 0; transform: translateY(40px) scale(0.96); filter: blur(6px); }
+.js .reveal.is-in {
+  opacity: 1; transform: none; filter: none;
+  transition: opacity 600ms ease, transform 1200ms var(--spring-soft), filter 600ms ease, translate 500ms var(--spring), box-shadow 300ms ease;
+  transition-delay: calc(var(--i, 0) * 80ms), calc(var(--i, 0) * 80ms), calc(var(--i, 0) * 80ms), 0ms, 0ms;
+}
+
+/* Hover and press: cards lift on a spring, buttons squash */
+@media (hover: hover) {
+  .js .tile.is-in:hover, .js .step.is-in:hover, .js .stat.is-in:hover, .js .price-card.is-in:hover { translate: 0 -6px; }
+}
+.btn { transition: transform 500ms var(--spring), filter var(--t-hover) ease; }
+.btn:hover { transform: translateY(-1px) scale(1.03); }
+.btn:active { transform: scale(0.95); transition-duration: 120ms; }
+.btn:hover svg { transform: translateX(4px); transition-timing-function: var(--spring); }
+.faq__icon { transition-timing-function: var(--spring); }
+
+/* Scroll progress and parallax */
+.progress { position: fixed; top: 0; left: 0; right: 0; height: 3px; z-index: 60; background: var(--accent); transform: scaleX(var(--p, 0)); transform-origin: left; pointer-events: none; }
+.js .stage { will-change: translate; }
+
 .js .stage .w { opacity: 0.0; transition: opacity 500ms ease; }
 .js .stage .w.on { opacity: 1; }
 
@@ -798,7 +833,8 @@ html.modal-open { overflow: hidden; }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
-  .js .rise, .js .reveal, .js .stage .w { opacity: 1 !important; transform: none !important; transition: none !important; }
+  .js .rise, .js .reveal, .js .stage .w { opacity: 1 !important; transform: none !important; filter: none !important; translate: none !important; transition: none !important; }
+  .progress { display: none; }
   *, *::before, *::after { animation-duration: 1ms !important; animation-iteration-count: 1 !important; transition-duration: 1ms !important; }
 }
 
