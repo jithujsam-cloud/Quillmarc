@@ -20,3 +20,17 @@ export const env = {
   /** Real email goes out only when EMAIL_PROVIDER is exactly "resend". Anything else uses the mock. */
   emailProvider: (): "resend" | "mock" => (process.env.EMAIL_PROVIDER === "resend" ? "resend" : "mock"),
 };
+
+/** Settings every page needs. Missing ones are listed by name (never value) on a setup page. */
+export const REQUIRED_ENV = [
+  "NEXT_PUBLIC_SUPABASE_URL",
+  "NEXT_PUBLIC_SUPABASE_ANON_KEY",
+  "SUPABASE_SERVICE_ROLE_KEY",
+  "ENCRYPTION_KEY",
+  "APP_URL",
+  "SENDING_DOMAIN",
+] as const;
+
+export function missingEnv(): string[] {
+  return REQUIRED_ENV.filter((name) => !process.env[name]);
+}
