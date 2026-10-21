@@ -18,7 +18,7 @@
 }
 .cover::before { content: ""; position: absolute; inset: 0; z-index: -1; background-image: radial-gradient(circle at 1px 1px, rgba(250, 248, 245, 0.12) 1px, transparent 0); background-size: 22px 22px; }
 .cover__top { display: flex; justify-content: space-between; gap: 16px; font-size: 14px; opacity: 0.85; }
-.cover__word { align-self: center; width: 100%; height: auto; aspect-ratio: 8800 / 1900; max-width: 1040px; }
+.cover__word { align-self: center; width: 100%; height: auto; aspect-ratio: 8745 / 1960; max-width: 1040px; }
 .cover__foot { display: flex; justify-content: space-between; align-items: flex-end; gap: 32px; }
 .cover__foot p { max-width: 30em; font-size: 18px; opacity: 0.9; }
 .cover__mark { flex: none; width: clamp(64px, 9vw, 120px); height: clamp(64px, 9vw, 120px); }
@@ -44,7 +44,7 @@
 .lg--green { background: #102542; color: #FAF8F5; --brass: #DDB040; }
 .lg--night { background: #0A1628; color: #FAF8F5; --brass: #DDB040; }
 .lg--mono { --brass: #102542; }
-.lg__word { width: min(76%, 640px); height: auto; aspect-ratio: 8800 / 1900; }
+.lg__word { width: min(76%, 640px); height: auto; aspect-ratio: 8745 / 1960; }
 .lg__word--sm { width: 82%; }
 .lg__icons { display: flex; gap: 12px; }
 .lg__icons img { width: 72px; height: 72px; }

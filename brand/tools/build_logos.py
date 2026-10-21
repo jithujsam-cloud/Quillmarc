@@ -3,23 +3,25 @@
 Run from the repo root:  python3 brand/tools/build_logos.py
 
 Two parts:
-- The wordmark (primary logo): "Quillmark" in Newsreader Regular, 72pt optical size,
-  outlined at 2000 units per em with -0.02em tracking (wordmark-path.txt, made by
-  outline_wordmark.py, which removes the dot of the "i"). A gold square takes the
-  dot's place.
+- The wordmark (primary logo): the pen-written Q, then "uillmark" in Newsreader Regular
+  (72pt optical size, 2000 units per em, -0.02em tracking; wordmark-path.txt, made by
+  outline_wordmark.py, which removes the dot of the "i"). Gold squares end the Q's tail
+  and dot the "i".
 - The symbol: a pen-written Q. An outer circle minus a tilted inner ellipse gives the
   thick-thin stress of a broad nib; a tapered tail crosses the stroke and ends in the
   same square full stop (mark.json, on a 40-unit grid).
 """
 import json
+import math
+import re
 from pathlib import Path
 
 HERE = Path(__file__).parent
 OUT = HERE.parents[1] / "assets" / "logo"
 WORD = (HERE / "wordmark-path.txt").read_text().strip()
 MARK = json.loads((HERE / "mark.json").read_text())
-WORD_W, CAP, XH, ASC, DESC = 8780.0, 1340.0, 852.0, 1470.0, 530.0
-I_DOT = (2804.0, -1471.0, 268.0)  # the i dot's box in font units, from outline_wordmark.py
+WORD_W, CAP, XH, ASC, DESC = 7221.0, 1340.0, 852.0, 1470.0, 530.0  # WORD_W: "uillmark"
+I_DOT = (1245.0, -1471.0, 268.0)  # the i dot's box within "uillmark", from outline_wordmark.py
 
 INK, REVERSE, SAPPHIRE, NAVY, BRASS, PAPER = "#102542", "#FAF8F5", "#1E3A5F", "#102542", "#DDB040", "#FAF8F5"
 
@@ -51,18 +53,67 @@ def mark(ink, dot, tx=0.0, ty=0.0, s=1.0):
     )
 
 
-def wordmark(ink, dot, cap):
-    """Returns (body, width, ascent, descent) with the baseline at y=0.
+def _ring(cx, cy, R, rx, ry, rot, dx=0.0, dy=0.0):
+    """Outer circle minus a tilted inner ellipse: the broad-nib bowl (evenodd)."""
+    a = math.radians(rot)
+    ix, iy = cx + dx, cy + dy
+    sx, sy = ix - rx * math.cos(a), iy - rx * math.sin(a)
+    ex, ey = ix + rx * math.cos(a), iy + rx * math.sin(a)
+    return (f"M{cx - R:.1f} {cy:.1f}a{R:.1f} {R:.1f} 0 1 0 {2 * R:.1f} 0a{R:.1f} {R:.1f} 0 1 0 {-2 * R:.1f} 0Z"
+            f"M{sx:.1f} {sy:.1f}A{rx:.1f} {ry:.1f} {rot} 1 0 {ex:.1f} {ey:.1f}A{rx:.1f} {ry:.1f} {rot} 1 0 {sx:.1f} {sy:.1f}Z")
 
-    The dot of the "i" is replaced by the square full stop, centred where
-    Newsreader's own dot sits (I_DOT, in font units)."""
+
+def _tail(x1, y1, x2, y2, w1, w2):
+    """A stroke that tapers from w1 to w2, like a pen lifting."""
+    ang = math.atan2(y2 - y1, x2 - x1)
+    nx, ny = -math.sin(ang), math.cos(ang)
+    pts = [(x1 + nx * w1 / 2, y1 + ny * w1 / 2), (x2 + nx * w2 / 2, y2 + ny * w2 / 2),
+           (x2 - nx * w2 / 2, y2 - ny * w2 / 2), (x1 - nx * w1 / 2, y1 - ny * w1 / 2)]
+    return "M" + "L".join(f"{x:.1f} {y:.1f}" for x, y in pts) + "Z"
+
+
+def wordmark_units():
+    """The wordmark in font units, baseline at y=0: (ink paths, squares, width).
+
+    The Q is the symbol redrawn at cap height, its strokes thinned to match
+    Newsreader Regular. Both squares, the Q's full stop and the dot of the i,
+    are the size of Newsreader's own i dot."""
+    R = CAP * 0.53
+    cx, cy = R + 10, -R + 18          # the bowl overshoots the baseline slightly, like a real O
+    bowl = _ring(cx, cy, R, R * 0.885, R * 0.80, -40, R * 0.025, R * 0.02)
+    t0, t1 = R * 0.27, R * 0.98
+    tail = _tail(cx + t0, cy + t0, cx + t1, cy + t1, R * 0.25, R * 0.135)
+    q = I_DOT[2]
+    q_square = (cx + t1 - q * 0.18, cy + t1 - q * 0.18, q)
+    ux = 2 * R + 10 + CAP * 0.055     # a little air between the Q and the u
+    ix, iy, isz = I_DOT
+    ink = [bowl, tail, f'<path transform="translate({ux:.1f} 0)" d="{WORD}"/>']
+    squares = [q_square, (ux + ix, iy, isz)]
+    return ink, squares, ux + WORD_W
+
+
+def wordmark(ink, dot, cap):
+    """Returns (body, width, ascent, descent) with the baseline at y=0."""
     s = cap / CAP
-    x, y, size = I_DOT
-    body = (
-        f'<path transform="scale({s:.5f})" d="{WORD}" fill="{ink}"/>'
-        f'<rect x="{x * s:.2f}" y="{y * s:.2f}" width="{size * s:.2f}" height="{size * s:.2f}" rx="{size * s * 0.1:.2f}" fill="{dot}"/>'
-    )
-    return body, WORD_W * s, ASC * s, DESC * s * 0.8
+    paths, squares, w = wordmark_units()
+    body = f'<g transform="scale({s:.5f})" fill="{ink}">'
+    for p in paths:
+        body += p if p.startswith("<") else f'<path fill-rule="evenodd" d="{p}"/>'
+    for x, y, q in squares:
+        body += f'<rect x="{x:.1f}" y="{y:.1f}" width="{q:.1f}" height="{q:.1f}" rx="{q * 0.1:.1f}" fill="{dot}"/>'
+    body += "</g>"
+    return body, w * s, ASC * s, (DESC * 0.8 + 120) * s
+
+
+def inline_symbol():
+    """The same wordmark as an SVG <symbol> for the site: ink follows currentColor, squares use --brass."""
+    paths, squares, w = wordmark_units()
+    inner = ""
+    for p in paths:
+        inner += p.replace("<path ", '<path fill="currentColor" ') if p.startswith("<") else f'<path fill="currentColor" fill-rule="evenodd" d="{p}"/>'
+    for x, y, q in squares:
+        inner += f'<rect x="{x:.1f}" y="{y:.1f}" width="{q:.1f}" height="{q:.1f}" rx="{q * 0.1:.1f}" fill="var(--brass)"/>'
+    return f'<symbol id="qm-word" viewBox="0 -1480 {w + 20:.0f} 1960">{inner}</symbol>', w + 20
 
 
 def write(name, content):
@@ -81,20 +132,6 @@ for k, (ink, dot) in WAYS.items():
 for k, (ink, dot) in WAYS.items():
     write(f"quillmark-symbol-{k}.svg", svg(40, 40, mark(ink, dot)))
 
-# Lockup for social avatars and signage: symbol, generous gap, wordmark
-for k in ("ink", "reverse"):
-    ink, dot = WAYS[k]
-    cap = 40
-    m = cap * 1.7
-    s = m / 40
-    base = 31 / 40 * m  # bottom of the ring sits on the baseline
-    body, w, asc, desc = wordmark(ink, dot, cap)
-    gx = m + cap * 0.7
-    write(
-        f"quillmark-lockup-{k}.svg",
-        svg(round(gx + w + 1), round(m), mark(ink, dot, 0, 0, s) + f'<g transform="translate({gx:.2f} {base:.2f})">{body}</g>'),
-    )
-
 # App icons
 write("quillmark-app-icon.svg", svg(512, 512, mark(REVERSE, BRASS, 96, 96, 8.0), bg=NAVY, radius=112))
 write("quillmark-app-icon-paper.svg", svg(512, 512, mark(INK, BRASS, 96, 96, 8.0), bg=PAPER, radius=112))
@@ -108,3 +145,13 @@ write(
     f'<path class="i" fill-rule="evenodd" d="{MARK["ring"]}"/><path class="i" d="{MARK["tail"]}"/>'
     f'<rect class="d" x="{x}" y="{y}" width="{q}" height="{q}" rx="0.5"/></svg>\n',
 )
+
+
+# Inline the same wordmark into the site and the brand page, so the page logo never drifts from the files
+sym, _ = inline_symbol()
+for page in (HERE.parents[1] / "index.html", HERE.parents[1] / "brand" / "index.html"):
+    html = page.read_text()
+    html, n = re.subn(r'<symbol id="qm-word".*?</symbol>', lambda m: sym, html, flags=re.S)
+    if n == 1:
+        page.write_text(html)
+        print("updated logo in", page.relative_to(HERE.parents[1]))
