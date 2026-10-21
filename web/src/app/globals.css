@@ -1,0 +1,141 @@
+@import "tailwindcss";
+
+/* Quillmarc tokens, matching brand/tokens.css on the marketing site.
+   Contrast checked: body text and muted text pass 4.5:1, control borders pass 3:1, in both themes. */
+:root {
+  --bg: #FAF7EF;
+  --surface: #FFFDF8;
+  --ink: #102542;
+  --muted: #4A5A72;
+  --accent: #1E3A5F;
+  --accent-ink: #FAF8F5;
+  --line: #E8DFD0;
+  --brass: #DDB040;
+  --control: #8790A0;
+  --error: #9B2C1F;
+  --ok: #2F5D3A;
+  --warn-bg: #FBF1D6;
+  --warn-ink: #5C4209;
+  --tint: #F1EBDD;
+  color-scheme: light;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --bg: #0A1628;
+    --surface: #102542;
+    --ink: #FAF8F5;
+    --muted: #A8B3C4;
+    --accent: #DDB040;
+    --accent-ink: #102542;
+    --line: #22385A;
+    --brass: #DDB040;
+    --control: #6B7C96;
+    --error: #F0A595;
+    --ok: #9FD3AA;
+    --warn-bg: #2A2410;
+    --warn-ink: #F3DA94;
+    --tint: #16304F;
+    color-scheme: dark;
+  }
+}
+
+:root[data-theme="dark"] {
+  --bg: #0A1628;
+  --surface: #102542;
+  --ink: #FAF8F5;
+  --muted: #A8B3C4;
+  --accent: #DDB040;
+  --accent-ink: #102542;
+  --line: #22385A;
+  --brass: #DDB040;
+  --control: #6B7C96;
+  --error: #F0A595;
+  --ok: #9FD3AA;
+  --warn-bg: #2A2410;
+  --warn-ink: #F3DA94;
+  --tint: #16304F;
+  color-scheme: dark;
+}
+
+@theme inline {
+  --color-bg: var(--bg);
+  --color-surface: var(--surface);
+  --color-ink: var(--ink);
+  --color-muted: var(--muted);
+  --color-accent: var(--accent);
+  --color-accent-ink: var(--accent-ink);
+  --color-line: var(--line);
+  --color-brass: var(--brass);
+  --color-control: var(--control);
+  --color-error: var(--error);
+  --color-ok: var(--ok);
+  --color-tint: var(--tint);
+  --font-display: var(--font-newsreader), "Iowan Old Style", Georgia, serif;
+  --font-sans: var(--font-hanken), system-ui, -apple-system, "Segoe UI", sans-serif;
+  --font-mono: var(--font-geist-mono), ui-monospace, "SF Mono", Menlo, monospace;
+}
+
+html { background: var(--bg); }
+body {
+  background: var(--bg);
+  color: var(--ink);
+  font-family: var(--font-sans);
+  font-size: 17px;
+  line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+h1, h2, h3 { font-family: var(--font-display); font-weight: 400; letter-spacing: -0.01em; line-height: 1.15; text-wrap: balance; }
+p, li { text-wrap: pretty; }
+a { color: var(--accent); text-underline-offset: 3px; }
+::selection { background: var(--accent); color: var(--accent-ink); }
+:focus-visible { outline: 2px solid var(--accent); outline-offset: 3px; border-radius: 4px; }
+
+.num { font-family: var(--font-mono); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
+.skip { position: absolute; left: 16px; top: -60px; z-index: 50; background: var(--accent); color: var(--accent-ink); padding: 10px 16px; border-radius: 6px; }
+.skip:focus { top: 12px; }
+
+/* Buttons */
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  min-height: 44px; padding: 0 18px;
+  font: 500 16px/1 var(--font-sans); white-space: nowrap; text-decoration: none;
+  color: var(--accent-ink); background: var(--accent);
+  border: 1px solid var(--accent); border-radius: 8px; cursor: pointer;
+  transition: filter 200ms ease, transform 200ms cubic-bezier(0.16, 1, 0.3, 1);
+}
+.btn:hover { filter: brightness(1.12); }
+.btn:active { transform: scale(0.98); }
+.btn:disabled, .btn[aria-disabled="true"] { opacity: 0.45; cursor: not-allowed; filter: none; transform: none; }
+.btn-secondary { background: transparent; color: var(--ink); border-color: var(--control); }
+.btn-secondary:hover { background: var(--tint); filter: none; }
+.btn-danger { background: var(--error); border-color: var(--error); color: var(--bg); }
+.btn-sm { min-height: 36px; padding: 0 12px; font-size: 15px; }
+.link-btn { background: none; border: 0; padding: 0; color: var(--accent); text-decoration: underline; text-underline-offset: 3px; cursor: pointer; font: inherit; }
+
+/* Fields */
+.label { display: block; font-weight: 500; margin-bottom: 6px; }
+.hint { color: var(--muted); font-size: 15px; }
+.field {
+  width: 100%; min-height: 44px; padding: 10px 12px;
+  background: var(--surface); color: var(--ink);
+  border: 1px solid var(--control); border-radius: 8px;
+  font: 400 16px/1.4 var(--font-sans);
+}
+textarea.field { min-height: 120px; resize: vertical; }
+.field:focus-visible { outline: 2px solid var(--accent); outline-offset: 1px; }
+.field[aria-invalid="true"] { border-color: var(--error); }
+.error { color: var(--error); font-size: 15px; }
+
+/* Surfaces */
+.card { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.notice { border-radius: 10px; padding: 12px 14px; font-size: 15px; background: var(--warn-bg); color: var(--warn-ink); }
+.notice-plain { border-radius: 10px; padding: 12px 14px; font-size: 15px; background: var(--tint); color: var(--ink); }
+.badge { display: inline-flex; align-items: center; gap: 6px; border-radius: 999px; padding: 2px 10px; font-size: 14px; font-weight: 500; border: 1px solid var(--line); background: var(--tint); color: var(--ink); white-space: nowrap; }
+.badge-quiet { background: transparent; color: var(--muted); }
+.rule-brass { height: 2px; width: 40px; background: var(--brass); border: 0; }
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

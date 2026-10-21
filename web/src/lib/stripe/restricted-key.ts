@@ -11,8 +11,7 @@ const MAX_PAGES = 100;
 
 export type FetchLike = (url: string, init?: RequestInit) => Promise<Response>;
 
-/** The permissions the founder must grant, shown on the connect screen. */
-export const REQUIRED_READ_PERMISSIONS = ["Customers", "Subscriptions", "Prices", "Invoices", "Charges"] as const;
+export { REQUIRED_READ_PERMISSIONS } from "./permissions";
 
 const READ_CHECKS: { label: string; path: string }[] = [
   { label: "Customers", path: "/customers?limit=1" },
