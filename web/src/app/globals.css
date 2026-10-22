@@ -387,6 +387,14 @@ textarea.field { min-height: 112px; resize: vertical; }
 .loading-note { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; color: var(--muted); font-size: 14px; }
 .loading-note .link-spin { opacity: 0.8; width: 14px; height: 14px; }
 
+/* tabs that are buttons (a short list with tabs), styled like the underline tabs */
+.tabs button { position: relative; display: inline-flex; align-items: center; height: 44px; padding: 0; border: 0; background: none; color: var(--muted); font: inherit; white-space: nowrap; cursor: pointer; }
+.tabs button:hover { color: var(--text); }
+.tabs button[aria-selected="true"] { color: var(--text); font-weight: 500; }
+.tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); }
+.tab-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 20px; color: var(--text); text-decoration: none; transition: background-color 150ms ease; }
+.tab-row:hover { background: var(--raised); }
+
 /* ---------- motion: feedback first, all of it off for reduced motion ---------- */
 @layer components {
   /* loading placeholders: flat bars at the size of what will arrive */

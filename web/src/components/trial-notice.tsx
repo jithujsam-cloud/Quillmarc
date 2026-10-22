@@ -6,7 +6,7 @@ export function continueHref(): string {
   const billing = env.billingUrl();
   if (billing) return billing;
   const contact = env.contactEmail();
-  return contact ? `mailto:${contact}?subject=${encodeURIComponent("Continue with Quillmarc")}` : "/settings#plan";
+  return contact ? `mailto:${contact}?subject=${encodeURIComponent("Continue with Quillmarc")}` : "/settings/plan";
 }
 
 // Shown in place of the send controls once the trial is over.

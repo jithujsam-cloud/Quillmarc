@@ -45,13 +45,13 @@ export async function AppFrame({ children }: { children: React.ReactNode }) {
           <SideNav investorCount={setup?.investorCount ?? 0} isAdmin={isAdmin} />
           <div className="side-foot">
             {access && access.plan !== "active" && (
-              <Link href="/settings#plan" className={`side-row ${access.expired ? "text-negative" : "text-accent-ink"}`} title={trialLabel(access)}>
+              <Link href="/settings/plan" className={`side-row ${access.expired ? "text-negative" : "text-accent-ink"}`} title={trialLabel(access)}>
                 <Icon name="clock" />
                 <span className="side-text truncate">{trialLabel(access)}</span>
               </Link>
             )}
             {stripeLabel ? (
-              <Link href="/settings#stripe" className="side-row" title={stripeLabel}>
+              <Link href="/settings/stripe" className="side-row" title={stripeLabel}>
                 <span className="grid size-4 flex-none place-items-center" aria-hidden="true">
                   <span className={`size-2 rounded-full ${conn?.status === "error" ? "bg-negative" : "bg-positive"}`} />
                 </span>

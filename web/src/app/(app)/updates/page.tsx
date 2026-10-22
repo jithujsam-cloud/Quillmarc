@@ -52,7 +52,7 @@ export default async function UpdatesPage() {
           : "Your update is a draft. Review the numbers, write a few bullets and send it.";
 
   const add = access.expired ? (
-    <Link href="/settings#plan" className="btn btn-secondary">
+    <Link href="/settings/plan" className="btn btn-secondary">
       Trial ended
     </Link>
   ) : setup.nextStep !== null ? (
