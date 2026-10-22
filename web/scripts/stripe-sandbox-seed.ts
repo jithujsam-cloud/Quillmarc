@@ -60,7 +60,8 @@ async function fixtureCustomers(): Promise<{ id: string }[]> {
 
 async function removeFixtures() {
   const customers = await fixtureCustomers();
-  for (const c of customers) await stripe("DELETE", `/customers/${c.id}`); // also cancels their subscriptions
+  // Search can lag behind deletes for a few seconds, so a customer that is already gone is skipped.
+  for (const c of customers) await stripe("DELETE", `/customers/${c.id}`).catch((e: Error) => { if (!/No such customer/.test(e.message)) throw e; });
   const coupons = await stripe<{ data: { id: string; metadata: Record<string, string> }[] }>("GET", "/coupons", { limit: 100 });
   for (const c of coupons.data) if (c.metadata?.quillmarc_fixture === "1") await stripe("DELETE", `/coupons/${c.id}`);
   const products = await stripe<{ data: { id: string; metadata: Record<string, string> }[] }>("GET", "/products", { limit: 100, active: true });

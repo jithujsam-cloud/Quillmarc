@@ -9,7 +9,8 @@
 // moments. Stripe records each change at that simulated time, so churn lands in the right months.
 //
 // Stripe's limits: three customers per clock, and clocks (with their customers) are deleted by Stripe
-// 30 days after creation. Run it again to rebuild. The company is fictional and the history is the
+// 30 days after creation. Run it again to rebuild. Customers sign up on their own days, more often
+// as the company grows, so charges spread across every month. The company is fictional and the history is the
 // same every run (fixed random seed). Refuses live keys; the key is never written anywhere.
 // --reset only deletes clocks named exactly "quillmarc history".
 
@@ -25,7 +26,7 @@ const CLOCK_NAME = "quillmarc history";
 const MONTHS = 18;
 const DAY = 86400;
 const HOP = 28 * DAY;
-const PARALLEL = 6;
+const PARALLEL = 10;
 const now = Math.floor(Date.now() / 1000);
 const end = now - 3600; // clocks stop an hour before now
 const TAG = { "metadata[quillmarc_fixture]": "1", "metadata[quillmarc_history]": "1" };
@@ -81,80 +82,88 @@ function pickPlan(): Plan {
   return PLANS[0].plan;
 }
 
-type HistoryEvent = { at: number; kind: "cancel" | "upgrade" | "seats"; customer: number; quantity?: number };
+type HistoryEvent = { at: number; kind: "join" | "cancel" | "upgrade" | "seats"; customer: number; quantity?: number };
 interface Joiner {
   name: string;
   email: string;
   plan: Plan;
   quantity: number;
   coupon: boolean;
+  currency: "usd" | "eur";
   trialDays?: number;
+  joinAt: number;
   events: HistoryEvent[];
 }
-
-function monthStart(offset: number) {
-  const d = new Date();
-  return Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - offset, 1) / 1000;
+interface Group {
+  startAt: number;
+  people: Joiner[];
 }
 
-/** Plan the whole company: who joins when, and what happens to each of them. */
-function planHistory(): { joinAt: number; people: Joiner[] }[] {
+/** Plan the whole company: a signup on some days, more often as it grows, and what happens next. */
+function planHistory(): Group[] {
   const used = new Set<string>();
-  const groups: { joinAt: number; people: Joiner[] }[] = [];
-  for (let m = 0; m < MONTHS; m++) {
-    const from = monthStart(MONTHS - 1 - m);
-    const isLast = m === MONTHS - 1;
-    const joins = Math.round(2 + m * 0.4 + rand() * 1.5);
-    const people: Joiner[] = [];
-    for (let i = 0; i < joins; i++) {
-      let name = "";
-      do name = `${pick(FIRST)} ${pick(SECOND)}`;
-      while (used.has(name));
-      used.add(name);
-      const plan = pickPlan();
-      people.push({
-        name,
-        email: `billing@${name.toLowerCase().replace(/[^a-z]+/g, "")}.example`,
-        plan,
-        quantity: plan.key === "seats" ? 3 + Math.floor(rand() * 10) : 1,
-        coupon: m < 5 && rand() < 0.4, // early customers kept a launch discount
-        trialDays: m >= MONTHS - 6 && rand() < 0.3 ? 14 : undefined,
-        events: [],
-      });
+  const joiners: Joiner[] = [];
+  const first = Math.floor(Date.UTC(new Date().getUTCFullYear(), new Date().getUTCMonth() - (MONTHS - 1), 1) / 1000);
+  const totalDays = Math.floor((end - DAY - first) / DAY);
+  for (let d = 0; d < totalDays; d++) {
+    const progress = d / totalDays;
+    const weekday = new Date((first + d * DAY) * 1000).getUTCDay();
+    const weekend = weekday === 0 || weekday === 6;
+    // About one signup every eight days at the start, about one every two days by the end.
+    const chance = (0.12 + progress * 0.4) * (weekend ? 0.4 : 1);
+    if (rand() >= chance) continue;
+    let name = "";
+    do name = `${pick(FIRST)} ${pick(SECOND)}`;
+    while (used.has(name));
+    used.add(name);
+    const plan = pickPlan();
+    joiners.push({
+      name,
+      email: `billing@${name.toLowerCase().replace(/[^a-z]+/g, "")}.example`,
+      plan,
+      quantity: plan.key === "seats" ? 3 + Math.floor(rand() * 10) : 1,
+      coupon: progress < 0.25 && rand() < 0.4, // early customers kept a launch discount
+      currency: rand() < 0.04 ? "eur" : "usd", // a few pay in euros: counted out, with a warning
+      trialDays: progress > 0.65 && rand() < 0.3 ? 14 : undefined,
+      joinAt: first + d * DAY + (8 + Math.floor(rand() * 10)) * 3600 + Math.floor(rand() * 3600),
+      events: [],
+    });
+  }
+
+  // What happens to each customer after joining.
+  joiners.forEach((p) => {
+    p.events.push({ at: p.joinAt, kind: "join", customer: 0 });
+    if (p.trialDays && rand() < 0.35) {
+      if (p.joinAt + 10 * DAY < end) p.events.push({ at: p.joinAt + 10 * DAY, kind: "cancel", customer: 0 }); // never converted
+      return;
     }
-    // Three customers per clock, all joining on the same day of the month.
-    for (let g = 0; g < people.length; g += 3) {
-      const day = Math.floor(rand() * (isLast ? Math.max(1, new Date().getUTCDate() - 2) : 27));
-      const joinAt = from + day * DAY + 9 * 3600;
-      if (joinAt >= end - DAY) continue;
-      const chunk = people.slice(g, g + 3);
-      chunk.forEach((p, idx) => {
-        let t = joinAt;
-        if (p.trialDays && rand() < 0.35) {
-          if (joinAt + 10 * DAY < end) p.events.push({ at: joinAt + 10 * DAY, kind: "cancel", customer: idx }); // never converted
-          return;
-        }
-        let qty = p.quantity;
-        let plan = p.plan.key;
-        for (let k = 1; ; k++) {
-          t = joinAt + k * 30 * DAY + Math.floor(rand() * 20) * DAY;
-          if (t >= end) break;
-          const churn = plan === "annual" ? (k % 12 === 0 ? 0.15 : 0) : p.plan.churn;
-          if (rand() < churn) {
-            p.events.push({ at: t, kind: "cancel", customer: idx });
-            break;
-          }
-          if (plan === "starter" && k >= 2 && rand() < 0.04) {
-            p.events.push({ at: t, kind: "upgrade", customer: idx });
-            plan = "growth";
-          } else if (plan === "seats" && rand() < 0.08) {
-            qty += 1 + Math.floor(rand() * 4);
-            p.events.push({ at: t, kind: "seats", customer: idx, quantity: qty });
-          }
-        }
-      });
-      groups.push({ joinAt, people: chunk });
+    let qty = p.quantity;
+    let plan = p.plan.key;
+    for (let k = 1; ; k++) {
+      const t = p.joinAt + k * 30 * DAY + Math.floor(rand() * 20) * DAY;
+      if (t >= end) break;
+      const churn = plan === "annual" ? (k % 12 === 0 ? 0.15 : 0) : p.plan.churn;
+      if (rand() < churn) {
+        p.events.push({ at: t, kind: "cancel", customer: 0 });
+        break;
+      }
+      if (plan === "starter" && k >= 2 && rand() < 0.04) {
+        p.events.push({ at: t, kind: "upgrade", customer: 0 });
+        plan = "growth";
+      } else if (plan === "seats" && rand() < 0.08) {
+        qty += 1 + Math.floor(rand() * 4);
+        p.events.push({ at: t, kind: "seats", customer: 0, quantity: qty });
+      }
     }
+  });
+
+  // Three customers per clock (Stripe's limit), joining on their own days. Neighbours in time share
+  // a clock, so each clock starts at its first customer's signup and adds the others as it moves on.
+  const groups: Group[] = [];
+  for (let i = 0; i < joiners.length; i += 3) {
+    const people = joiners.slice(i, i + 3);
+    people.forEach((p, idx) => p.events.forEach((e) => (e.customer = idx)));
+    groups.push({ startAt: people[0].joinAt, people });
   }
   return groups;
 }
@@ -172,6 +181,10 @@ async function prices() {
     scale: await make("Scale", 39900, "month"),
     annual: await make("Growth annual", 149000, "year"),
     seats: await make("Team seat", 2500, "month"),
+    euro: await (async () => {
+      const product = await stripe<{ id: string }>("POST", "/products", { name: "Growth EU (Quillmarc history)", ...TAG });
+      return (await stripe<{ id: string }>("POST", "/prices", { product: product.id, currency: "eur", unit_amount: 13900, "recurring[interval]": "month", ...TAG })).id;
+    })(),
     coupon: coupon.id,
   };
 }
@@ -181,48 +194,50 @@ async function waitReady(clock: string) {
     const c = await stripe<{ status: string }>("GET", `/test_helpers/test_clocks/${clock}`);
     if (c.status === "ready") return;
     if (c.status === "internal_failure") throw new Error(`Test clock ${clock} failed inside Stripe`);
-    await sleep(1500);
+    await sleep(1000);
   }
   throw new Error(`Test clock ${clock} did not finish advancing`);
 }
 
-async function runGroup(group: { joinAt: number; people: Joiner[] }, p: Awaited<ReturnType<typeof prices>>) {
-  const clock = await stripe<{ id: string }>("POST", "/test_helpers/test_clocks", { frozen_time: group.joinAt, name: CLOCK_NAME });
+async function runGroup(group: Group, p: Awaited<ReturnType<typeof prices>>) {
+  const clock = await stripe<{ id: string }>("POST", "/test_helpers/test_clocks", { frozen_time: group.startAt, name: CLOCK_NAME });
   const subs: { id: string; item: string }[] = [];
-  for (const person of group.people) {
-    const c = await stripe<{ id: string }>("POST", "/customers", {
-      test_clock: clock.id,
-      name: person.name,
-      email: person.email,
-      payment_method: "pm_card_visa",
-      "invoice_settings[default_payment_method]": "pm_card_visa",
-      ...TAG,
-    });
-    const s = await stripe<{ id: string; items: { data: { id: string }[] } }>("POST", "/subscriptions", {
-      customer: c.id,
-      "items[0][price]": p[person.plan.key],
-      "items[0][quantity]": person.quantity,
-      trial_period_days: person.trialDays,
-      coupon: person.coupon ? p.coupon : undefined,
-      ...TAG,
-    });
-    subs.push({ id: s.id, item: s.items.data[0].id });
-  }
-
   const events = group.people.flatMap((x) => x.events).sort((a, b) => a.at - b.at);
-  let t = group.joinAt;
-  while (t < end) {
+  let t = group.startAt;
+  for (;;) {
+    while (events.length && events[0].at <= t) {
+      const e = events.shift()!;
+      const person = group.people[e.customer];
+      const s = subs[e.customer];
+      if (e.kind === "join") {
+        const c = await stripe<{ id: string }>("POST", "/customers", {
+          test_clock: clock.id,
+          name: person.name,
+          email: person.email,
+          payment_method: "pm_card_visa",
+          "invoice_settings[default_payment_method]": "pm_card_visa",
+          ...TAG,
+        });
+        const created = await stripe<{ id: string; items: { data: { id: string }[] } }>("POST", "/subscriptions", {
+          customer: c.id,
+          "items[0][price]": person.currency === "eur" ? p.euro : p[person.plan.key],
+          "items[0][quantity]": person.quantity,
+          trial_period_days: person.trialDays,
+          coupon: person.coupon && person.currency === "usd" ? p.coupon : undefined,
+          ...TAG,
+        });
+        subs[e.customer] = { id: created.id, item: created.items.data[0].id };
+      } else if (s) {
+        if (e.kind === "cancel") await stripe("DELETE", `/subscriptions/${s.id}`);
+        if (e.kind === "upgrade" && person.currency === "usd") await stripe("POST", `/subscriptions/${s.id}`, { "items[0][id]": s.item, "items[0][price]": p.growth, proration_behavior: "none" });
+        if (e.kind === "seats") await stripe("POST", `/subscriptions/${s.id}`, { "items[0][id]": s.item, "items[0][quantity]": e.quantity, proration_behavior: "none" });
+      }
+    }
+    if (t >= end) break;
     const next = Math.min(events[0]?.at ?? end, t + HOP, end);
     await stripe("POST", `/test_helpers/test_clocks/${clock.id}/advance`, { frozen_time: next });
     await waitReady(clock.id);
     t = next;
-    while (events.length && events[0].at <= t) {
-      const e = events.shift()!;
-      const s = subs[e.customer];
-      if (e.kind === "cancel") await stripe("DELETE", `/subscriptions/${s.id}`);
-      if (e.kind === "upgrade") await stripe("POST", `/subscriptions/${s.id}`, { "items[0][id]": s.item, "items[0][price]": p.growth, proration_behavior: "none" });
-      if (e.kind === "seats") await stripe("POST", `/subscriptions/${s.id}`, { "items[0][id]": s.item, "items[0][quantity]": e.quantity, proration_behavior: "none" });
-    }
   }
 }
 
