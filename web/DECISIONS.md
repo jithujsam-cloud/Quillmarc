@@ -134,3 +134,6 @@ The marketing site's decisions live in `../DECISIONS.md`.
 - **"Investors reached" is sent over everyone on the list when it went out.** `investor_total` is written when sending starts, so "18 of 24" stays true after the list changes. The dashboard and updates table show sent over total only; who opened it stays on each update's page. The Investors page shows received, read and last read per investor.
 - **Revenue is best effort.** If Stripe cannot be reached the saved figures still show and the update is created without a revenue figure.
 - **The canvas is no longer capped at 1152px.** It now grows to 1600px so wide screens do not leave an empty strip on the right. Panels use the landing page's 10px radius.
+## Database hardening (October 22)
+- **Applied the Supabase advisors' fixes in `20261022140000_hardening.sql`.** Outside callers can no longer run the template's `rls_auto_enable()` event trigger. Row rules call `auth.uid()` once per query, not once per row. The foreign keys that deletes cascade through are now indexed. Who can see what is unchanged; the RLS tests prove it.
+- **Kept as is:** `rate_limits` and `waitlist` have no policies on purpose (server only). The leaked-password check does not apply, because sign-in is by magic link only.
