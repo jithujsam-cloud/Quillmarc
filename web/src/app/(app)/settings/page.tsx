@@ -9,6 +9,7 @@ import { setTimeZone } from "@/lib/actions/timezone";
 import { getSetupState } from "@/lib/setup";
 import { timeZoneOptions } from "@/lib/timezone";
 import { getTimeZone } from "@/lib/timezone-server";
+import { PasswordForm } from "./password-form";
 
 export const metadata: Metadata = { title: "Settings" };
 
@@ -25,6 +26,10 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
     <SettingsFrame tab="account" email={user.email}>
       <Setting id="sender" title="Sender details" desc="How your update arrives: who it is from, the subject, and where replies go.">
         <SenderForm profile={profile} />
+      </Setting>
+
+      <Setting id="password" title="Password" desc="You sign in with your email and this password.">
+        <PasswordForm />
       </Setting>
 
       <Setting id="time" title="Time zone" desc="Times in Quillmarc are shown in this time zone. Your data is kept in UTC, so changing it never changes a number.">

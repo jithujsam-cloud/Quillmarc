@@ -32,6 +32,9 @@ export function verifyJwt(token, secret = JWT_SECRET) {
   return claims;
 }
 
+// Passwords for users made through the stand-in's /signup (user id -> password). Memory only, for tests.
+const passwords = new Map();
+
 const far = () => Math.floor(Date.now() / 1000) + 10 * 365 * 86400;
 export const anonKey = signJwt({ role: "anon", iss: "local", exp: far() });
 export const serviceKey = signJwt({ role: "service_role", iss: "local", exp: far() });
@@ -146,6 +149,28 @@ export async function startStack({ root, dir, pgPort = 54329, restPort = 54330, 
           const { rows } = await db.query("select id, email from auth.users where id = $1", [claims.sub]);
           if (!rows[0]) return json(res, 404, { msg: "User not found" });
           return json(res, 200, toUser(rows[0]));
+        }
+        if (p === "/signup" && req.method === "POST") {
+          const email = String(body.email ?? "").toLowerCase();
+          const taken = await db.query("select id from auth.users where lower(email) = $1", [email]);
+          if (taken.rows[0]) return json(res, 422, { code: "user_already_exists", msg: "User already registered" });
+          const { rows } = await db.query("insert into auth.users (email) values ($1) returning id, email", [email]);
+          passwords.set(rows[0].id, String(body.password ?? ""));
+          return json(res, 200, makeSession(rows[0])); // email confirmation off, as on a fresh Supabase project with it disabled
+        }
+        if (p === "/token" && url.searchParams.get("grant_type") === "password") {
+          const { rows } = await db.query("select id, email from auth.users where lower(email) = $1", [String(body.email ?? "").toLowerCase()]);
+          if (!rows[0] || passwords.get(rows[0].id) !== String(body.password ?? "")) return json(res, 400, { code: "invalid_credentials", error: "invalid_grant", error_description: "Invalid login credentials", msg: "Invalid login credentials" });
+          return json(res, 200, makeSession(rows[0]));
+        }
+        if (p === "/recover") return json(res, 200, {});
+        if (p === "/user" && req.method === "PUT") {
+          const claims = verifyJwt(bearer);
+          if (!claims?.sub) return json(res, 401, { msg: "invalid JWT" });
+          if (body.password && passwords.get(claims.sub) === body.password) return json(res, 422, { code: "same_password", msg: "New password should be different from the old password." });
+          if (body.password) passwords.set(claims.sub, String(body.password));
+          const { rows } = await db.query("select id, email from auth.users where id = $1", [claims.sub]);
+          return rows[0] ? json(res, 200, toUser(rows[0])) : json(res, 404, { msg: "User not found" });
         }
         if (p === "/token" && url.searchParams.get("grant_type") === "refresh_token") {
           const id = String(body.refresh_token ?? "").replace(/^refresh\./, "");

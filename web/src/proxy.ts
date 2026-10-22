@@ -1,10 +1,10 @@
 // Refreshes the Supabase session cookie on every request and keeps signed-out visitors
-// out of the app. Public: /login, /auth, /u (hosted updates), /privacy, /terms, /api.
+// out of the app. Public: /login, /forgot-password, /auth, /u (hosted updates), /privacy, /terms, /api.
 import { createServerClient } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { env, missingEnv } from "./lib/env";
 
-const PUBLIC = [/^\/login/, /^\/auth\//, /^\/u\//, /^\/privacy/, /^\/terms/, /^\/api\//];
+const PUBLIC = [/^\/login/, /^\/forgot-password/, /^\/auth\//, /^\/u\//, /^\/privacy/, /^\/terms/, /^\/api\//];
 
 // Shown instead of a bare "Internal Server Error" when the deployment is missing settings.
 function setupPage(title: string, body: string) {

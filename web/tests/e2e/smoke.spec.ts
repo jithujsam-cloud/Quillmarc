@@ -103,10 +103,11 @@ test("founder sends an update and sees statuses", async ({ page, context }) => {
 
   // The investor's own page shows every update sent to them.
   await page.goto("/investors");
-  await expect(page.getByText("Theo Marchetti has not read your last 2 updates.")).toBeVisible();
+  // Whoever the simulated delivery events left quiet (the bounce lands on a different person from run to run).
+  await expect(page.getByText(/has not read your last 2 updates\./).first()).toBeVisible();
   await expect(page.getByText("Gone quiet", { exact: true }).first()).toBeVisible();
-  await page.getByRole("link", { name: "Theo Marchetti" }).first().click();
-  await expect(page.getByText("Theo has not read your last 2 updates.")).toBeVisible();
+  await page.getByRole("region", { name: "Gone quiet" }).getByRole("link", { name: "See their history" }).first().click();
+  await expect(page.getByText(/has not read your last 2 updates\./)).toBeVisible();
   await expect(page.getByRole("heading", { name: "Updates sent to them" })).toBeVisible();
   await expect(page.getByRole("heading", { name: /^Asks for / })).toBeVisible();
   await page.goto("/updates");

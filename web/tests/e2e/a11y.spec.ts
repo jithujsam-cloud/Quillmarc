@@ -31,6 +31,7 @@ async function check(page: Page, name: string) {
 test("every page passes axe and fits small screens", async ({ page, context }) => {
   test.setTimeout(600_000);
   await check(await gotoAnd(page, "/login"), "login");
+  await check(await gotoAnd(page, "/forgot-password"), "forgot-password");
   await check(await gotoAnd(page, "/privacy"), "privacy");
   await check(await gotoAnd(page, "/terms"), "terms");
 
@@ -53,6 +54,7 @@ test("every page passes axe and fits small screens", async ({ page, context }) =
     ["investor", `/investors/${investorId}`],
     ["asks", "/asks"],
     ["settings", "/settings"],
+    ["reset-password", "/reset-password"],
     ["settings-stripe", "/settings/stripe"],
     ["settings-plan", "/settings/plan"],
     ["settings-data", "/settings/data"],

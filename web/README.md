@@ -11,8 +11,8 @@ call), `DELIVERABILITY_CHECKLIST.md` (manual email checks), `.env.example` (ever
 
 1. **Supabase project.** At supabase.com create a new project (not the waitlist one). Note the database password.
 2. **Run the migration.** In the project's SQL Editor, paste and run `web/supabase/migrations/20261021100000_app_schema.sql`. (Or with the Supabase CLI: `supabase link` then `supabase db push` from `web/`.)
-3. **Auth settings.** In Authentication, URL Configuration, set Site URL to your app address (for example `https://app.yourdomain.com`) and add `<APP_URL>/auth/callback` to Redirect URLs. Add `http://localhost:3000/auth/callback` too for local work. Email sign-in is on by default.
-4. **Auth email sender.** In Authentication, SMTP Settings, use Resend's SMTP (host `smtp.resend.com`, user `resend`, password your Resend API key) so magic links come from your domain instead of Supabase's rate-limited test sender.
+3. **Auth settings.** In Authentication, URL Configuration, set Site URL to your app address (for example `https://app.yourdomain.com`) and add `<APP_URL>/auth/callback` to Redirect URLs. Add `http://localhost:3000/auth/callback` too for local work. Sign-in is email and password. In Authentication, Sign In / Providers, keep Email on. Turn **Confirm email** on for production (people confirm with a link before they can sign in) or off while testing (an account works straight away). The app handles both. Set the minimum password length there to 8 or more.
+4. **Auth email sender.** In Authentication, SMTP Settings, use Resend's SMTP (host `smtp.resend.com`, user `resend`, password your Resend API key) so the confirmation and password-reset emails come from your domain instead of Supabase's rate-limited test sender.
 5. **Resend domain.** In Resend, Domains, add your sending domain (for example `updates.klaroh.com`), add the DNS records it shows at your DNS host, wait for Verified, and turn on open tracking for the domain.
 6. **Resend API key.** In Resend, API Keys, create a key with sending access.
 7. **Encryption key.** Run `openssl rand -hex 32` and keep the output.

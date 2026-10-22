@@ -38,3 +38,20 @@ export function isMonth(raw: unknown): raw is string {
 export function isUuid(raw: unknown): raw is string {
   return typeof raw === "string" && /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i.test(raw);
 }
+
+export const PASSWORD_MIN = 8;
+/** bcrypt, which Supabase uses, ignores everything after 72 bytes. */
+export const PASSWORD_MAX = 72;
+
+/** Why this password cannot be used, in a sentence. Null when it is fine. Length only: no rules about symbols. */
+export function passwordProblem(raw: unknown): string | null {
+  if (typeof raw !== "string" || raw.length === 0) return "Enter a password.";
+  if (raw.length < PASSWORD_MIN) return `Use at least ${PASSWORD_MIN} characters.`;
+  if (new TextEncoder().encode(raw).length > PASSWORD_MAX) return `Use ${PASSWORD_MAX} characters or fewer.`;
+  return null;
+}
+
+/** Where to go after a link from an email. Only pages we name, never an address from the link itself. */
+export function afterEmailLink(raw: unknown): "/dashboard" | "/reset-password" {
+  return raw === "/reset-password" ? "/reset-password" : "/dashboard";
+}
