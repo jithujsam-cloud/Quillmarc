@@ -97,7 +97,8 @@ Set `PLAYWRIGHT_CHROMIUM_PATH` if Playwright should use an existing Chromium.
 | Path | What |
 | --- | --- |
 | `src/lib/metrics/` | Metric calculation (pure) and how figures are labelled |
-| `src/lib/stripe/` | Stripe adapter: interface, restricted-key source, sample source, normaliser |
+| `src/lib/stripe/` | Stripe adapter: interface, restricted-key source, sample source, normaliser, payments (`charges.ts`) |
+| `src/lib/periods.ts`, `analytics.ts`, `revenue.ts` | Update periods, dashboard figures, the saved revenue history and its live refresh |
 | `src/lib/sending/` | Send queue, status derivation, mock event simulator |
 | `src/lib/webhooks/` | Svix verification and Resend event ingest |
 | `src/lib/email/` | Email providers (Resend, mock) and the HTML and text email |
@@ -111,4 +112,4 @@ Set `PLAYWRIGHT_CHROMIUM_PATH` if Playwright should use an existing Chromium.
 - Stripe Connect OAuth: add a `BillingSource` in `src/lib/stripe/adapter.ts`.
 - Own-domain sending: `fromAddress` in `src/lib/sending/queue.ts`.
 - Monthly reminders: a Vercel cron calling a new route that lists founders without an update.
-- Billing, AI rewriting, teammates, PDF export, history charts: none.
+- Billing, AI rewriting, teammates, PDF export: none.

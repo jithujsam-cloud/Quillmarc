@@ -81,6 +81,43 @@ The founder can edit MRR, last month MRR, customers, new customers and churned c
 growth are always recalculated from the two MRR figures, and are marked adjusted when either is edited.
 Every edited figure is marked "Adjusted by founder" in the email and on the hosted page.
 
+## Periods (quarter, year, custom range)
+
+An update covers a month, a calendar quarter, a calendar year, or a custom range of up to 24 months that
+ends today or earlier. A period runs from the first instant of its first day to the first instant after its
+last day (UTC). The month rules above apply unchanged; "month" simply becomes the period.
+
+- **MRR** is at the end of the period; **last period MRR** is the same calculation at its start. Growth and
+  net new MRR compare the two. For a quarter this is "last quarter MRR", for a year "last year MRR", for a
+  custom range "last period MRR".
+- **New customers**: first counted subscription began inside the period. **Churned customers**: last counted
+  subscription ended inside it. A customer who joined and left inside a longer period is neither new at the
+  end nor counted in customers at the end, but is counted in both new and churned.
+- **Starting customers**: customers counted at the start. **Churn rate** (dashboard) is churned customers over
+  starting customers. **Net revenue retention** (dashboard, estimated) is today's MRR from the customers who
+  were counted at the start, over their MRR at the start.
+- **Compared with the period before.** The update also stores the figures of the previous period of the same
+  kind (the previous month, quarter or year; for a custom range, the same number of days directly before it).
+  Colour on a comparison says good or bad, not up or down: more churned customers is bad.
+- **A period still running** ends at "now" and is labelled "so far".
+
+## Revenue collected
+
+Cash received, from Stripe charges that succeeded, minus refunds, per UTC day and currency. Only the account's
+main currency is shown. A refund is counted on the day of the charge it refunds, because Stripe's charge list
+does not say when each refund happened. Revenue collected is not MRR: it includes one-off payments, annual
+plans in the month they are paid, and ignores discounts that never reached a charge.
+
+Past days are saved in `revenue_daily` and never read from Stripe again, except the last 35 days, which are
+re-read once a day so late refunds are picked up. The day a sync last ran is re-read on every sync, so "today"
+is current to within five minutes. History older than 35 days is imported a month at a time on first use.
+
+## Dashboard monthly numbers
+
+The dashboard's 12 months come from `metrics_snapshots`. A closed month is calculated once and then left
+alone; the running month is recalculated when it is more than five minutes old. "Recalculate history" is not
+exposed in the app yet: delete the founder's rows in `metrics_snapshots` to rebuild them.
+
 ## Known limits
 
 - Price changes and discount changes during past months are not rebuilt.

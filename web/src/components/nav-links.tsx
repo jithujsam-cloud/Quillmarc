@@ -6,7 +6,8 @@ import { Icon } from "./icons";
 import { LinkPending } from "./link-pending";
 
 const LINKS = [
-  { href: "/dashboard", label: "Updates", match: /^\/(dashboard|updates)/, icon: "updates" as const },
+  { href: "/dashboard", label: "Dashboard", match: /^\/dashboard/, icon: "dashboard" as const },
+  { href: "/updates", label: "Updates", match: /^\/updates/, icon: "updates" as const },
   { href: "/investors", label: "Investors", match: /^\/investors/, icon: "investors" as const },
   { href: "/settings", label: "Settings", match: /^\/(settings|onboarding)/, icon: "settings" as const },
 ];

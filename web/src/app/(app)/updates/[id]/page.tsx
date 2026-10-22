@@ -6,10 +6,10 @@ import { ReadStrip } from "@/components/read-strip";
 import { TitleRow } from "@/components/title-row";
 import { requireUser } from "@/lib/auth";
 import type { UpdateRow } from "@/lib/db-types";
-import { monthKey } from "@/lib/db-types";
 import { env } from "@/lib/env";
 import { formatDateTime } from "@/lib/format";
-import { monthLabel } from "@/lib/metrics/present";
+import { PeriodChip } from "@/components/period-chip";
+import { periodFromRow, periodLabel } from "@/lib/periods";
 import { STATUS_LABELS, type DisplayStatus } from "@/lib/sending/status";
 import { loadSendStatuses } from "@/lib/status-data";
 import { isUuid } from "@/lib/validate";
@@ -40,7 +40,8 @@ export default async function UpdateStatusPage({ params }: { params: Promise<{ i
   const { rows, totals: t } = await loadSendStatuses(supabase, id);
   const pending = t.queued > 0;
   const mock = env.emailProvider() === "mock";
-  const month = monthLabel(monthKey(update.month));
+  const period = periodFromRow(update);
+  const month = periodLabel(period);
   const problems = [
     t.bounced && `${t.bounced} bounced`,
     t.complained && `${t.complained} marked it as spam`,
@@ -54,7 +55,7 @@ export default async function UpdateStatusPage({ params }: { params: Promise<{ i
 
   return (
     <AppShell
-      crumbs={[{ label: "Updates", href: "/dashboard" }, { label: month }]}
+      crumbs={[{ label: "Updates", href: "/updates" }, { label: month }]}
       actions={
         <Link href={`/updates/${id}/preview`} className="btn btn-secondary btn-sm">
           See the update
@@ -63,6 +64,9 @@ export default async function UpdateStatusPage({ params }: { params: Promise<{ i
     >
       <QueueRunner id={id} pending={pending} />
       <TitleRow title={`${month} update`} sub={<span aria-live="polite">{sub}</span>} />
+      <div className="-mt-3 mb-6">
+        <PeriodChip period={period} />
+      </div>
 
       {pending && (
         <div className="panel panel-pad mb-6" role="status">

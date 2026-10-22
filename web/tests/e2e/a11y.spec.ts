@@ -39,13 +39,14 @@ test("every page passes axe and fits small screens", async ({ page, context }) =
   const { data: sent } = await admin.from("updates").select("*").eq("status", "sent").limit(1).single();
   const { data: draft } = await admin
     .from("updates")
-    .upsert({ user_id: sent.user_id, month: "2026-01-01", metrics_json: sent.metrics_json, bullets_json: sent.bullets_json }, { onConflict: "user_id,month" })
+    .upsert({ user_id: sent.user_id, month: "2026-01-01", period_type: "month", period_start: "2026-01-01", period_end: "2026-01-31", metrics_json: sent.metrics_json, bullets_json: sent.bullets_json }, { onConflict: "user_id,period_type,period_start,period_end" })
     .select("id")
     .single();
   const { data: send } = await admin.from("sends").select("token").eq("update_id", sent.id).limit(1).single();
 
   const pages: [string, string][] = [
     ["dashboard", "/dashboard"],
+    ["updates", "/updates"],
     ["investors", "/investors"],
     ["settings", "/settings"],
     ["admin", "/admin"],

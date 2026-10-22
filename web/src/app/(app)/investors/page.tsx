@@ -5,6 +5,7 @@ import { TitleRow } from "@/components/title-row";
 import { requireUser } from "@/lib/auth";
 import { removeInvestor } from "@/lib/actions/setup";
 import type { InvestorRow } from "@/lib/db-types";
+import { formatDate } from "@/lib/format";
 import { SubmitButton } from "@/components/submit-button";
 
 export const metadata: Metadata = { title: "Investors" };
@@ -18,8 +19,27 @@ function state(i: InvestorRow): { label: string; cls: string } | null {
 // The screen's question: "Who gets my update?"
 export default async function InvestorsPage() {
   const { supabase, user } = await requireUser();
-  const { data } = await supabase.from("investors").select("*").eq("user_id", user.id).order("name");
+  const [{ data }, { data: sendData }, { data: readData }] = await Promise.all([
+    supabase.from("investors").select("*").eq("user_id", user.id).order("name"),
+    supabase.from("sends").select("id, investor_id, status").eq("user_id", user.id),
+    supabase.from("events").select("send_id, occurred_at").eq("user_id", user.id).eq("type", "read"),
+  ]);
   const investors = (data ?? []) as InvestorRow[];
+  // Per investor: updates received, updates read, and when they last read one.
+  const sendOwner = new Map<string, string>();
+  const stats = new Map<string, { received: number; read: Set<string>; last: string | null }>();
+  for (const s of (sendData ?? []) as { id: string; investor_id: string; status: string }[]) {
+    sendOwner.set(s.id, s.investor_id);
+    const c = stats.get(s.investor_id) ?? { received: 0, read: new Set<string>(), last: null };
+    if (s.status === "sent") c.received += 1;
+    stats.set(s.investor_id, c);
+  }
+  for (const e of (readData ?? []) as { send_id: string; occurred_at: string }[]) {
+    const c = stats.get(sendOwner.get(e.send_id) ?? "");
+    if (!c) continue;
+    c.read.add(e.send_id);
+    if (!c.last || e.occurred_at > c.last) c.last = e.occurred_at;
+  }
   const blocked = investors.filter((i) => i.opted_out || i.suppressed).length;
   const active = investors.length - blocked;
 
@@ -50,6 +70,9 @@ export default async function InvestorsPage() {
                 <tr>
                   <th>Investor</th>
                   <th>Status</th>
+                  <th className="n">Received</th>
+                  <th className="n">Read</th>
+                  <th className="n">Last read</th>
                   <th className="n">
                     <span className="sr-only">Actions</span>
                   </th>
@@ -58,6 +81,7 @@ export default async function InvestorsPage() {
               <tbody>
                 {investors.map((i) => {
                   const s = state(i);
+                  const st = stats.get(i.id) ?? { received: 0, read: new Set<string>(), last: null };
                   return (
                     <tr key={i.id}>
                       <td className="min-w-0">
@@ -65,6 +89,9 @@ export default async function InvestorsPage() {
                         <span className="sub truncate" title={i.email}>{i.email}</span>
                       </td>
                       <td className="n line2 !text-left">{s ? <span className={s.cls}>{s.label}</span> : <span className="text-faint">Receives updates</span>}</td>
+                      <td className="n hidden num sm:table-cell">{st.received}</td>
+                      <td className="n hidden num sm:table-cell">{st.received ? `${st.read.size} of ${st.received}` : <span className="text-faint">-</span>}</td>
+                      <td className="n hidden sm:table-cell">{st.last ? formatDate(st.last) : <span className="text-faint">-</span>}</td>
                       <td className="n row-start-1 col-start-2">
                         <form action={removeInvestor}>
                           <input type="hidden" name="id" value={i.id} />

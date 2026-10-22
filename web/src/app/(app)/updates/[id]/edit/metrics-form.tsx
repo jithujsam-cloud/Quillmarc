@@ -11,7 +11,7 @@ export interface EditableFigure extends Figure {
   /** The current value, same unit. */
   currentInput: string;
   calculatedDisplay: string;
-  /** A short line under the figure, like the change versus last month. */
+  /** A short line under the figure, like the growth against the period before. */
   sub?: string;
 }
 
@@ -40,6 +40,12 @@ export function MetricsForm({ id, figures }: { id: string; figures: EditableFigu
               </div>
               <p className={`font-medium tracking-tight ${i === 0 ? "text-[32px] leading-[38px]" : "text-[24px] leading-[30px]"}`}>{f.display}</p>
               {f.sub && <p className="mt-0.5 text-[12px] text-faint">{f.sub}</p>}
+              {f.compare && (
+                <p className="delta mt-0.5" data-tone={f.compare.tone}>
+                  vs {f.compare.label}: {f.compare.display}
+                  {f.compare.delta ? ` (${f.compare.delta})` : ""}
+                </p>
+              )}
               {(f.adjusted || f.estimated) && (
                 <p className="mt-2 flex flex-wrap gap-2">
                   {f.adjusted && <span className="pill pill-accent">Adjusted by founder</span>}
