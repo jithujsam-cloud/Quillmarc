@@ -13,7 +13,8 @@
     "test:db": "vitest run tests/integration",
     "test:e2e": "playwright test",
     "stack": "node scripts/local-stack.mjs",
-    "seed": "tsx --env-file=.env.local scripts/seed.ts"
+    "seed": "tsx --env-file=.env.local scripts/seed.ts",
+    "stripe:sandbox": "tsx scripts/stripe-sandbox-seed.ts"
   },
   "dependencies": {
     "@supabase/ssr": "0.12.7",
