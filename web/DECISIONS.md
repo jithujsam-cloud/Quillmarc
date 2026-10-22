@@ -137,3 +137,13 @@ The marketing site's decisions live in `../DECISIONS.md`.
 ## Database hardening (October 22)
 - **Applied the Supabase advisors' fixes in `20261022140000_hardening.sql`.** Outside callers can no longer run the template's `rls_auto_enable()` event trigger. Row rules call `auth.uid()` once per query, not once per row. The foreign keys that deletes cascade through are now indexed. Who can see what is unchanged; the RLS tests prove it.
 - **Kept as is:** `rate_limits` and `waitlist` have no policies on purpose (server only). The leaked-password check does not apply, because sign-in is by magic link only.
+
+## Investors first: gone quiet, timeline, asks (October 23)
+- **"Gone quiet" means: has not read the update page in either of the last two updates they received.** Email opens are not used, because mail apps open messages by themselves. An update only counts as missed after 3 days. Investors who opted out, bounced or marked spam are never flagged, since they are not emailed. The rule is a pure function with tests (`investor-activity.ts`).
+- **One investor page per investor (`/investors/[id]`).** Every update sent to them, with when it was delivered, opened and read, the same status words as the update page, their asks, and the one-line prompt when they have gone quiet.
+- **The Investors list links to it and flags the quiet ones**, with a one-line prompt above the table: "Priya has not read your last 2 updates."
+- **Asks are records, not text.** New `asks` table: the text, an optional investor who could help, an optional owner (blank means the founder), and a status: open, intro made, done. A founder can only name one of their own investors (checked in the database). Removing an investor keeps the ask.
+- **Open asks go into the next update draft.** When a new update is created, its Asks bullets start with every ask that is not done. The founder edits them like any other bullet.
+- **The dashboard opens with the investors row**: last update, how many investors it was sent to out of everyone on the list, who has gone quiet, and how many asks are open. It shows once something has been sent or an ask exists. Stripe numbers follow.
+- **Left for later, by the owner's choice:** monthly auto-draft and reminder, own-domain sending, the 250-investor limit.
+- **The demo seed has two earlier updates** with different read patterns, so the quiet flag has something to show.

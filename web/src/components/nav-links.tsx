@@ -9,6 +9,7 @@ const LINKS = [
   { href: "/dashboard", label: "Dashboard", match: /^\/dashboard/, icon: "dashboard" as const },
   { href: "/updates", label: "Updates", match: /^\/updates/, icon: "updates" as const },
   { href: "/investors", label: "Investors", match: /^\/investors/, icon: "investors" as const },
+  { href: "/asks", label: "Asks", match: /^\/asks/, icon: "asks" as const },
   { href: "/settings", label: "Settings", match: /^\/(settings|onboarding)/, icon: "settings" as const },
 ];
 

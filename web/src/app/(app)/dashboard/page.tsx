@@ -11,9 +11,11 @@ import { requireUser } from "@/lib/auth";
 import { chargeSourceFor, ensureSnapshots } from "@/lib/billing";
 import type { MetricsResult } from "@/lib/metrics";
 import { formatCount, formatMoney, formatPercent } from "@/lib/metrics/present";
-import { compactMoney, dayShort, monthName, monthShort, signedPercent } from "@/lib/format";
+import { compactMoney, dayShort, formatDate, monthName, monthShort, signedPercent } from "@/lib/format";
 import { loadDailyRevenue, syncRevenue } from "@/lib/revenue";
+import { loadInvestorOverview } from "@/lib/investor-data";
 import { getSetupState } from "@/lib/setup";
+import { getTimeZone } from "@/lib/timezone-server";
 import { adminClient } from "@/lib/supabase/admin";
 import { accessFor } from "@/lib/trial";
 
@@ -47,6 +49,12 @@ export default async function Dashboard() {
   const importing = syncResult.status === "fulfilled" ? !syncResult.value.complete && !syncResult.value.error : false;
   const problem = stripeError ?? syncError;
 
+  const tz = await getTimeZone();
+  const [overview, { count: openAsks }] = await Promise.all([
+    loadInvestorOverview(supabase, user.id),
+    supabase.from("asks").select("id", { count: "exact", head: true }).eq("user_id", user.id).neq("status", "done"),
+  ]);
+  const last = overview.last;
   const { data: snapData } = await supabase.from("metrics_snapshots").select("month, metrics_json").eq("user_id", user.id).order("month");
   const snapshots = (snapData ?? []).map((r) => ({ month: String(r.month).slice(0, 7), metrics: r.metrics_json as MetricsResult }));
   const rows = await loadDailyRevenue(supabase, user.id, `${Number(today.slice(0, 4)) - 1}-01-01`, today);
@@ -109,6 +117,28 @@ export default async function Dashboard() {
           <p className="notice" role="status">
             <strong>Sample data.</strong> These figures are fictional. Connect your own Stripe in Settings to see yours.
           </p>
+        )}
+
+        {(last || (openAsks ?? 0) > 0) && (
+          <section className="panel" aria-labelledby="inv-h">
+            <div className="panel-head">
+              <h2 id="inv-h">Your investors</h2>
+              <Link href="/investors" className="card-link">
+                All investors
+              </Link>
+            </div>
+            <div className="kpis border-t border-line">
+              <Kpi label="Last update" value={last?.label ?? "-"} sub={last ? `Sent ${formatDate(last.sentAt, tz.zone)}` : "Nothing sent yet"} />
+              <Kpi label="Sent to" value={last ? `${last.reached} of ${last.of}` : "-"} sub={last ? "Investors on your list" : "Send your first update"} />
+              <Kpi
+                label="Gone quiet"
+                value={String(overview.quiet.length)}
+                sub={overview.quiet.length ? `${overview.quiet.slice(0, 3).map((q) => q.name.split(" ")[0]).join(", ")}${overview.quiet.length > 3 ? ` and ${overview.quiet.length - 3} more` : ""}: not read the last 2` : "Nobody has missed two in a row"}
+                tone={overview.quiet.length ? -1 : null}
+              />
+              <Kpi label="Open asks" value={String(openAsks ?? 0)} sub={<Link href="/asks">See your asks</Link>} />
+            </div>
+          </section>
         )}
 
         <section className="panel" aria-labelledby="rev-h">
@@ -235,7 +265,7 @@ function deltaText(p: number | null, against: string): string {
   return s ? `${s} against ${against}` : `Nothing to compare with in ${against}`;
 }
 
-function Kpi({ label, value, sub, tone }: { label: string; value: string; sub: string; tone?: number | null }) {
+function Kpi({ label, value, sub, tone }: { label: string; value: string; sub: React.ReactNode; tone?: number | null }) {
   return (
     <div className="kpi">
       <p className="kpi-label">{label}</p>
