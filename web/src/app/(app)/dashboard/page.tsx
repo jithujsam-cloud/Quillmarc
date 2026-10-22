@@ -205,7 +205,7 @@ export default async function Dashboard() {
           />
         </section>
 
-        <div className="grid items-start gap-4 lg:grid-cols-3">
+        <div className="grid items-stretch gap-4 lg:grid-cols-3">
           <StatRows
             topic="money"
             id="rev-h"

@@ -2,10 +2,8 @@ import Link from "next/link";
 import { createUserClient } from "@/lib/supabase/server";
 import { getSetupState } from "@/lib/setup";
 import { Mark, Wordmark } from "./wordmark";
-import { SideNav, SidebarToggle } from "./nav-links";
+import { AccountMenu, SideNav } from "./nav-links";
 import { MobileMenu } from "./mobile-menu";
-import { ThemeToggle } from "./theme-toggle";
-import { Icon } from "./icons";
 import { SiteFooter } from "./site-footer";
 import { accessFor, trialLabel } from "@/lib/trial";
 import { env } from "@/lib/env";
@@ -43,41 +41,11 @@ export async function AppFrame({ children }: { children: React.ReactNode }) {
           </Link>
           <p className="side-group side-text truncate font-medium text-ink">{company ?? "Your company"}</p>
           <SideNav investorCount={setup?.investorCount ?? 0} isAdmin={isAdmin} />
-          <div className="side-foot">
-            {access && access.plan !== "active" && (
-              <Link href="/settings/plan" className={`side-row ${access.expired ? "text-negative" : "text-accent-ink"}`} title={trialLabel(access)}>
-                <Icon name="clock" />
-                <span className="side-text truncate">{trialLabel(access)}</span>
-              </Link>
-            )}
-            {stripeLabel ? (
-              <Link href="/settings/stripe" className="side-row" title={stripeLabel}>
-                <span className="grid size-4 flex-none place-items-center" aria-hidden="true">
-                  <span className={`size-2 rounded-full ${conn?.status === "error" ? "bg-negative" : "bg-positive"}`} />
-                </span>
-                <span className="side-text truncate">{stripeLabel}</span>
-                <span className="sr-only">, read only</span>
-              </Link>
-            ) : (
-              <Link href="/onboarding?step=1" className="side-row" title="Connect Stripe">
-                <Icon name="stripe" />
-                <span className="side-text">Connect Stripe</span>
-              </Link>
-            )}
-            <div className="side-theme">
-              <ThemeToggle />
-            </div>
-            <p className="side-email side-text meta truncate" title={data.user?.email}>
-              {data.user?.email}
-            </p>
-            <form action="/auth/signout" method="post">
-              <button className="side-row w-full" title="Sign out">
-                <Icon name="signout" />
-                <span className="side-text">Sign out</span>
-              </button>
-            </form>
-            <SidebarToggle />
-          </div>
+          <AccountMenu
+            email={data.user?.email ?? ""}
+            stripe={stripeLabel ? { label: stripeLabel, error: conn?.status === "error" } : null}
+            plan={access && access.plan !== "active" ? { label: trialLabel(access), expired: access.expired } : null}
+          />
         </div>
       </aside>
 
