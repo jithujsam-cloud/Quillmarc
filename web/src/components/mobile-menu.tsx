@@ -6,7 +6,7 @@ import { ThemeToggle } from "./theme-toggle";
 import { Wordmark } from "./wordmark";
 
 // The phone: the sidebar becomes a full-screen sheet behind a menu button.
-export function MobileMenu({ investorCount, email, company }: { investorCount: number; email: string; company: string | null }) {
+export function MobileMenu({ investorCount, email, company, isAdmin = false }: { investorCount: number; email: string; company: string | null; isAdmin?: boolean }) {
   const [open, setOpen] = useState(false);
   useEffect(() => {
     document.body.style.overflow = open ? "hidden" : "";
@@ -29,7 +29,7 @@ export function MobileMenu({ investorCount, email, company }: { investorCount: n
             </button>
           </div>
           {company && <p className="side-group mx-0">{company}</p>}
-          <SideNav investorCount={investorCount} onNavigate={() => setOpen(false)} />
+          <SideNav investorCount={investorCount} isAdmin={isAdmin} onNavigate={() => setOpen(false)} />
           <div className="mt-auto grid gap-4 border-t border-line pt-4">
             <div className="flex items-center justify-between gap-3">
               <span className="text-muted">Theme</span>

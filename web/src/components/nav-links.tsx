@@ -10,11 +10,12 @@ const LINKS = [
   { href: "/settings", label: "Settings", match: /^\/(settings|onboarding)/, icon: "settings" as const },
 ];
 
-export function SideNav({ investorCount, onNavigate }: { investorCount: number; onNavigate?: () => void }) {
+export function SideNav({ investorCount, onNavigate, isAdmin = false }: { investorCount: number; onNavigate?: () => void; isAdmin?: boolean }) {
   const path = usePathname();
+  const links = isAdmin ? [...LINKS, { href: "/admin", label: "Accounts", match: /^\/admin/, icon: "investors" as const }] : LINKS;
   return (
     <nav aria-label="Main" className="nav">
-      {LINKS.map((l) => (
+      {links.map((l) => (
         <Link key={l.href} href={l.href} onClick={onNavigate} aria-current={l.match.test(path) ? "page" : undefined}>
           <Icon name={l.icon} />
           <span>{l.label}</span>

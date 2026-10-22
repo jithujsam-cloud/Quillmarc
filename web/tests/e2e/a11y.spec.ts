@@ -48,6 +48,7 @@ test("every page passes axe and fits small screens", async ({ page, context }) =
     ["dashboard", "/dashboard"],
     ["investors", "/investors"],
     ["settings", "/settings"],
+    ["admin", "/admin"],
     ["onboarding", "/onboarding?step=1"],
     ["new-update", "/updates/new"],
     ["edit-metrics", `/updates/${draft!.id}/edit?step=metrics`],

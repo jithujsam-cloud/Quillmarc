@@ -61,6 +61,31 @@ async function revokeConnect(userId: string): Promise<void> {
   if (cfg && data?.method === "oauth" && data.stripe_account_id) await deauthorize(cfg, data.stripe_account_id);
 }
 
+/** Try the product before finding a Stripe key: fictional subscriptions, labelled "Sample data" everywhere. */
+export async function connectSampleData(form: FormData): Promise<void> {
+  const { user } = await requireUser();
+  await revokeConnect(user.id);
+  await adminClient()
+    .from("stripe_connections")
+    .upsert(
+      {
+        user_id: user.id,
+        method: "sample",
+        encrypted_key: null,
+        stripe_account_id: null,
+        account_name: null,
+        key_mode: null,
+        key_last4: null,
+        status: "connected",
+        last_checked_at: new Date().toISOString(),
+        last_error: null,
+      },
+      { onConflict: "user_id" },
+    );
+  revalidatePath("/", "layout");
+  redirect(safeNext(form.get("next"), "/onboarding?step=2"));
+}
+
 export async function disconnectStripe(): Promise<void> {
   const { user } = await requireUser();
   await revokeConnect(user.id);

@@ -1,5 +1,7 @@
 import { StripeKeyForm } from "./stripe-key-form";
 import { connectMessage } from "@/lib/stripe/connect-messages";
+import { connectSampleData } from "@/lib/actions/setup";
+import { SubmitButton } from "../submit-button";
 
 // Connect with Stripe first (one click, read only). The restricted key stays as a fallback,
 // and is the only option when Connect is not set up on this server.
@@ -34,6 +36,16 @@ export function StripeConnectPanel({ from, connectAvailable, code, next }: { fro
       ) : (
         <StripeKeyForm next={next} />
       )}
+      <form action={connectSampleData} className="grid gap-2 border-t border-line pt-4">
+        <input type="hidden" name="next" value={next} />
+        <p className="font-medium">No key to hand?</p>
+        <p className="hint">Explore with sample data: a fictional company&apos;s subscriptions, labelled &ldquo;Sample data&rdquo; on every screen and email. Switch to your own Stripe in Settings at any time.</p>
+        <div>
+          <SubmitButton className="btn btn-secondary" pendingLabel="Loading sample data">
+            Explore with sample data
+          </SubmitButton>
+        </div>
+      </form>
     </div>
   );
 }

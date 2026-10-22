@@ -7,10 +7,12 @@ import { TitleRow } from "@/components/title-row";
 import { requireUser } from "@/lib/auth";
 import { disconnectStripe } from "@/lib/actions/setup";
 import { env } from "@/lib/env";
-import { formatDateTime } from "@/lib/format";
+import { formatDate, formatDateTime } from "@/lib/format";
 import { getSetupState } from "@/lib/setup";
 import { connectMessage } from "@/lib/stripe/connect-messages";
 import { DeleteForm } from "./delete-form";
+import { accessFor, trialLabel } from "@/lib/trial";
+import { continueHref } from "@/components/trial-notice";
 import { SubmitButton } from "@/components/submit-button";
 
 export const metadata: Metadata = { title: "Settings" };
@@ -37,6 +39,31 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
   return (
     <AppShell crumbs={[{ label: "Settings" }]}>
       <TitleRow title="Settings" sub={<>Signed in as {user.email}</>} />
+
+      <Setting
+        id="plan"
+        title="Plan"
+        desc={profile?.plan === "active" ? "Your account is active." : "Every new account gets 14 days with everything on. No card needed."}
+      >
+        {(() => {
+          const a = accessFor(profile ?? {});
+          return (
+            <div className="grid gap-4">
+              <div className="flex flex-wrap items-center gap-3">
+                <span className={`pill ${a.expired ? "pill-warn" : a.plan === "active" ? "pill-pos" : "pill-accent"}`}>{trialLabel(a)}</span>
+                {a.plan === "trial" && profile?.trial_ends_at && <span className="text-muted">{a.expired ? "Ended" : "Ends"} {formatDate(profile.trial_ends_at)}</span>}
+              </div>
+              {a.plan !== "active" && (
+                <div>
+                  <a href={continueHref()} className={`btn no-underline ${a.expired ? "" : "btn-secondary"}`}>
+                    Continue with Quillmarc
+                  </a>
+                </div>
+              )}
+            </div>
+          );
+        })()}
+      </Setting>
 
       <Setting id="sender" title="Sender details" desc="How your update arrives: who it is from, the subject, and where replies go.">
         <SenderForm profile={profile} />

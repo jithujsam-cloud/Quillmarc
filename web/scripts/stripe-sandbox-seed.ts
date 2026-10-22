@@ -3,7 +3,11 @@
 // quillmarc_fixture=1, so it can find and remove them again.
 //
 //   STRIPE_SANDBOX_SECRET_KEY=sk_test_... npm run stripe:sandbox            create the fixtures
+//   STRIPE_SANDBOX_SECRET_KEY=sk_test_... npm run stripe:sandbox -- --month a month passes: some join, some leave
 //   STRIPE_SANDBOX_SECRET_KEY=sk_test_... npm run stripe:sandbox -- --reset cancel and delete them
+//
+// Stripe cannot backdate a cancellation, so churn only builds up for real: run --month once a
+// month (or more often to fast-forward) and each run adds a month of joins, cancellations and an upgrade.
 //
 // The key is read from the environment only and never written anywhere.
 // Test cards: pm_card_visa always pays; pm_card_chargeCustomerFail always declines.
@@ -11,6 +15,7 @@
 const API = "https://api.stripe.com/v1";
 const key = process.env.STRIPE_SANDBOX_SECRET_KEY ?? "";
 const reset = process.argv.includes("--reset");
+const month = process.argv.includes("--month");
 
 if (!/^(sk|rk)_test_/.test(key)) {
   console.error("Set STRIPE_SANDBOX_SECRET_KEY to a sandbox (test mode) secret key. Live keys are refused.");
@@ -192,7 +197,46 @@ async function seed() {
   console.log("\nDone. In Quillmarc, open the draft and click Recalculate (or start a new update) to read these numbers.");
 }
 
-(reset ? removeFixtures() : seed()).catch((e) => {
+const JOINERS = ["Fern Studio", "Lantern Tax", "Cobalt Clinics", "Mosswood Hotels", "Quill & Co Print", "Larkspur Learning", "Beacon Plumbing", "Halcyon Spa", "Rowan Robotics", "Sundial Coffee", "Tern Travel", "Basalt Climbing"];
+const pick = <T,>(list: T[]) => list[Math.floor(Math.random() * list.length)];
+
+async function monthlyTick() {
+  if (!(await fixtureCustomers()).length) {
+    console.log("No fixture data yet. Run without --month first.");
+    return;
+  }
+  const prices = await stripe<{ data: { id: string; metadata: Record<string, string>; product: { name: string } }[] }>("GET", "/prices", { limit: 100, active: true, "expand[]": "data.product" });
+  const fx = prices.data.filter((p) => p.metadata?.quillmarc_fixture === "1");
+  const byName = (n: string) => fx.find((p) => p.product.name.startsWith(n));
+  const starter = byName("Starter");
+  const growth = byName("Growth (");
+  const seats = byName("Team seat");
+  if (!starter || !growth || !seats) throw new Error("Fixture prices are missing. Run with --reset, then without flags.");
+
+  const subs = await stripe<{ data: { id: string; metadata: Record<string, string>; items: { data: { id: string; price: { id: string } }[] }; trial_end: number | null }[] }>("GET", "/subscriptions", { status: "active", limit: 100 });
+  const live = subs.data.filter((s) => s.metadata?.quillmarc_fixture === "1" && !s.trial_end);
+
+  // Some leave.
+  const leaving = [...live].sort(() => Math.random() - 0.5).slice(0, 1 + Math.floor(Math.random() * 2));
+  for (const s of leaving) await stripe("DELETE", `/subscriptions/${s.id}`);
+
+  // One upgrades from Starter to Growth.
+  const upgrade = live.find((s) => !leaving.includes(s) && s.items.data[0]?.price.id === starter.id);
+  if (upgrade) await stripe("POST", `/subscriptions/${upgrade.id}`, { "items[0][id]": upgrade.items.data[0].id, "items[0][price]": growth.id, proration_behavior: "none" });
+
+  // Some join.
+  const label = new Date().toLocaleString("en-US", { month: "short", year: "2-digit" }).replace(" ", " '");
+  const joining = 2 + Math.floor(Math.random() * 3);
+  for (let i = 0; i < joining; i++) {
+    const name = `${pick(JOINERS)} (${label})`;
+    const c = await customer(name, `billing+${Date.now()}${i}@joiners.example`);
+    const choice = pick([starter, starter, growth, seats]);
+    await subscribe(c.id, choice.id, choice === seats ? { quantity: 2 + Math.floor(Math.random() * 6) } : {});
+  }
+  console.log(`A month passed: ${leaving.length} cancelled, ${upgrade ? 1 : 0} upgraded, ${joining} joined.`);
+}
+
+(reset ? removeFixtures() : month ? monthlyTick() : seed()).catch((e) => {
   // Only the message: never the key or a full Stripe response.
   console.error(`Stopped: ${(e as Error).message}`);
   process.exit(1);

@@ -14,10 +14,18 @@ import { queueConfig } from "../sending/config";
 import { enqueueSends, processQueue, sendTest, SendGateError } from "../sending/queue";
 import { adminClient } from "../supabase/admin";
 import { isMonth, isUuid } from "../validate";
+import { accessFor, TRIAL_ENDED_MESSAGE } from "../trial";
+import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FormState } from "./setup";
 
 const MAX_BULLETS = 10;
 const MAX_BULLET_LENGTH = 500;
+
+/** The trial gate. Checked on the server for every action that creates or sends. */
+async function canSend(supabase: SupabaseClient, userId: string): Promise<boolean> {
+  const { data } = await supabase.from("profiles").select("plan, trial_ends_at").eq("id", userId).maybeSingle();
+  return accessFor(data ?? {}).canSend;
+}
 
 /** Load an update the signed-in founder owns. Row level security does the ownership check. */
 async function ownUpdate(id: unknown) {
@@ -30,6 +38,7 @@ async function ownUpdate(id: unknown) {
 
 export async function createUpdate(_prev: FormState, form: FormData): Promise<FormState> {
   const { supabase, user } = await requireUser();
+  if (!(await canSend(supabase, user.id))) return { error: TRIAL_ENDED_MESSAGE };
   const month = form.get("month");
   if (!isMonth(month) || !monthChoices().includes(month)) return { error: "Choose a month from the list." };
 
@@ -118,7 +127,8 @@ export async function saveRecipients(_prev: FormState, form: FormData): Promise<
 }
 
 export async function sendTestAction(_prev: FormState, form: FormData): Promise<FormState> {
-  const { user, update } = await ownUpdate(form.get("id"));
+  const { supabase, user, update } = await ownUpdate(form.get("id"));
+  if (!(await canSend(supabase, user.id))) return { error: TRIAL_ENDED_MESSAGE };
   if (!(await rateLimit(`test:${user.id}`, 5, 600))) return { error: "That is a lot of tests. Wait a few minutes." };
   try {
     await sendTest(adminClient(), queueConfig(), update.id);
@@ -130,7 +140,8 @@ export async function sendTestAction(_prev: FormState, form: FormData): Promise<
 }
 
 export async function sendToInvestors(_prev: FormState, form: FormData): Promise<FormState> {
-  const { update } = await ownUpdate(form.get("id"));
+  const { supabase, user, update } = await ownUpdate(form.get("id"));
+  if (!(await canSend(supabase, user.id))) return { error: TRIAL_ENDED_MESSAGE };
   if (form.get("confirm") !== "yes") return { error: "Confirm before sending." };
   if (!update.test_sent_at) return { error: "Send a test to yourself first." };
   const admin = adminClient();

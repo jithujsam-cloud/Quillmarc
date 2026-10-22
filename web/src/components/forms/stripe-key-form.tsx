@@ -16,7 +16,7 @@ export function StripeKeyForm({ next }: { next: string }) {
           , and choose Create restricted key.
         </li>
         <li>Set {REQUIRED_READ_PERMISSIONS.join(", ")} to Read. Leave the rest as None.</li>
-        <li>Create the key and paste it below. It starts with rk_.</li>
+        <li>Create the key and paste it below. It starts with rk_live_, or rk_test_ from a Stripe sandbox if you want to try it on test data first.</li>
       </ol>
       <form action={action} className="grid gap-4" noValidate>
         <input type="hidden" name="next" value={next} />

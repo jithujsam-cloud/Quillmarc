@@ -22,6 +22,14 @@ export const env = {
     process.env.STRIPE_CONNECT_CLIENT_ID && process.env.STRIPE_SECRET_KEY
       ? { clientId: process.env.STRIPE_CONNECT_CLIENT_ID, secretKey: process.env.STRIPE_SECRET_KEY, redirectUri: `${required("APP_URL").replace(/\/+$/, "")}/api/stripe/callback` }
       : null,
+  /** Where a founder goes to continue after the trial (a payment link). Optional. */
+  billingUrl: () => process.env.BILLING_URL ?? "",
+  /** Emails allowed to open /admin. Comma-separated. */
+  adminEmails: () =>
+    (process.env.ADMIN_EMAILS ?? "")
+      .split(",")
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean),
   /** Real email goes out only when EMAIL_PROVIDER is exactly "resend". Anything else uses the mock. */
   emailProvider: (): "resend" | "mock" => (process.env.EMAIL_PROVIDER === "resend" ? "resend" : "mock"),
 };

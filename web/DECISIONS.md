@@ -109,3 +109,12 @@ The marketing site's decisions live in `../DECISIONS.md`.
 - **Integration tests run against a real Postgres plus PostgREST, started by the test setup, with a small Supabase stand-in for `auth`.** Docker was not available; this tests the real SQL, RLS and the real supabase-js calls.
 - **PostgREST is downloaded once into `.cache/bin` (Linux x64).** Tests skip with a message where that is not possible.
 - **The end-to-end test signs in by writing the session cookie, not by email.** The stand-in has no mail server; the magic link itself is Supabase's code.
+
+## Free trial, accounts and sandbox testing (October 22)
+- **No waitlist: open sign-up with a 14-day free trial (owner's request).** `plan` and `trial_ends_at` live on `profiles`; founders can read them but not change them (column grants), and a test proves it.
+- **When a trial ends, sending stops but nothing is deleted.** Creating updates, test sends and sends are refused on the server; viewing, settings and delete still work. A running send is allowed to finish.
+- **No payment integration.** Stripe cannot be used for Quillmarc's own billing from India yet, so "Continue" goes to a configurable `BILLING_URL` (any payment link) or emails the owner, and the owner switches the account on.
+- **Owner's Accounts page at `/admin`, gated by `ADMIN_EMAILS`.** Activate, add 14 days (from today or from the current end, whichever is later), or end access. Anyone else gets a 404.
+- **"Explore with sample data" in setup.** Lets a trial user see the whole product in one click; the existing sample source is labelled on every screen and email.
+- **The sandbox is enough to build and test everything.** Founders' connections never use the owner's Stripe account; only Stripe Connect needs an activated platform account, so it stays off until then.
+- **`npm run stripe:sandbox` fills a test-mode account with fixtures; `--month` adds a month of joins, cancellations and an upgrade.** Stripe cannot backdate cancellations, so churn history accumulates for real. Live keys are refused; every fixture is tagged and `--reset` removes them.

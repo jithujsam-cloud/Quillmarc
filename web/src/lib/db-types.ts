@@ -9,6 +9,9 @@ export interface ProfileRow {
   founder_name: string | null;
   company_name: string | null;
   reply_to_email: string | null;
+  plan: "trial" | "active" | "ended";
+  trial_ends_at: string;
+  created_at: string;
 }
 
 export interface StripeConnectionRow {

@@ -9,6 +9,8 @@ import { monthLabel } from "@/lib/metrics/present";
 import { defaultMonth, monthChoices } from "@/lib/months";
 import { connectionLabel } from "@/components/forms/stripe-connect-panel";
 import { NewUpdateForm } from "./new-update-form";
+import { accessFor } from "@/lib/trial";
+import { TrialEndedPanel } from "@/components/trial-notice";
 
 export const metadata: Metadata = { title: "New update" };
 
@@ -29,7 +31,11 @@ export default async function NewUpdatePage() {
           <p className="desc">{setup.connection ? connectionLabel(setup.connection) : ""}</p>
         </div>
         <div className="setting-panel">
+          {accessFor(setup.profile ?? {}).expired ? (
+            <TrialEndedPanel access={accessFor(setup.profile ?? {})} />
+          ) : (
           <NewUpdateForm months={months} defaultMonth={defaultMonth(now)} existing={(data ?? []).map((u) => String(u.month).slice(0, 7))} />
+          )}
         </div>
       </section>
       <StepsAhead />

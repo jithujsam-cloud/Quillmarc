@@ -11,6 +11,8 @@ import { figures, headlineFigures, monthLabel } from "@/lib/metrics/present";
 import { defaultMonth } from "@/lib/months";
 import { formatDate } from "@/lib/format";
 import { loadSendStatuses } from "@/lib/status-data";
+import { accessFor } from "@/lib/trial";
+import { TrialEndedPanel, continueHref } from "@/components/trial-notice";
 
 export const metadata: Metadata = { title: "Updates" };
 
@@ -37,8 +39,12 @@ export default async function Dashboard() {
   const latestSent = updates.find((u) => u.status !== "draft");
   const statuses = latestSent ? await loadSendStatuses(supabase, latestSent.id) : null;
 
-  const primary =
-    setup.nextStep !== null ? (
+  const access = accessFor(setup.profile ?? {});
+  const primary = access.expired ? (
+    <a href={continueHref()} className="btn no-underline">
+      Continue with Quillmarc
+    </a>
+  ) : setup.nextStep !== null ? (
       <Link href={`/onboarding?step=${setup.nextStep}`} className="btn">
         Finish setup
       </Link>
@@ -72,6 +78,12 @@ export default async function Dashboard() {
         <p className="notice mb-6" role="status">
           Stripe: {setup.connection.last_error} <Link href="/settings#stripe">Open settings</Link>
         </p>
+      )}
+
+      {access.expired && (
+        <div className="mb-6">
+          <TrialEndedPanel access={access} />
+        </div>
       )}
 
       {setup.nextStep !== null && <SetupPanel step={setup.nextStep} />}

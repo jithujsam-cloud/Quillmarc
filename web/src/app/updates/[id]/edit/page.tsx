@@ -17,6 +17,8 @@ import { RecipientsForm, type RecipientOption } from "./recipients-form";
 import { SendPanel } from "./send-panel";
 import { SubmitButton } from "@/components/submit-button";
 import { LinkPending } from "@/components/link-pending";
+import { accessFor } from "@/lib/trial";
+import { TrialEndedPanel } from "@/components/trial-notice";
 
 export const metadata: Metadata = { title: "Edit update" };
 
@@ -195,7 +197,11 @@ export default async function EditUpdatePage({ params, searchParams }: { params:
               <h2 id="step-h" className="sr-only">
                 Test, then send
               </h2>
+              {accessFor(profile).expired ? (
+                <TrialEndedPanel access={accessFor(profile)} />
+              ) : (
               <SendPanel id={update.id} testSentAt={update.test_sent_at} recipientCount={recipientCount} founderEmail={profile.email} mock={env.emailProvider() === "mock"} />
+              )}
             </section>
           )}
 
