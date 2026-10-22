@@ -54,7 +54,11 @@ read-only restricted key, and a sandbox behaves exactly like live.
    plans, add seats, keep early discounts, take trials, and cancel at about 3% a month, each change
    recorded in the month it happened. It takes a few minutes. Stripe deletes test clocks and their
    customers after 30 days, so run it again to rebuild (`--reset` first). It only ever deletes clocks
-   named "quillmarc history".
+   named "quillmarc history". Stripe hides test-clock subscriptions from normal lists, so with a
+   sandbox key Quillmarc also reads them clock by clock; give the restricted key Read access to
+   **Test clocks** too. Stripe dates every payment with the real date, so the Payments page shows
+   them on the day they were made; subscriptions carry the simulated dates, which is what Quillmarc
+   uses. `npm run stripe:history -- --plan` prints the numbers Quillmarc should show.
 
 A founder with no key to hand can choose **Explore with sample data** during setup. Every screen
 and email then says "Sample data", and they switch to their own Stripe in Settings.

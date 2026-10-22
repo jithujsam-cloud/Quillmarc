@@ -45,4 +45,6 @@ export interface BillingData {
   subscriptions: NormalizedSubscription[];
   /** True when this is labeled sample data from the demo seed, not a real Stripe account. */
   sample: boolean;
+  /** A sandbox key that cannot read test clocks: simulated subscriptions on clocks were not counted. */
+  testClocksHidden?: boolean;
 }

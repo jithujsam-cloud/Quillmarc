@@ -89,6 +89,7 @@ describe("RestrictedKeySource", () => {
     ];
     const urls: string[] = [];
     const f: FetchLike = async (url) => {
+      if (url.includes("/test_helpers/test_clocks")) return new Response(JSON.stringify({ data: [], has_more: false }), { status: 200 });
       urls.push(url);
       return new Response(JSON.stringify(pages[urls.length - 1]), { status: 200 });
     };
@@ -108,5 +109,42 @@ describe("sample data", () => {
     expect(m.sample).toBe(true);
     expect(m.mrr).toBeGreaterThan(0);
     expect(m.newCustomers).toBeGreaterThan(0);
+  });
+});
+
+describe("sandbox test clocks", () => {
+  function clockStripe(clockStatus: number) {
+    const urls: string[] = [];
+    const f: FetchLike = async (url) => {
+      urls.push(url);
+      const u = new URL(url);
+      if (u.pathname.endsWith("/test_helpers/test_clocks")) {
+        return new Response(JSON.stringify({ data: [{ id: "clock_1" }], has_more: false }), { status: clockStatus });
+      }
+      const onClock = u.searchParams.get("test_clock") === "clock_1";
+      return new Response(JSON.stringify({ data: [{ ...fixture, id: onClock ? "sub_clock" : "sub_plain" }], has_more: false }), { status: 200 });
+    };
+    return { f, urls };
+  }
+
+  it("reads subscriptions on test clocks with a sandbox key", async () => {
+    const { f } = clockStripe(200);
+    const data = await new RestrictedKeySource(KEY, f).fetchBillingData();
+    expect(data.subscriptions.map((s) => s.id).sort()).toEqual(["sub_clock", "sub_plain"]);
+    expect(data.testClocksHidden).toBe(false);
+  });
+
+  it("never looks for test clocks with a live key", async () => {
+    const { f, urls } = clockStripe(200);
+    await new RestrictedKeySource("rk_live_" + "a".repeat(24), f).fetchBillingData();
+    expect(urls.some((u) => u.includes("test_clock"))).toBe(false);
+  });
+
+  it("says so when a sandbox key cannot read test clocks", async () => {
+    const { f } = clockStripe(403);
+    const data = await new RestrictedKeySource(KEY, f).fetchBillingData();
+    expect(data.testClocksHidden).toBe(true);
+    const m = calculateMetrics(data, { month: "2026-09", now: Date.parse("2026-10-10") / 1000 });
+    expect(m.warnings.map((w) => w.code)).toContain("test_clocks_hidden");
   });
 });

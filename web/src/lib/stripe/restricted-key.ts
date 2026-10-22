@@ -90,24 +90,64 @@ export async function validateRestrictedKey(raw: string, fetchImpl: FetchLike = 
  * Read every subscription. `key` is a restricted key, or the platform key when `account` is set
  * (Stripe Connect). With `account`, Stripe limits the request to what the founder granted: read_only.
  */
+/**
+ * Read every subscription. `key` is a restricted key, or the platform key when `account` is set
+ * (Stripe Connect). With `account`, Stripe limits the request to what the founder granted: read_only.
+ *
+ * In a sandbox (test-mode key), subscriptions on Stripe test clocks are hidden from the normal list,
+ * so they are read clock by clock as well. Live keys never do this: live accounts have no test clocks.
+ */
 export async function fetchSubscriptions(opts: { key: string; account?: string; fetchImpl?: FetchLike; kind: StripeFetchError["kind"] }): Promise<BillingData> {
   const fetchImpl = opts.fetchImpl ?? fetch;
   const h: Record<string, string> = { Authorization: `Bearer ${opts.key}`, "Stripe-Version": STRIPE_VERSION };
   if (opts.account) h["Stripe-Account"] = opts.account;
+  const seen = new Set<string>();
   const subscriptions: NormalizedSubscription[] = [];
-  let startingAfter: string | null = null;
-  for (let page = 0; page < MAX_PAGES; page++) {
-    const params = new URLSearchParams({ limit: "100", status: "all" });
-    params.append("expand[]", "data.discounts");
-    if (startingAfter) params.set("starting_after", startingAfter);
-    const res = await fetchImpl(`${API}/subscriptions?${params}`, { headers: h });
-    if (!res.ok) throw new StripeFetchError(res.status, opts.kind);
-    const body = (await res.json()) as { data: Record<string, unknown>[]; has_more: boolean };
-    for (const s of body.data) subscriptions.push(normalizeSubscription(s));
-    if (!body.has_more || body.data.length === 0) break;
-    startingAfter = String(body.data[body.data.length - 1].id);
+
+  async function readAll(extra: Record<string, string>) {
+    let startingAfter: string | null = null;
+    for (let page = 0; page < MAX_PAGES; page++) {
+      const params = new URLSearchParams({ limit: "100", status: "all", ...extra });
+      params.append("expand[]", "data.discounts");
+      if (startingAfter) params.set("starting_after", startingAfter);
+      const res = await fetchImpl(`${API}/subscriptions?${params}`, { headers: h });
+      if (!res.ok) throw new StripeFetchError(res.status, opts.kind);
+      const body = (await res.json()) as { data: Record<string, unknown>[]; has_more: boolean };
+      for (const s of body.data) {
+        const n = normalizeSubscription(s);
+        if (!seen.has(n.id)) {
+          seen.add(n.id);
+          subscriptions.push(n);
+        }
+      }
+      if (!body.has_more || body.data.length === 0) break;
+      startingAfter = String(body.data[body.data.length - 1].id);
+    }
   }
-  return { subscriptions, sample: false };
+
+  await readAll({});
+
+  let testClocksHidden = false;
+  if (/^(rk|sk)_test_/.test(opts.key) && !opts.account) {
+    const clocks: string[] = [];
+    let after: string | null = null;
+    for (let page = 0; page < MAX_PAGES; page++) {
+      const params = new URLSearchParams({ limit: "100" });
+      if (after) params.set("starting_after", after);
+      const res = await fetchImpl(`${API}/test_helpers/test_clocks?${params}`, { headers: h });
+      if (res.status === 401 || res.status === 403) {
+        testClocksHidden = true; // the key has no Read access to test clocks
+        break;
+      }
+      if (!res.ok) throw new StripeFetchError(res.status, opts.kind);
+      const body = (await res.json()) as { data: { id: string }[]; has_more: boolean };
+      clocks.push(...body.data.map((c) => c.id));
+      if (!body.has_more || body.data.length === 0) break;
+      after = body.data[body.data.length - 1].id;
+    }
+    for (const clock of clocks) await readAll({ test_clock: clock });
+  }
+  return { subscriptions, sample: false, testClocksHidden };
 }
 
 export class RestrictedKeySource implements BillingSource {

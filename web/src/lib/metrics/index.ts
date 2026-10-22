@@ -2,7 +2,7 @@
 // Definitions live in METRICS.md. Keep the two in step.
 import type { BillingData, Interval, NormalizedDiscount, NormalizedSubscription } from "../stripe/types";
 
-export type WarningCode = "multi_currency" | "metered_excluded" | "tiered_excluded" | "large_change" | "no_subscriptions";
+export type WarningCode = "multi_currency" | "metered_excluded" | "tiered_excluded" | "large_change" | "no_subscriptions" | "test_clocks_hidden";
 
 export interface MetricWarning {
   code: WarningCode;
@@ -148,6 +148,12 @@ export function calculateMetrics(data: BillingData, { month, now }: CalculateOpt
   const periodStart = bounds.start;
   const periodEnd = monthToDate ? now : bounds.end;
   const warnings: MetricWarning[] = [];
+  if (data.testClocksHidden) {
+    warnings.push({
+      code: "test_clocks_hidden",
+      message: "This sandbox has test clocks this key cannot read, so their subscriptions are not counted. Give the key Read access to Test clocks.",
+    });
+  }
 
   const currency = mainCurrency(data.subscriptions, periodStart, periodEnd);
   if (!currency) {
@@ -155,7 +161,7 @@ export function calculateMetrics(data: BillingData, { month, now }: CalculateOpt
       month, currency: "usd", periodStart, periodEnd, monthToDate,
       mrr: 0, previousMrr: 0, previousMrrEstimated: true, netNewMrr: 0, growthPercent: null,
       customers: 0, newCustomers: 0, churnedCustomers: 0, subscriptionsCounted: 0,
-      warnings: [{ code: "no_subscriptions", message: "No subscriptions were found in this Stripe account." }],
+      warnings: [...warnings, { code: "no_subscriptions", message: "No subscriptions were found in this Stripe account." }],
       sample: data.sample,
     };
   }
