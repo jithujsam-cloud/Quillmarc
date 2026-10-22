@@ -2,10 +2,7 @@
 import { useSyncExternalStore } from "react";
 
 type Theme = "light" | "dark" | "system";
-const KEY = "qm-theme"; // shared with the marketing site
-
-// Set before first paint by the script in layout.tsx, so there is no flash.
-export const THEME_SCRIPT = `try{var t=localStorage.getItem("${KEY}");if(t==="light"||t==="dark")document.documentElement.setAttribute("data-theme",t)}catch(e){}`;
+const KEY = "qm-theme"; // shared with the marketing site; restored before first paint by layout.tsx
 
 const OPTIONS: { value: Theme; label: string; path: string }[] = [
   { value: "light", label: "Light", path: "M8 11a3 3 0 1 0 0-6 3 3 0 0 0 0 6ZM8 1v1.5M8 13.5V15M1 8h1.5M13.5 8H15M3 3l1 1M12 12l1 1M3 13l1-1M12 4l1-1" },
