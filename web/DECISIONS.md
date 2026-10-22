@@ -151,3 +151,9 @@ The marketing site's decisions live in `../DECISIONS.md`.
 ## Loading speed (October 23)
 - **The dashboard opens from what is saved and refreshes from Stripe in the background.** It used to wait for Stripe (subscriptions and payments) before showing anything. Now the page reads the saved monthly numbers and revenue straight away, and `DashboardRefresher` calls `/api/dashboard/refresh` after it opens, reloads the figures once, then keeps importing older payments. A founder's first visit shows a plain "Reading your Stripe data" line until the first figures arrive.
 - **A dashboard-shaped loading screen** (`DashboardSkeleton`) shows while the page is fetched, instead of the generic list placeholder.
+
+## Dashboard stats and loading screens (October 23)
+- **The dashboard separates what matters from the detail.** Four headline cards (collected this month, MRR, customers, investors gone quiet), each with a badge for how it moved (green good, red bad, gold needs a look) and a line in words. Everything else is plain label-and-figure rows grouped under Revenue, Customers and Investors. Big cards against plain rows is a difference you can see at a glance.
+- **Topic colour is a small dot only.** Money is sapphire, customers teal, investors gold. A first version put a thick coloured edge on top of each card; it curved at the rounded corners and looked wrong, so it was removed.
+- **A loading screen for full reloads.** The page's HTML carries the wordmark and a ring; `BootDone` hides it once the page is ready. Moving between pages never brings it back. With no JavaScript it is hidden, and it hides itself after 8 seconds in any case so it can never block the page.
+- **Every page's loading placeholder says "Loading your data"**, so it is clear something is happening.

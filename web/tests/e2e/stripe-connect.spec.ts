@@ -32,7 +32,7 @@ test("founder connects Stripe with one click and gets real numbers", async ({ pa
 
   // The dashboard reads the account's payments (three in the fake Stripe: yesterday, 10 and 40 days ago).
   await page.goto("/dashboard");
-  await expect(page.getByRole("heading", { name: "Revenue collected" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Revenue", exact: true })).toBeVisible();
   await expect(page.getByText("Importing your payment history")).toHaveCount(0, { timeout: 30_000 });
   await expect(page.getByRole("heading", { name: "Revenue by day" })).toBeVisible();
 

@@ -79,6 +79,7 @@ export default async function Dashboard() {
   const customerPoints: ChartPoint[] = snapshots.map((s) => ({ key: s.month, value: s.metrics.customers, title: `${monthShort(s.month, true)}: ${formatCount(s.metrics.customers)} customers`, tick: monthShort(s.month) }));
   const compact = (n: number) => compactMoney(n, currency);
 
+  const customersChange = latest && closed ? latest.customers - closed.metrics.customers : null;
   const churn = closed ? churnRate(closed.metrics) : null;
   const retention = closed ? netRetention(closed.metrics) : null;
 
@@ -110,61 +111,95 @@ export default async function Dashboard() {
           </p>
         )}
 
-        {(last || (openAsks ?? 0) > 0) && (
-          <section className="panel" aria-labelledby="inv-h">
-            <div className="panel-head">
-              <h2 id="inv-h">Your investors</h2>
-              <Link href="/investors" className="card-link">
-                All investors
-              </Link>
-            </div>
-            <div className="kpis border-t border-line">
-              <Kpi label="Last update" value={last?.label ?? "-"} sub={last ? `Sent ${formatDate(last.sentAt, tz.zone)}` : "Nothing sent yet"} />
-              <Kpi label="Sent to" value={last ? `${last.reached} of ${last.of}` : "-"} sub={last ? "Investors on your list" : "Send your first update"} />
-              <Kpi
-                label="Gone quiet"
-                value={String(overview.quiet.length)}
-                sub={overview.quiet.length ? `${overview.quiet.slice(0, 3).map((q) => q.name.split(" ")[0]).join(", ")}${overview.quiet.length > 3 ? ` and ${overview.quiet.length - 3} more` : ""}: not read the last 2` : "Nobody has missed two in a row"}
-                tone={overview.quiet.length ? -1 : null}
-              />
-              <Kpi label="Open asks" value={String(openAsks ?? 0)} sub={<Link href="/asks">See your asks</Link>} />
-            </div>
-          </section>
-        )}
-
-        <section className="panel" aria-labelledby="rev-h">
-          <div className="panel-head">
-            <h2 id="rev-h">Revenue collected</h2>
-            <span className="meta">Payments received minus refunds, by UTC day</span>
-          </div>
-          <div className="kpis border-t border-line">
-            <Kpi label="Today" value={money(revenue.today)} sub={`Yesterday ${money(revenue.yesterday)}`} />
-            <Kpi label={monthName(thisMonthKey)} value={money(revenue.monthToDate)} sub={deltaText(monthChange, `the same days of ${lastMonthKey ? monthName(lastMonthKey) : "last month"}`)} tone={monthChange} />
-            <Kpi label={today.slice(0, 4)} value={money(revenue.yearToDate)} sub={deltaText(yearChange, `the same days of ${Number(today.slice(0, 4)) - 1}`)} tone={yearChange} />
-            <Kpi label="Average per day" value={money(avgDay)} sub="Last 30 days" />
-          </div>
+        <section className="headline" aria-label="The numbers that matter most">
+          <HeadlineCard
+            topic="money"
+            label={`Collected in ${monthName(thisMonthKey)}`}
+            value={money(revenue.monthToDate)}
+            badge={signedPercent(monthChange)}
+            tone={toneOf(monthChange)}
+            note={signedPercent(monthChange) ? `against the same days of ${lastMonthKey ? monthName(lastMonthKey) : "last month"}` : "Nothing to compare with yet"}
+          />
+          <HeadlineCard
+            topic="money"
+            label="MRR"
+            value={latest ? formatMoney(latest.mrr, latest.currency) : "-"}
+            badge={signedPercent(mrrGrowth)}
+            tone={toneOf(mrrGrowth)}
+            note={latest ? `against ${closed ? monthName(closed.month) : "last month"}` : "Reading your subscriptions"}
+          />
+          <HeadlineCard
+            topic="customers"
+            label="Customers"
+            value={latest ? formatCount(latest.customers) : "-"}
+            badge={customersChange === null ? null : `${customersChange > 0 ? "+" : customersChange < 0 ? "−" : ""}${Math.abs(customersChange)}`}
+            tone={customersChange === null ? undefined : toneOf(customersChange)}
+            note={latest ? `${formatCount(latest.newCustomers)} new, ${formatCount(latest.churnedCustomers)} churned` : "Reading your subscriptions"}
+          />
+          <HeadlineCard
+            topic="investors"
+            label="Investors gone quiet"
+            value={last ? String(overview.quiet.length) : "-"}
+            badge={last ? (overview.quiet.length ? "Needs a look" : "All reading") : null}
+            tone={last ? (overview.quiet.length ? "warn" : "good") : undefined}
+            note={
+              !last
+                ? "Send your first update"
+                : overview.quiet.length
+                  ? `${overview.quiet.slice(0, 3).map((q) => q.name.split(" ")[0]).join(", ")}${overview.quiet.length > 3 ? ` and ${overview.quiet.length - 3} more` : ""}: not read the last 2`
+                  : "Nobody has missed two in a row"
+            }
+          />
         </section>
 
-        {latest && (
-          <section className="panel" aria-labelledby="rec-h">
-            <div className="panel-head">
-              <h2 id="rec-h">Recurring revenue</h2>
-              <span className="meta">From your Stripe subscriptions, {monthName(thisMonthKey)} so far</span>
-            </div>
-            <div className="kpis border-t border-line">
-              <Kpi label="MRR" value={formatMoney(latest.mrr, latest.currency)} sub={deltaText(mrrGrowth, `${closed ? monthName(closed.month) : "last month"}`)} tone={mrrGrowth} />
-              <Kpi label="ARR" value={formatMoney(latest.mrr * 12, latest.currency)} sub="MRR times 12" />
-              <Kpi label="Customers" value={formatCount(latest.customers)} sub={`${formatCount(latest.newCustomers)} new, ${formatCount(latest.churnedCustomers)} churned`} />
-              <Kpi label="Net new MRR" value={formatMoney(latest.netNewMrr, latest.currency, { signed: true })} sub={`Estimated, against ${closed ? monthName(closed.month) : "last month"}`} />
-            </div>
-            <div className="kpis border-t border-line">
-              <Kpi label={`Churn${closed ? `, ${monthName(closed.month)}` : ""}`} value={churn === null ? "-" : formatPercent(churn).replace("+", "")} sub="Customers lost, of those at the start" />
-              <Kpi label="Revenue per customer" value={arpa(latest) === null ? "-" : formatMoney(arpa(latest) as number, latest.currency)} sub="MRR over customers, a month" />
-              <Kpi label={`Net revenue retention${closed ? `, ${monthName(closed.month)}` : ""}`} value={retention === null ? "-" : `${retention.toFixed(1)}%`} sub="Estimated, from today's prices" />
-              <Kpi label="New customers" value={formatCount(latest.newCustomers)} sub={`${monthName(thisMonthKey)} so far`} />
-            </div>
-          </section>
-        )}
+        <div className="grid items-start gap-4 lg:grid-cols-3">
+          <StatRows
+            topic="money"
+            id="rev-h"
+            title="Revenue"
+            note="Payments received, by UTC day"
+            rows={[
+              { label: "Today", value: money(revenue.today), hint: `Yesterday ${money(revenue.yesterday)}` },
+              { label: today.slice(0, 4), value: money(revenue.yearToDate), hint: signedPercent(yearChange) ? `${signedPercent(yearChange)} on the same days of ${Number(today.slice(0, 4)) - 1}` : undefined },
+              { label: "Average per day", value: money(avgDay), hint: "Last 30 days" },
+              ...(latest
+                ? [
+                    { label: "ARR", value: formatMoney(latest.mrr * 12, latest.currency), hint: "MRR times 12" },
+                    { label: "Net new MRR", value: formatMoney(latest.netNewMrr, latest.currency, { signed: true }), hint: "Estimated" },
+                  ]
+                : []),
+            ]}
+          />
+          {latest && (
+            <StatRows
+              topic="customers"
+              id="cus-stats-h"
+              title="Customers"
+              note="From your Stripe subscriptions"
+              rows={[
+                { label: "New this month", value: formatCount(latest.newCustomers) },
+                { label: "Churned this month", value: formatCount(latest.churnedCustomers) },
+                { label: `Churn rate${closed ? `, ${monthName(closed.month)}` : ""}`, value: churn === null ? "-" : formatPercent(churn).replace("+", ""), hint: "Of customers at the start" },
+                { label: "Revenue per customer", value: arpa(latest) === null ? "-" : formatMoney(arpa(latest) as number, latest.currency), hint: "A month" },
+                { label: `Net revenue retention${closed ? `, ${monthName(closed.month)}` : ""}`, value: retention === null ? "-" : `${retention.toFixed(1)}%`, hint: "Estimated" },
+              ]}
+            />
+          )}
+          {(last || (openAsks ?? 0) > 0) && (
+            <StatRows
+              topic="investors"
+              id="inv-h"
+              title="Investors"
+              note={last ? `${last.label}, sent ${formatDate(last.sentAt, tz.zone)}` : "Nothing sent yet"}
+              rows={[
+                { label: "Sent to", value: last ? `${last.reached} of ${last.of}` : "-", hint: "Investors on your list" },
+                { label: "Read the last update", value: last ? `${last.read} of ${last.reached}` : "-" },
+                { label: "Gone quiet", value: String(overview.quiet.length), hint: <Link href="/investors">See who</Link> },
+                { label: "Open asks", value: String(openAsks ?? 0), hint: <Link href="/asks">See your asks</Link> },
+              ]}
+            />
+          )}
+        </div>
 
         <div className="grid gap-4 lg:grid-cols-2">
           <section className="panel" aria-labelledby="day-h">
@@ -251,19 +286,55 @@ export default async function Dashboard() {
   );
 }
 
-function deltaText(p: number | null, against: string): string {
-  const s = signedPercent(p);
-  return s ? `${s} against ${against}` : `Nothing to compare with in ${against}`;
+type Tone = "good" | "bad" | "warn" | "flat";
+
+function toneOf(n: number | null | undefined): Tone | undefined {
+  return n === null || n === undefined ? undefined : n > 0 ? "good" : n < 0 ? "bad" : "flat";
 }
 
-function Kpi({ label, value, sub, tone }: { label: string; value: string; sub: React.ReactNode; tone?: number | null }) {
+// One of the four numbers that matter most: big, with a coloured badge for how it moved and a line in words.
+function HeadlineCard({ topic, label, value, badge, tone, note }: { topic: "money" | "customers" | "investors"; label: string; value: string; badge: string | null; tone?: Tone; note: string }) {
   return (
-    <div className="kpi">
-      <p className="kpi-label">{label}</p>
-      <p className="kpi-value">{value}</p>
-      <p className="delta" data-tone={tone === undefined || tone === null || tone === 0 ? undefined : tone > 0 ? "good" : "bad"}>
-        {sub}
+    <div className={`hcard topic-${topic}`}>
+      <p className="hcard-label">
+        <span className="topic-dot" aria-hidden="true" />
+        {label}
+      </p>
+      <p className="hcard-value">{value}</p>
+      <p className="hcard-foot">
+        {badge && (
+          <span className="badge-delta" data-tone={tone}>
+            {badge}
+          </span>
+        )}
+        <span>{note}</span>
       </p>
     </div>
+  );
+}
+
+// The supporting numbers of one topic as plain rows: the label on the left, the figure on the right.
+function StatRows({ topic, id, title, note, rows }: { topic: "money" | "customers" | "investors"; id: string; title: string; note: string; rows: { label: string; value: string; hint?: React.ReactNode }[] }) {
+  return (
+    <section className={`panel topic-panel topic-${topic}`} aria-labelledby={id}>
+      <div className="panel-head">
+        <h2 id={id}>
+          <span className="topic-dot" aria-hidden="true" />
+          {title}
+        </h2>
+      </div>
+      <p className="meta stat-note">{note}</p>
+      <dl className="stat-rows">
+        {rows.map((r) => (
+          <div key={r.label}>
+            <dt>
+              {r.label}
+              {r.hint && <span className="stat-hint">{r.hint}</span>}
+            </dt>
+            <dd>{r.value}</dd>
+          </div>
+        ))}
+      </dl>
+    </section>
   );
 }

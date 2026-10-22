@@ -356,6 +356,37 @@ textarea.field { min-height: 112px; resize: vertical; }
 .pick .pick-sub { font-size: 12px; color: var(--muted); }
 .pick[data-used] .pick-sub { color: var(--faint); }
 
+
+/* ---------- dashboard stats: four headline cards, then plain rows by topic ---------- */
+:root { --topic-customers: #2f6f73; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --topic-customers: #6fc3c8; } }
+:root[data-theme="dark"] { --topic-customers: #6fc3c8; }
+.topic-money { --topic: var(--accent); }
+.topic-customers { --topic: var(--topic-customers); }
+.topic-investors { --topic: var(--brass); }
+.headline { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; }
+@media (max-width: 1100px) { .headline { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 560px) { .headline { grid-template-columns: minmax(0, 1fr); } }
+.hcard { min-width: 0; padding: 18px 20px 20px; background: var(--surface); border: 1px solid var(--border); border-radius: 10px; }
+.hcard-label { display: flex; align-items: center; gap: 10px; font-size: 14px; font-weight: 600; color: var(--text); }
+.hcard-label .topic-dot { margin-right: 0; flex: none; }
+.hcard-value { margin-top: 10px; font: 400 36px/42px var(--font-figures); letter-spacing: -0.02em; overflow-wrap: anywhere; }
+.hcard-foot { margin-top: 12px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px 10px; font-size: 13px; line-height: 18px; color: var(--muted); }
+.badge-delta { display: inline-flex; align-items: center; height: 22px; padding: 0 8px; border-radius: 999px; font-size: 12px; font-weight: 600; white-space: nowrap; background: var(--pill-neutral-bg); color: var(--pill-neutral-ink); }
+.badge-delta[data-tone="good"] { background: var(--pill-pos-bg); color: var(--pill-pos-ink); }
+.badge-delta[data-tone="bad"] { background: var(--pill-neg-bg); color: var(--pill-neg-ink); }
+.badge-delta[data-tone="warn"] { background: var(--pill-warn-bg); color: var(--pill-warn-ink); }
+.topic-panel .panel-head { padding-bottom: 4px; }
+.topic-dot { display: inline-block; width: 10px; height: 10px; margin-right: 10px; border-radius: 50%; background: var(--topic); vertical-align: 1px; }
+.stat-note { padding: 0 20px 12px; }
+.stat-rows > div { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 11px 20px; border-top: 1px solid var(--rule); }
+.stat-rows dt { min-width: 0; color: var(--text); }
+.stat-rows dd { flex: none; font: 400 15px/20px var(--font-figures); letter-spacing: -0.01em; }
+.stat-hint { display: block; font-size: 12px; line-height: 16px; color: var(--faint); }
+.stat-hint a { color: inherit; }
+.loading-note { display: flex; align-items: center; gap: 10px; margin: 0 0 16px; color: var(--muted); font-size: 14px; }
+.loading-note .link-spin { opacity: 0.8; width: 14px; height: 14px; }
+
 /* ---------- motion: feedback first, all of it off for reduced motion ---------- */
 @layer components {
   /* loading placeholders: flat bars at the size of what will arrive */
@@ -379,7 +410,7 @@ textarea.field { min-height: 112px; resize: vertical; }
 
   /* a new screen settles in, quickly */
   .app-canvas-inner, .plain-main { animation: qm-rise 220ms cubic-bezier(0.22, 1, 0.36, 1) both; }
-  .btn[aria-busy="true"]::before, .link-spin.is-pending { animation: qm-spin 700ms linear infinite; }
+  .btn[aria-busy="true"]::before, .link-spin.is-pending, .loading-note .link-spin { animation: qm-spin 700ms linear infinite; }
   .link-spin { transition: opacity 150ms ease 120ms; }
   .skeleton { animation: qm-breathe 1.4s ease-in-out infinite; }
   /* the read strip fills in, one investor at a time */
@@ -394,3 +425,11 @@ textarea.field { min-height: 112px; resize: vertical; }
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { transition: none !important; animation: none !important; }
 }
+
+/* ---------- loading screen for a full reload: the wordmark and a ring until the page is ready ---------- */
+.boot { position: fixed; inset: 0; z-index: 100; display: grid; place-content: center; justify-items: center; gap: 22px; background: var(--ground); color: var(--text); animation: boot-give-up 0s linear 8s forwards; }
+html[data-ready] .boot { display: none; }
+.boot-spin { width: 22px; height: 22px; border-radius: 50%; border: 2px solid var(--control); border-top-color: var(--accent); animation: boot-spin 800ms linear infinite; }
+@keyframes boot-spin { to { transform: rotate(360deg); } }
+@keyframes boot-give-up { to { visibility: hidden; pointer-events: none; } }
+@media (prefers-reduced-motion: reduce) { .boot-spin { animation: none; border-top-color: var(--control); } }
