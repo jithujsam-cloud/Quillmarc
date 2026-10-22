@@ -10,8 +10,12 @@ export function SkeletonShell({ children }: { children: React.ReactNode }) {
   return (
     <div aria-busy="true" aria-live="polite">
       <p className="sr-only">Loading</p>
-      <div className="app-canvas-inner" aria-hidden="true">
-        {children}
+      <div className="app-canvas-inner">
+        <p className="loading-note" aria-hidden="true">
+          <span className="link-spin" />
+          Loading your data
+        </p>
+        <div aria-hidden="true">{children}</div>
       </div>
     </div>
   );
@@ -66,8 +70,30 @@ export function DashboardSkeleton() {
     <SkeletonShell>
       <Title />
       <div className="grid gap-4">
-        <Kpis />
-        <Kpis />
+        <div className="headline">
+          {[0, 1, 2, 3].map((i) => (
+            <div key={i} className="hcard grid gap-3">
+              <Bar w="55%" h={14} />
+              <Bar w="70%" h={36} />
+              <Bar w="50%" />
+            </div>
+          ))}
+        </div>
+        <div className="grid gap-4 lg:grid-cols-3">
+          {[0, 1, 2].map((i) => (
+            <div key={i} className="panel p-5">
+              <Bar w="40%" h={16} />
+              <div className="mt-5 grid gap-4">
+                {[0, 1, 2, 3, 4].map((j) => (
+                  <div key={j} className="flex justify-between">
+                    <Bar w="45%" />
+                    <Bar w="20%" />
+                  </div>
+                ))}
+              </div>
+            </div>
+          ))}
+        </div>
         <div className="grid gap-4 lg:grid-cols-2">
           {[0, 1].map((i) => (
             <div key={i} className="panel p-5">

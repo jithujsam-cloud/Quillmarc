@@ -12,9 +12,9 @@ test("founder sends an update and sees statuses", async ({ page, context }) => {
   // The dashboard shows revenue and monthly numbers from the sample account's payments and subscriptions.
   await page.goto("/dashboard");
   await expect(page.getByRole("heading", { name: "Dashboard", exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Your investors" })).toBeVisible();
-  await expect(page.getByText("Gone quiet", { exact: true }).first()).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Revenue collected" })).toBeVisible();
+  await expect(page.getByText("Investors gone quiet", { exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Investors", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Revenue", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Month by month" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Revenue by day" })).toBeVisible();
 

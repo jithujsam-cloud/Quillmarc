@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Hanken_Grotesk, Newsreader } from "next/font/google";
+import { BootDone } from "@/components/boot-done";
+import { Wordmark } from "@/components/wordmark";
 import "./globals.css";
 
 // The landing page's three faces: Newsreader for headings and the letter, Hanken Grotesk for text,
@@ -31,8 +33,17 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="en" className={`${hanken.variable} ${newsreader.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: PREPAINT_SCRIPT }} />
+        <noscript>
+          <style>{".boot{display:none}"}</style>
+        </noscript>
       </head>
       <body className="min-h-dvh">
+        {/* Shown while the page loads after a full reload, then hidden by BootDone. It hides itself after a few seconds in any case. */}
+        <div className="boot" aria-hidden="true">
+          <Wordmark className="h-7 w-auto" />
+          <span className="boot-spin" />
+        </div>
+        <BootDone />
         <a className="skip" href="#main">
           Skip to content
         </a>
