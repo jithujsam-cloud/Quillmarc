@@ -61,6 +61,26 @@ function Kpis() {
   );
 }
 
+export function DashboardSkeleton() {
+  return (
+    <SkeletonShell>
+      <Title />
+      <div className="grid gap-4">
+        <Kpis />
+        <Kpis />
+        <div className="grid gap-4 lg:grid-cols-2">
+          {[0, 1].map((i) => (
+            <div key={i} className="panel p-5">
+              <Bar w="140px" h={16} />
+              <Bar w="100%" h={168} className="mt-5" />
+            </div>
+          ))}
+        </div>
+      </div>
+    </SkeletonShell>
+  );
+}
+
 export function ListSkeleton() {
   return (
     <SkeletonShell>

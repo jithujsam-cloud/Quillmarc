@@ -147,3 +147,7 @@ The marketing site's decisions live in `../DECISIONS.md`.
 - **The dashboard opens with the investors row**: last update, how many investors it was sent to out of everyone on the list, who has gone quiet, and how many asks are open. It shows once something has been sent or an ask exists. Stripe numbers follow.
 - **Left for later, by the owner's choice:** monthly auto-draft and reminder, own-domain sending, the 250-investor limit.
 - **The demo seed has two earlier updates** with different read patterns, so the quiet flag has something to show.
+
+## Loading speed (October 23)
+- **The dashboard opens from what is saved and refreshes from Stripe in the background.** It used to wait for Stripe (subscriptions and payments) before showing anything. Now the page reads the saved monthly numbers and revenue straight away, and `DashboardRefresher` calls `/api/dashboard/refresh` after it opens, reloads the figures once, then keeps importing older payments. A founder's first visit shows a plain "Reading your Stripe data" line until the first figures arrive.
+- **A dashboard-shaped loading screen** (`DashboardSkeleton`) shows while the page is fetched, instead of the generic list placeholder.
