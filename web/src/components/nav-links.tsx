@@ -47,10 +47,20 @@ const isCollapsed = () => document.documentElement.getAttribute("data-sidebar") 
 export function SidebarToggle() {
   const collapsed = useSyncExternalStore(subscribe, isCollapsed, () => false);
 
-  function toggle() {
+  function toggle(e: React.MouseEvent<HTMLButtonElement>) {
     const next = !collapsed;
-    if (next) document.documentElement.setAttribute("data-sidebar", "collapsed");
-    else document.documentElement.removeAttribute("data-sidebar");
+    const root = document.documentElement;
+    if (next) {
+      root.setAttribute("data-sidebar", "collapsed");
+      // The pointer is still over the sidebar; hold off the hover peek until it leaves, or folding looks like it did nothing.
+      const panel = e.currentTarget.closest(".side-panel");
+      if (panel && e.detail > 0) {
+        root.setAttribute("data-peek", "off");
+        panel.addEventListener("mouseleave", () => root.removeAttribute("data-peek"), { once: true });
+      }
+    } else {
+      root.removeAttribute("data-sidebar");
+    }
     try {
       if (next) localStorage.setItem(SIDEBAR_KEY, "collapsed");
       else localStorage.removeItem(SIDEBAR_KEY);
@@ -59,8 +69,9 @@ export function SidebarToggle() {
 
   const label = collapsed ? "Expand sidebar" : "Collapse sidebar";
   return (
-    <button type="button" className="side-toggle btn btn-ghost btn-sm" aria-label={label} title={label} aria-expanded={!collapsed} onClick={toggle}>
+    <button type="button" className="side-row w-full" aria-label={label} title={label} aria-expanded={!collapsed} onClick={toggle}>
       <Icon name="sidebar" />
+      <span className="side-text">{collapsed ? "Expand" : "Collapse"}</span>
     </button>
   );
 }
