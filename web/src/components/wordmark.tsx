@@ -9,3 +9,14 @@ export function Wordmark({ className = "h-6 w-auto" }: { className?: string }) {
     </svg>
   );
 }
+
+// The Q on its own, from assets/logo/quillmarc-symbol-ink.svg: shown when the sidebar is folded.
+export function Mark({ className = "size-6" }: { className?: string }) {
+  return (
+    <svg viewBox="4 4 31 31" className={className} aria-hidden="true">
+      <path fillRule="evenodd" fill="currentColor" d="M5 18a13 13 0 1 0 26 0a13 13 0 1 0 -26 0ZM9.847 25.435A11.1 9.5 -40 1 0 26.853 11.165A11.1 9.5 -40 1 0 9.847 25.435Z" />
+      <path fill="currentColor" d="M20.327 22.873L30.405 31.395L31.395 30.405L22.873 20.327Z" />
+      <rect x="30" y="30" width="4.4" height="4.4" rx="0.5" fill="var(--brass)" />
+    </svg>
+  );
+}

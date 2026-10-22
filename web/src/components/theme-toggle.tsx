@@ -35,7 +35,7 @@ export function ThemeToggle() {
   return (
     <div className="segmented" role="group" aria-label="Colour theme">
       {OPTIONS.map((o) => (
-        <button key={o.value} type="button" aria-pressed={theme === o.value} aria-label={`${o.label} theme`} title={`${o.label} theme`} onClick={() => choose(o.value)}>
+        <button key={o.value} type="button" data-value={o.value} aria-pressed={theme === o.value} aria-label={`${o.label} theme`} title={`${o.label} theme`} onClick={() => choose(o.value)}>
           <svg viewBox="0 0 16 16" aria-hidden="true">
             <path d={o.path} fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" strokeLinejoin="round" />
           </svg>
