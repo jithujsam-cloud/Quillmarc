@@ -92,7 +92,7 @@ export default async function InvestorsPage() {
                       </td>
                       <td className="n line2 !text-left">{s ? <span className={s.cls}>{s.label}</span> : st?.quiet ? <span className="pill pill-warn">Gone quiet</span> : <span className="text-faint">Receives updates</span>}</td>
                       <td className="n hidden num sm:table-cell">{st?.received ?? 0}</td>
-                      <td className="n hidden num sm:table-cell">{st?.received ? `${st.read} of ${st.received}` : <span className="text-faint">-</span>}</td>
+                      <td className="n hidden of sm:table-cell">{st?.received ? `${st.read} of ${st.received}` : <span className="text-faint">-</span>}</td>
                       <td className="n hidden sm:table-cell">{st?.lastReadAt ? formatDate(st.lastReadAt, tz.zone) : <span className="text-faint">-</span>}</td>
                       <td className="n row-start-1 col-start-2">
                         <form action={removeInvestor}>

@@ -123,7 +123,7 @@ export default async function UpdatesPage() {
                       <span className={u.status === "draft" ? "pill pill-quiet" : "pill pill-accent"}>{u.status === "draft" ? "Draft" : u.status === "sending" ? "Sending" : "Sent"}</span>
                     </td>
                     <td className="line2 sm:!text-left">{u.sent_at ? formatDate(u.sent_at, tz.zone) : <span className="text-faint" aria-label="Not sent">-</span>}</td>
-                    <td className="n num">
+                    <td className="n of">
                       {u.status === "draft" ? (
                         <span className="text-faint" aria-label="Not sent">
                           -

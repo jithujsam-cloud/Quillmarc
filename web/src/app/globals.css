@@ -394,7 +394,7 @@ textarea.field { min-height: 112px; resize: vertical; }
 .tabs button[aria-selected="true"] { color: var(--text); font-weight: 500; }
 .tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); }
 .tab-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 54px; padding: 8px 20px; color: var(--text); text-decoration: none; transition: background-color 150ms ease; }
-.tab-figure { flex: none; font: 400 15px/20px var(--font-figures); letter-spacing: -0.01em; }
+.tab-figure { flex: none; font: 400 14px/20px var(--font-ui); font-variant-numeric: tabular-nums; }
 .panel .tabs { margin-top: 4px; }
 .tab-row:hover { background: var(--raised); }
 
@@ -452,3 +452,6 @@ html[data-ready] .boot { display: none; }
 @media (min-width: 1024px) { .tab-scroll { max-height: none; } }
 .dash-trio .stat-rows { flex: 1; display: flex; flex-direction: column; }
 .dash-trio .stat-rows > div { flex: 1; }
+
+/* Figures that read as words ("6 of 6", "1 of 2 read") use the text face with aligned digits; the mono face is for bare numbers. */
+.of { font-variant-numeric: tabular-nums; }
