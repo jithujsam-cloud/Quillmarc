@@ -120,8 +120,8 @@
 .app-brand .brand-mark { position: absolute; left: 8px; top: 20px; opacity: 0; transition: opacity 160ms ease; }
 .app-phonebar { display: none; }
 .app-canvas { grid-column: 2; grid-row: 1; min-width: 0; padding: 32px 29px 64px; }
-.app-canvas-inner { max-width: 1152px; }
-.app-top { display: flex; align-items: center; gap: 12px; min-height: 32px; margin-bottom: 20px; min-width: 0; max-width: 1152px; }
+.app-canvas-inner { max-width: 1600px; }
+.app-top { display: flex; align-items: center; gap: 12px; min-height: 32px; margin-bottom: 20px; min-width: 0; max-width: 1600px; }
 .crumbs { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--muted); }
 .crumbs a { color: var(--muted); text-decoration: none; }
 .crumbs a:hover { color: var(--text); }
@@ -181,7 +181,7 @@
 .title-row .sub { margin-top: 4px; color: var(--muted); font-size: 14px; }
 
 /* ---------- panels ---------- */
-.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; min-width: 0; }
+.panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; min-width: 0; }
 .panel-pad { padding: 20px; }
 .panel-head { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 16px 20px; }
 .panel-head + .panel-body { padding-top: 0; }
@@ -301,7 +301,7 @@ textarea.field { min-height: 112px; resize: vertical; }
 .setting:first-of-type { border-top: 0; padding-top: 0; }
 .setting h2 { font-size: 20px; line-height: 26px; }
 .setting .desc { margin-top: 4px; color: var(--muted); }
-.setting-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 8px; padding: 20px; }
+.setting-panel { background: var(--surface); border: 1px solid var(--border); border-radius: 10px; padding: 20px; }
 @media (max-width: 860px) { .setting { grid-template-columns: minmax(0, 1fr); } }
 
 /* the letter: the update as investors read it. The serif has this one job. */
@@ -310,6 +310,51 @@ textarea.field { min-height: 112px; resize: vertical; }
 .num { font-family: var(--font-figures); font-variant-numeric: tabular-nums; letter-spacing: -0.02em; }
 .letter-body { font: 400 18px/30px var(--font-letter); }
 }
+
+
+/* ---------- charts: HTML columns and one SVG line, a scale on the left, the hue on the current period ---------- */
+.chart { display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: 168px auto; column-gap: 10px; margin: 0; }
+.chart-y { display: flex; flex-direction: column; justify-content: space-between; align-items: flex-end; margin: -7px 0; color: var(--faint); font: 400 12px/14px var(--font-figures); }
+.chart-plot { position: relative; min-width: 0; }
+.chart-grid { position: absolute; left: 0; right: 0; height: 0; border-top: 1px solid var(--rule); }
+.chart-grid[data-base] { border-top-color: var(--control); }
+.chart-cols { position: absolute; inset: 0; display: flex; align-items: stretch; gap: 3px; }
+.chart-col { flex: 1 1 0; min-width: 0; display: flex; align-items: flex-end; }
+.chart-bar { display: block; width: 100%; min-height: 0; background: var(--tint-2); border-radius: 2px 2px 0 0; transition: background-color 150ms ease; }
+.chart-bar[data-current] { background: var(--accent); }
+.chart-col:hover .chart-bar { background: var(--accent); }
+.chart-line { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+.chart-line polyline { stroke: var(--accent); stroke-width: 2; vector-effect: non-scaling-stroke; stroke-linejoin: round; }
+.chart-hits .chart-col:hover { background: var(--raised); }
+.chart-end { position: absolute; width: 8px; height: 8px; margin: -4px 0 0 -4px; border-radius: 50%; background: var(--accent); }
+.chart-end-label { position: absolute; margin: 10px 10px 0 0; font: 400 13px/16px var(--font-figures); color: var(--text); white-space: nowrap; }
+.chart-x { grid-column: 2; display: flex; gap: 3px; padding-top: 6px; color: var(--faint); font-size: 12px; line-height: 16px; }
+.chart-x span { flex: 1 1 0; min-width: 0; display: flex; justify-content: center; }
+.chart-x b { font-weight: 400; width: 0; overflow: visible; white-space: nowrap; display: flex; justify-content: center; }
+@media (max-width: 640px) { .chart[data-dense] .chart-x span:nth-child(even) b { display: none; } .chart { grid-template-rows: 140px auto; } .chart-y { font-size: 11px; } }
+
+/* ---------- period: the chip that says what an update covers, the picker, deltas ---------- */
+.period-chip { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 4px 10px; padding: 6px 12px; border-radius: 999px; background: var(--tint-1); color: var(--accent-ink); font-size: 13px; line-height: 18px; }
+.period-chip strong { font-weight: 600; }
+.period-chip .dot { width: 4px; height: 4px; border-radius: 50%; background: currentColor; opacity: 0.5; }
+.delta { font-size: 12px; line-height: 16px; color: var(--faint); }
+.delta[data-tone="good"] { color: var(--positive); }
+.delta[data-tone="bad"] { color: var(--negative); }
+.choice { display: inline-flex; padding: 3px; gap: 2px; border-radius: 10px; background: var(--raised); border: 1px solid var(--border); max-width: 100%; overflow-x: auto; scrollbar-width: none; }
+.choice label { position: relative; display: inline-flex; align-items: center; justify-content: center; min-height: 36px; padding: 0 16px; border-radius: 7px; color: var(--muted); cursor: pointer; white-space: nowrap; font-weight: 500; transition: background-color 150ms ease, color 150ms ease; }
+.choice label:hover { color: var(--text); }
+.choice input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.choice label:has(input:checked) { background: var(--surface); color: var(--text); box-shadow: 0 0 0 1px var(--border); }
+.choice label:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 1px; }
+.pick-list { display: grid; gap: 8px; grid-template-columns: repeat(auto-fill, minmax(168px, 1fr)); }
+.pick { position: relative; display: grid; gap: 2px; padding: 12px 14px; border: 1px solid var(--control); border-radius: 8px; background: var(--surface); cursor: pointer; transition: border-color 150ms ease, background-color 150ms ease; }
+.pick:hover { background: var(--raised); }
+.pick input { position: absolute; opacity: 0; inset: 0; margin: 0; cursor: pointer; }
+.pick:has(input:checked) { border-color: var(--accent); background: var(--tint-1); box-shadow: 0 0 0 1px var(--accent); }
+.pick:has(input:focus-visible) { outline: 2px solid var(--accent); outline-offset: 2px; }
+.pick .pick-name { font-weight: 500; }
+.pick .pick-sub { font-size: 12px; color: var(--muted); }
+.pick[data-used] .pick-sub { color: var(--faint); }
 
 /* ---------- motion: feedback first, all of it off for reduced motion ---------- */
 @layer components {

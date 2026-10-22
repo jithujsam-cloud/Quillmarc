@@ -41,7 +41,12 @@ export interface InvestorRow {
 export interface UpdateRow {
   id: string;
   user_id: string;
-  month: string; // YYYY-MM-01
+  month: string; // first day of the period's first month, YYYY-MM-01
+  period_type: import("./periods").PeriodType;
+  period_start: string; // YYYY-MM-DD
+  period_end: string; // YYYY-MM-DD, inclusive
+  /** Everyone on the investor list when it was sent. Null until then. */
+  investor_total: number | null;
   status: "draft" | "sending" | "sent";
   metrics_json: MetricsResult | null;
   adjustments_json: Adjustments;

@@ -4,16 +4,16 @@ import { revalidatePath } from "next/cache";
 import { redirect } from "next/navigation";
 import { after } from "next/server";
 import { requireUser } from "../auth";
-import { computeMetrics } from "../billing";
+import { computePeriodMetrics } from "../billing";
 import type { UpdateRow } from "../db-types";
 import type { Bullets } from "../email/render";
 import { EDITABLE_KEYS, parseAdjustment, type Adjustments } from "../metrics/present";
-import { monthChoices } from "../months";
+import { isPeriodType, periodFromRow, validatePeriod, type Period } from "../periods";
 import { rateLimit } from "../rate-limit";
 import { queueConfig } from "../sending/config";
 import { enqueueSends, processQueue, sendTest, SendGateError } from "../sending/queue";
 import { adminClient } from "../supabase/admin";
-import { isMonth, isUuid } from "../validate";
+import { isUuid } from "../validate";
 import { accessFor, TRIAL_ENDED_MESSAGE } from "../trial";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { FormState } from "./setup";
@@ -30,29 +30,52 @@ async function canSend(supabase: SupabaseClient, userId: string): Promise<boolea
 /** Load an update the signed-in founder owns. Row level security does the ownership check. */
 async function ownUpdate(id: unknown) {
   const { supabase, user } = await requireUser();
-  if (!isUuid(id)) redirect("/dashboard");
+  if (!isUuid(id)) redirect("/updates");
   const { data } = await supabase.from("updates").select("*").eq("id", id).maybeSingle<UpdateRow>();
-  if (!data) redirect("/dashboard");
+  if (!data) redirect("/updates");
   return { supabase, user, update: data };
+}
+
+/** The period a form asks for: a preset arrives as "start_end", a custom range as two dates. */
+function periodFromForm(form: FormData): Period | null {
+  const type = form.get("type");
+  if (!isPeriodType(type)) return null;
+  if (type === "custom") return { type, start: String(form.get("start") ?? ""), end: String(form.get("end") ?? "") };
+  const [start, end] = String(form.get("period") ?? "").split("_");
+  return start && end ? { type, start, end } : null;
 }
 
 export async function createUpdate(_prev: FormState, form: FormData): Promise<FormState> {
   const { supabase, user } = await requireUser();
   if (!(await canSend(supabase, user.id))) return { error: TRIAL_ENDED_MESSAGE };
-  const month = form.get("month");
-  if (!isMonth(month) || !monthChoices().includes(month)) return { error: "Choose a month from the list." };
+  const period = periodFromForm(form);
+  if (!period) return { error: "Choose how often this update covers, then the period." };
+  const problem = validatePeriod(period);
+  if (problem) return { error: problem };
 
-  const { data: existing } = await supabase.from("updates").select("id").eq("user_id", user.id).eq("month", `${month}-01`).maybeSingle();
-  if (existing) redirect(`/updates/${existing.id}/edit`);
+  const { data: existing } = await supabase
+    .from("updates")
+    .select("id, status")
+    .eq("user_id", user.id)
+    .eq("period_type", period.type)
+    .eq("period_start", period.start)
+    .eq("period_end", period.end)
+    .maybeSingle();
+  if (existing) redirect(existing.status === "draft" ? `/updates/${existing.id}/edit` : `/updates/${existing.id}`);
 
   let metrics;
   try {
-    metrics = await computeMetrics(user.id, month);
+    metrics = await computePeriodMetrics(user.id, period);
   } catch (e) {
     return { error: (e as Error).message };
   }
-  const { data, error } = await supabase.from("updates").insert({ user_id: user.id, month: `${month}-01`, metrics_json: metrics }).select("id").single();
+  const { data, error } = await supabase
+    .from("updates")
+    .insert({ user_id: user.id, month: `${period.start.slice(0, 7)}-01`, period_type: period.type, period_start: period.start, period_end: period.end, metrics_json: metrics })
+    .select("id")
+    .single();
   if (error || !data) return { error: "Could not create the update. Try again." };
+  revalidatePath("/updates");
   redirect(`/updates/${data.id}/edit`);
 }
 
@@ -60,7 +83,7 @@ export async function recalculate(form: FormData): Promise<void> {
   const { supabase, user, update } = await ownUpdate(form.get("id"));
   if (update.status !== "draft") redirect(`/updates/${update.id}`);
   try {
-    const metrics = await computeMetrics(user.id, update.month.slice(0, 7));
+    const metrics = await computePeriodMetrics(user.id, periodFromRow(update));
     await supabase.from("updates").update({ metrics_json: metrics, updated_at: new Date().toISOString() }).eq("id", update.id);
   } catch {
     redirect(`/updates/${update.id}/edit?step=metrics&error=stripe`);
@@ -158,6 +181,6 @@ export async function sendToInvestors(_prev: FormState, form: FormData): Promise
 export async function deleteDraft(form: FormData): Promise<void> {
   const { supabase, update } = await ownUpdate(form.get("id"));
   if (update.status === "draft") await supabase.from("updates").delete().eq("id", update.id);
-  revalidatePath("/dashboard");
-  redirect("/dashboard");
+  revalidatePath("/updates");
+  redirect("/updates");
 }

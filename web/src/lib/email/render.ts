@@ -17,7 +17,14 @@ export const BULLET_GROUPS: { key: keyof Bullets; label: string }[] = [
 export interface UpdateContent {
   founderName: string;
   companyName: string;
-  monthLabel: string;
+  /** "Q3 2026" */
+  periodLabel: string;
+  /** "1 Jul to 30 Sep 2026" */
+  periodRange: string;
+  /** "month", "quarter", "year" or "period" */
+  noun: string;
+  /** The period has not ended, so the figures are to date. */
+  running: boolean;
   figures: Figure[];
   bullets: Bullets;
   sample: boolean;
@@ -37,8 +44,14 @@ export function escapeHtml(s: string): string {
   return s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 
-export function subjectFor(companyName: string, monthLabel: string): string {
-  return `${companyName} investor update, ${monthLabel}`;
+export function subjectFor(companyName: string, periodLabel: string): string {
+  return `${companyName} investor update, ${periodLabel}`;
+}
+
+/** "Q3 2026, 1 Jul to 30 Sep 2026" — the name and the dates, so the period is never a guess. A custom range is its own dates. */
+export function coverLine(c: Pick<UpdateContent, "periodLabel" | "periodRange" | "running">): string {
+  const dates = c.periodLabel === c.periodRange ? c.periodRange : `${c.periodLabel}, ${c.periodRange}`;
+  return c.running ? `${dates} (so far)` : dates;
 }
 
 const C = {
@@ -55,8 +68,14 @@ const SERIF = "Georgia, 'Times New Roman', serif";
 const SANS = "-apple-system, 'Segoe UI', Helvetica, Arial, sans-serif";
 
 
+/** "Q2 2026: $13,533 (+$1,392)" */
+export function compareText(f: Figure): string {
+  if (!f.compare) return "";
+  return `vs ${f.compare.label}: ${f.compare.display}${f.compare.delta ? ` (${f.compare.delta})` : ""}`;
+}
+
 export function renderUpdateEmail(c: UpdateContent, o: RenderOptions): { subject: string; html: string; text: string } {
-  const subject = subjectFor(c.companyName, c.monthLabel);
+  const subject = subjectFor(c.companyName, c.periodLabel);
   const top = headlineFigures(c.figures);
   const e = escapeHtml;
 
@@ -64,6 +83,7 @@ export function renderUpdateEmail(c: UpdateContent, o: RenderOptions): { subject
     <td valign="top" width="50%" style="padding:16px;border:1px solid ${C.line};background:${C.sheet};">
       <div style="font:500 13px/1.4 ${SANS};color:${C.muted};">${e(f.label)}</div>
       <div style="font:500 24px/1.3 ${SANS};font-variant-numeric:tabular-nums;color:${C.ink};padding-top:4px;">${e(f.display)}</div>
+      ${f.compare ? `<div style="font:400 12px/1.4 ${SANS};color:${C.muted};padding-top:4px;">${e(compareText(f))}</div>` : ""}
       ${f.adjusted ? `<div style="font:400 12px/1.4 ${SANS};color:${C.muted};padding-top:4px;">Adjusted by founder</div>` : ""}
     </td>`;
 
@@ -75,14 +95,15 @@ export function renderUpdateEmail(c: UpdateContent, o: RenderOptions): { subject
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="color-scheme" content="light"><title>${e(subject)}</title></head>
 <body style="margin:0;padding:0;background:${C.bg};">
-<div style="display:none;max-height:0;overflow:hidden;">${e(`${c.companyName} update for ${c.monthLabel}.`)}</div>
+<div style="display:none;max-height:0;overflow:hidden;">${e(`${c.companyName} update for ${c.periodLabel}.`)}</div>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="background:${C.bg};">
 <tr><td align="center" style="padding:32px 16px;">
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
 ${o.banner ? `<tr><td style="padding:12px 16px;margin-bottom:16px;background:${C.ink};color:${C.onAccent};font:500 14px/1.5 ${SANS};">${e(o.banner)}</td></tr><tr><td style="height:16px;"></td></tr>` : ""}
 ${c.sample ? `<tr><td style="padding:0 0 12px;font:600 13px/1.4 ${SANS};color:${C.muted};">Sample data. These figures are fictional.</td></tr>` : ""}
 <tr><td style="font:400 16px/1.6 ${SANS};color:${C.ink};padding-bottom:8px;">Hi ${e(o.greetingName)},</td></tr>
-<tr><td style="font:400 16px/1.6 ${SANS};color:${C.ink};padding-bottom:24px;">Here is the ${e(c.companyName)} update for ${e(c.monthLabel)}.</td></tr>
+<tr><td style="font:400 16px/1.6 ${SANS};color:${C.ink};padding-bottom:8px;">Here is the ${e(c.companyName)} update for ${e(c.periodLabel)}.</td></tr>
+<tr><td style="font:500 14px/1.5 ${SANS};color:${C.muted};padding-bottom:24px;">Covers ${e(coverLine(c))}</td></tr>
 <tr><td style="font:400 26px/1.25 ${SERIF};color:${C.ink};padding-bottom:16px;border-top:2px solid ${C.brass};padding-top:16px;">Key numbers</td></tr>
 <tr><td>
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="border-collapse:collapse;">
@@ -90,7 +111,7 @@ ${c.sample ? `<tr><td style="padding:0 0 12px;font:600 13px/1.4 ${SANS};color:${
 <tr>${cell(top[2])}${cell(top[3])}</tr>
 </table>
 </td></tr>
-<tr><td style="font:400 13px/1.5 ${SANS};color:${C.muted};padding-top:8px;">From Stripe. Growth compares with an estimate of last month.</td></tr>
+<tr><td style="font:400 13px/1.5 ${SANS};color:${C.muted};padding-top:8px;">From Stripe. Growth compares with an estimate of last ${e(c.noun)}.</td></tr>
 ${groups
   .map(
     (g) => `<tr><td style="font:400 22px/1.3 ${SERIF};color:${C.ink};padding-top:28px;padding-bottom:8px;">${e(g.label)}</td></tr>
@@ -116,9 +137,9 @@ ${o.unsubscribeUrl ? `<a href="${e(o.unsubscribeUrl)}" style="color:${C.accent};
   const lines: string[] = [];
   if (o.banner) lines.push(o.banner, "");
   if (c.sample) lines.push("Sample data. These figures are fictional.", "");
-  lines.push(`Hi ${o.greetingName},`, "", `Here is the ${c.companyName} update for ${c.monthLabel}.`, "", "KEY NUMBERS");
-  for (const f of top) lines.push(`${f.label}: ${f.display}${f.adjusted ? " (adjusted by founder)" : ""}`);
-  lines.push("From Stripe. Growth compares with an estimate of last month.");
+  lines.push(`Hi ${o.greetingName},`, "", `Here is the ${c.companyName} update for ${c.periodLabel}.`, `Covers ${coverLine(c)}`, "", "KEY NUMBERS");
+  for (const f of top) lines.push(`${f.label}: ${f.display}${f.compare ? ` (${compareText(f)})` : ""}${f.adjusted ? " (adjusted by founder)" : ""}`);
+  lines.push(`From Stripe. Growth compares with an estimate of last ${c.noun}.`);
   for (const g of groups) {
     lines.push("", g.label.toUpperCase());
     for (const b of g.items) lines.push(`- ${b}`);

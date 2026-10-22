@@ -10,7 +10,10 @@ const metrics = calculateMetrics(data([sub(), sub({ startDate: t("2026-09-10T00:
 const content = {
   founderName: "Ada <script>",
   companyName: "Northwind & Co",
-  monthLabel: "September 2026",
+  periodLabel: "September 2026",
+  periodRange: "1 to 30 Sep 2026",
+  noun: "month",
+  running: false,
   figures: figures(metrics, { customers: 3 }),
   bullets: { wins: ["Closed <b>Acme</b>"], problems: [], asks: ["Intros to \"CFOs\""] },
   sample: false,

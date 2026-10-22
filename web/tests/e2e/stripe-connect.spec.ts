@@ -24,11 +24,17 @@ test("founder connects Stripe with one click and gets real numbers", async ({ pa
 
   // Numbers now come from the connected account: three $250 subscriptions, one started this month.
   await page.goto("/updates/new");
-  await page.getByLabel(/which month/i).selectOption({ index: 0 });
+  await page.getByRole("radio", { name: /so far/ }).first().check(); // the month in progress
   await page.getByRole("button", { name: "Calculate the numbers" }).click();
   await expect(page.getByRole("heading", { name: "Review the numbers" })).toBeVisible();
   await expect(page.getByText(/From your Stripe subscriptions/)).toBeVisible();
   await expect(page.getByText("$750", { exact: true }).first()).toBeVisible();
+
+  // The dashboard reads the account's payments (three in the fake Stripe: yesterday, 10 and 40 days ago).
+  await page.goto("/dashboard");
+  await expect(page.getByRole("heading", { name: "Revenue collected" })).toBeVisible();
+  await expect(page.getByText("Importing your payment history")).toHaveCount(0, { timeout: 20_000 });
+  await expect(page.getByRole("heading", { name: "Revenue by day" })).toBeVisible();
 
   // A stranger's callback with a state that does not match is refused.
   await page.goto("/api/stripe/callback?code=ac_localfake&state=forged");

@@ -1,5 +1,6 @@
 // Metric calculation. Pure functions only: no network, no clock, no database.
 // Definitions live in METRICS.md. Keep the two in step.
+import { periodBounds, type PeriodType } from "../periods";
 import type { BillingData, Interval, NormalizedDiscount, NormalizedSubscription } from "../stripe/types";
 
 export type WarningCode = "multi_currency" | "metered_excluded" | "tiered_excluded" | "large_change" | "no_subscriptions" | "test_clocks_hidden";
@@ -9,8 +10,27 @@ export interface MetricWarning {
   message: string;
 }
 
+/** The comparison period's own figures, saved with the update so the page and the email can compare. */
+export interface PreviousPeriod {
+  /** "Q2 2026" */
+  label: string;
+  mrr: number;
+  customers: number;
+  newCustomers: number;
+  churnedCustomers: number;
+  netNewMrr: number;
+}
+
+/** Cash collected in the period, from Stripe payments net of refunds. Present once payment history is imported. */
+export interface RevenueSummary {
+  net: number;
+  gross: number;
+  refunds: number;
+  payments: number;
+}
+
 export interface MetricsResult {
-  /** "YYYY-MM" */
+  /** "YYYY-MM" of the period's first day. */
   month: string;
   currency: string;
   /** Unix seconds. The month's first instant (UTC). */
@@ -29,6 +49,14 @@ export interface MetricsResult {
   subscriptionsCounted: number;
   warnings: MetricWarning[];
   sample: boolean;
+  // Added with periods. Older monthly updates do not carry them.
+  periodType?: PeriodType;
+  /** Customers counted at the start of the period. */
+  startingCustomers?: number;
+  /** Today's MRR from the customers who were already customers at the start. Net revenue retention is this over previousMrr. */
+  retainedMrr?: number;
+  previous?: PreviousPeriod;
+  revenue?: RevenueSummary;
 }
 
 /** Statuses that never count, whatever their dates say. */
@@ -142,8 +170,25 @@ export interface CalculateOptions {
   now: number;
 }
 
+export interface PeriodOptions {
+  /** First day, "YYYY-MM-DD". */
+  start: string;
+  /** Last day, inclusive, "YYYY-MM-DD". */
+  end: string;
+  type?: PeriodType;
+  now: number;
+}
+
+/** One calendar month. The same as a period from its first to its last day. */
 export function calculateMetrics(data: BillingData, { month, now }: CalculateOptions): MetricsResult {
-  const bounds = monthBounds(month);
+  const { start, end } = monthBounds(month);
+  const last = new Date((end - 86400) * 1000).toISOString().slice(0, 10);
+  return calculatePeriodMetrics(data, { start: new Date(start * 1000).toISOString().slice(0, 10), end: last, type: "month", now });
+}
+
+export function calculatePeriodMetrics(data: BillingData, { start, end, type = "custom", now }: PeriodOptions): MetricsResult {
+  const month = start.slice(0, 7);
+  const bounds = periodBounds({ type, start, end });
   const monthToDate = now < bounds.end;
   const periodStart = bounds.start;
   const periodEnd = monthToDate ? now : bounds.end;
@@ -162,7 +207,7 @@ export function calculateMetrics(data: BillingData, { month, now }: CalculateOpt
       mrr: 0, previousMrr: 0, previousMrrEstimated: true, netNewMrr: 0, growthPercent: null,
       customers: 0, newCustomers: 0, churnedCustomers: 0, subscriptionsCounted: 0,
       warnings: [...warnings, { code: "no_subscriptions", message: "No subscriptions were found in this Stripe account." }],
-      sample: data.sample,
+      sample: data.sample, periodType: type, startingCustomers: 0, retainedMrr: 0,
     };
   }
 
@@ -211,8 +256,14 @@ export function calculateMetrics(data: BillingData, { month, now }: CalculateOpt
   let customers = 0;
   let newCustomers = 0;
   let churnedCustomers = 0;
+  let startingCustomers = 0;
+  let retainedMrr = 0;
   for (const list of byCustomer.values()) {
     if (list.some((s) => isCountedAt(s, periodEnd))) customers++;
+    if (list.some((s) => isCountedAt(s, periodStart))) {
+      startingCustomers++;
+      retainedMrr += list.reduce((sum, s) => sum + subscriptionMrrAt(s, periodEnd), 0);
+    }
     const first = Math.min(...list.map(countedStart));
     if (first >= periodStart && first < periodEnd) newCustomers++;
     if (list.every((s) => s.endedAt !== null)) {
@@ -228,7 +279,7 @@ export function calculateMetrics(data: BillingData, { month, now }: CalculateOpt
   if (growthPercent !== null && Math.abs(growthPercent) > LARGE_CHANGE_PERCENT) {
     warnings.push({
       code: "large_change",
-      message: `MRR changed by ${Math.abs(growthPercent)} percent versus last month. Check the numbers before you send.`,
+      message: `MRR changed by ${Math.abs(growthPercent)} percent over the period. Check the numbers before you send.`,
     });
   }
 
@@ -249,5 +300,8 @@ export function calculateMetrics(data: BillingData, { month, now }: CalculateOpt
     subscriptionsCounted: subs.filter((s) => isCountedAt(s, periodEnd)).length,
     warnings,
     sample: data.sample,
+    periodType: type,
+    startingCustomers,
+    retainedMrr: Math.round(retainedMrr),
   };
 }

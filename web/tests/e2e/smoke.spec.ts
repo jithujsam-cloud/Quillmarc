@@ -9,13 +9,24 @@ test("founder sends an update and sees statuses", async ({ page, context }) => {
   await expect(page.getByRole("heading", { name: "Sign in" })).toBeVisible();
 
   await signIn(context);
+  // The dashboard shows revenue and monthly numbers from the sample account's payments and subscriptions.
   await page.goto("/dashboard");
+  await expect(page.getByRole("heading", { name: "Dashboard", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Revenue collected" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Month by month" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Revenue by day" })).toBeVisible();
+
+  await page.goto("/updates");
   await expect(page.getByRole("heading", { name: "Updates", exact: true })).toBeVisible();
 
-  // Create an update for the last full month.
-  await page.getByRole("link", { name: /^Write .* update$/ }).click();
+  // Add an update for the last finished quarter. The dates it covers are on screen before anything is calculated.
+  await page.getByRole("link", { name: "Add update" }).first().click();
+  await page.getByLabel("Quarterly").check();
+  await expect(page.getByText(/This update will cover/)).toContainText(/\d+ \w+ \d{4} to \d+ \w+ \d{4}/);
   await page.getByRole("button", { name: "Calculate the numbers" }).click();
   await expect(page.getByRole("heading", { name: "Review the numbers" })).toBeVisible();
+  await expect(page.getByLabel(/^Covers Q\d \d{4}/).first()).toBeVisible();
+  await expect(page.getByText("Last quarter MRR").first()).toBeVisible();
   await expect(page.getByText("Sample data.").first()).toBeVisible();
 
   // Every figure explains itself. Edit one.
@@ -67,7 +78,13 @@ test("founder sends an update and sees statuses", async ({ page, context }) => {
   await expect(page.locator("tbody").getByText("Bounced")).toHaveCount(1);
   await expect(page.locator("tbody").getByText("Opened, possibly automatic").first()).toBeVisible();
 
+  // The updates table says how many investors it reached, out of everyone on the list.
+  await page.goto("/updates");
+  await expect(page.getByText("Investors reached", { exact: true })).toBeVisible();
+  await expect(page.locator("tbody tr").first()).toContainText(/\d+ of \d+/);
+
   // Hosted page logs a read, then the investor opts out.
+  await page.goBack();
   await page.getByRole("link", { name: "See the update" }).click();
   await expect(page.getByText("No read is logged")).toBeVisible();
 });

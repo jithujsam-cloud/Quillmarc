@@ -17,6 +17,8 @@ import { RecipientsForm, type RecipientOption } from "./recipients-form";
 import { SendPanel } from "./send-panel";
 import { SubmitButton } from "@/components/submit-button";
 import { LinkPending } from "@/components/link-pending";
+import { PeriodChip } from "@/components/period-chip";
+import { periodFromRow, periodNoun } from "@/lib/periods";
 import { accessFor } from "@/lib/trial";
 import { TrialEndedPanel } from "@/components/trial-notice";
 
@@ -48,6 +50,8 @@ export default async function EditUpdatePage({ params, searchParams }: { params:
   const step: Step = STEPS.some((s) => s.key === sp.step) ? (sp.step as Step) : "metrics";
   const m = update.metrics_json;
   const content = contentFor(update, profile);
+  const period = periodFromRow(update);
+  const noun = periodNoun(period.type);
   const investors = (inv ?? []) as InvestorRow[];
 
   const recipients: RecipientOption[] = investors.map((i) => ({
@@ -82,7 +86,7 @@ export default async function EditUpdatePage({ params, searchParams }: { params:
 
   return (
     <AppShell
-      crumbs={[{ label: "Updates", href: "/dashboard" }, { label: `${content.monthLabel} draft` }]}
+      crumbs={[{ label: "Updates", href: "/updates" }, { label: `${content.periodLabel} draft` }]}
       actions={
         <>
           <Link href={`/updates/${update.id}/preview`} className="btn btn-secondary btn-sm hide-phone">
@@ -98,10 +102,13 @@ export default async function EditUpdatePage({ params, searchParams }: { params:
         <div className="min-w-0">
           <div className="title-row !mb-4">
             <div className="min-w-0">
-              <h1>{content.monthLabel} update</h1>
+              <h1>{content.periodLabel} update</h1>
+              <div className="mt-2">
+                <PeriodChip period={period} running={Boolean(m?.monthToDate)} />
+              </div>
               <p className="sub">
                 {finding}
-                {m?.monthToDate ? " This month is still running, so figures are month to date." : ""}
+                {m?.monthToDate ? ` This ${noun} is still running, so figures are to date.` : ""}
               </p>
             </div>
           </div>
@@ -227,6 +234,7 @@ function toInput(key: EditableKey, value: number, currency: string): string {
 
 function editableFigures(update: UpdateRow): EditableFigure[] {
   const m = update.metrics_json!;
+  const noun = periodNoun(update.period_type);
   const calculated = figures(m);
   const current = figures(m, update.adjustments_json);
   const byKey = (k: string) => current.find((x) => x.key === k)!;
@@ -234,7 +242,7 @@ function editableFigures(update: UpdateRow): EditableFigure[] {
     const editable = (EDITABLE_KEYS as string[]).includes(f.key);
     const calc = calculated.find((c) => c.key === f.key)!;
     const sub =
-      f.key === "mrr" ? `${byKey("growthPercent").display} vs last month` : f.key === "netNewMrr" ? `Last month ${byKey("previousMrr").display}` : f.key === "customers" ? `+${byKey("newCustomers").display} new, ${byKey("churnedCustomers").display} churned` : undefined;
+      f.key === "mrr" ? `${byKey("growthPercent").display} growth over the ${noun}` : f.key === "netNewMrr" ? `Last ${noun} ${byKey("previousMrr").display}` : f.key === "customers" ? `+${byKey("newCustomers").display} new, ${byKey("churnedCustomers").display} churned` : undefined;
     return {
       ...f,
       sub,

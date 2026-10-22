@@ -7,9 +7,9 @@
 import type { SupabaseClient } from "@supabase/supabase-js";
 import { generateToken } from "../crypto";
 import type { InvestorRow, ProfileRow, SendRow, UpdateRow } from "../db-types";
-import { monthKey } from "../db-types";
 import { firstName } from "../investors";
-import { figures, monthLabel } from "../metrics/present";
+import { figures } from "../metrics/present";
+import { periodFromRow, periodLabel, periodNoun, periodRange } from "../periods";
 import { EmailSendError, type EmailProvider } from "../email/provider";
 import { renderUpdateEmail, type UpdateContent } from "../email/render";
 import { headerSafe } from "../validate";
@@ -58,10 +58,14 @@ export async function loadContent(admin: SupabaseClient, updateId: string): Prom
 }
 
 export function contentFor(update: UpdateRow, profile: ProfileRow): UpdateContent {
+  const period = periodFromRow(update);
   return {
     founderName: profile.founder_name ?? "",
     companyName: profile.company_name ?? "",
-    monthLabel: monthLabel(monthKey(update.month)),
+    periodLabel: periodLabel(period),
+    periodRange: periodRange(period),
+    noun: periodNoun(period.type),
+    running: Boolean(update.metrics_json?.monthToDate),
     figures: update.metrics_json ? figures(update.metrics_json, update.adjustments_json) : [],
     bullets: update.bullets_json,
     sample: Boolean(update.metrics_json?.sample),
@@ -116,7 +120,9 @@ export async function enqueueSends(admin: SupabaseClient, updateId: string): Pro
     const { error } = await admin.from("sends").upsert(rows, { onConflict: "update_id,investor_id", ignoreDuplicates: true });
     if (error) throw new Error(`Could not queue sends: ${error.message}`);
   }
-  await admin.from("updates").update({ status: "sending" }).eq("id", update.id).eq("status", "draft");
+  // Everyone on the list when the update goes out: the "out of" in "sent to 18 of 24".
+  const { count: listed } = await admin.from("investors").select("id", { count: "exact", head: true }).eq("user_id", update.user_id);
+  await admin.from("updates").update({ status: "sending", investor_total: listed ?? 0 }).eq("id", update.id).eq("status", "draft");
   const { count } = await admin.from("sends").select("id", { count: "exact", head: true }).eq("update_id", update.id);
   return { queued: count ?? 0 };
 }

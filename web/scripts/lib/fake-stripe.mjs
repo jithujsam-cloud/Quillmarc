@@ -52,6 +52,14 @@ export function startFakeStripe(port) {
       if (!bearerOk(req) || req.headers["stripe-account"] !== FAKE.account) return json(res, 403, { error: { type: "permission_error" } });
       return json(res, 200, { data: [subscription(1, 400), subscription(2, 200), subscription(3, 5)], has_more: false });
     }
+    if (url.pathname === "/v1/charges") {
+      if (!bearerOk(req) || req.headers["stripe-account"] !== FAKE.account) return json(res, 403, { error: { type: "permission_error" } });
+      const now = Math.floor(Date.now() / 1000);
+      const gte = Number(url.searchParams.get("created[gte]") ?? 0);
+      const lt = Number(url.searchParams.get("created[lt]") ?? now + 1);
+      const all = [1, 10, 40].map((days, i) => ({ id: `ch_fake_${i}`, created: now - days * 86400, amount: 25000, amount_refunded: 0, currency: "usd", status: "succeeded", paid: true }));
+      return json(res, 200, { data: all.filter((c) => c.created >= gte && c.created < lt), has_more: false });
+    }
     json(res, 404, { error: "not found" });
   });
   return new Promise((r) => server.listen(port, "127.0.0.1", () => r(server)));

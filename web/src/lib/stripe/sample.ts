@@ -1,6 +1,7 @@
 // SAMPLE DATA. Fictional subscriptions for the demo seed account only. Every screen that shows
 // figures from this source labels them "Sample data". Never used for a real connection.
 import type { BillingSource } from "./adapter";
+import type { ChargeLite, ChargeSource } from "./charges";
 import type { BillingData, NormalizedSubscription } from "./types";
 
 const DAY = 86400;
@@ -50,5 +51,36 @@ export class SampleSource implements BillingSource {
   constructor(private readonly now: () => number = () => Math.floor(Date.now() / 1000)) {}
   async fetchBillingData(): Promise<BillingData> {
     return sampleBillingData(this.now());
+  }
+}
+
+/** Payments the sample subscriptions would have made: one per billing interval, on the start day. */
+export function sampleCharges(now: number): ChargeLite[] {
+  const out: ChargeLite[] = [];
+  for (const sub of sampleBillingData(now).subscriptions) {
+    const price = sub.items[0].price;
+    const monthsPer = price.interval === "year" ? 12 : 1;
+    const start = new Date(sub.startDate * 1000);
+    const end = sub.endedAt ?? now;
+    let amount = (price.unitAmount ?? 0) * sub.items[0].quantity;
+    for (const d of sub.discounts) if (d.percentOff) amount = Math.round(amount * (1 - d.percentOff / 100));
+    for (let i = 0; ; i++) {
+      const t = Date.UTC(start.getUTCFullYear(), start.getUTCMonth() + i * monthsPer, start.getUTCDate(), start.getUTCHours()) / 1000;
+      if (t > end || t > now) break;
+      if (sub.status === "trialing" || sub.pauseCollection) break;
+      out.push({ created: t, amount, refunded: 0, currency: sub.currency });
+    }
+  }
+  return out.sort((a, b) => a.created - b.created);
+}
+
+export class SampleChargeSource implements ChargeSource {
+  constructor(private readonly now: () => number = () => Math.floor(Date.now() / 1000)) {}
+  async listCharges(range: { gte: number; lt: number }): Promise<ChargeLite[]> {
+    return sampleCharges(this.now()).filter((c) => c.created >= range.gte && c.created < range.lt);
+  }
+  async newestBefore(lt: number): Promise<number | null> {
+    const older = sampleCharges(this.now()).filter((c) => c.created < lt);
+    return older.length ? older[older.length - 1].created : null;
   }
 }
