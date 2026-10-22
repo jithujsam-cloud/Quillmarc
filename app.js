@@ -166,6 +166,16 @@
   var tbody = $(".chart__table tbody");
   series.forEach(function (d) { var tr = document.createElement("tr"); tr.innerHTML = "<th>" + d[0] + "</th><td>" + money(d[1]) + "</td>"; tbody.appendChild(tr); });
 
+  // The dashboard's Recent panel: its tabs switch the list, as they do in the app
+  $$("[data-qa-tab]").forEach(function (tab) {
+    tab.addEventListener("click", function () {
+      var key = tab.dataset.qaTab;
+      $$("[data-qa-tab]").forEach(function (t) { t.setAttribute("aria-selected", String(t === tab)); });
+      $$("[data-qa-panel]").forEach(function (p) { p.hidden = p.dataset.qaPanel !== key; });
+      $$("[data-qa-links]").forEach(function (l) { l.hidden = l.dataset.qaLinks !== key; });
+    });
+  });
+
   // Sample updates: Ledgerlane's last three months, and the visitor's own numbers
   var months = {
     jul: { name: "July", prev: "June", mrr: 43060, last: 41500, cust: 371, custLast: 359, churn: 1.6, churnLast: 1.8, netLast: 1210,
