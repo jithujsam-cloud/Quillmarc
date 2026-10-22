@@ -4,8 +4,8 @@ Run from the repo root:  python3 brand/tools/build_logos.py
 
 Two parts:
 - The wordmark (primary logo): the pen-written Q, then "uillmarc" in Newsreader Regular
-  (72pt optical size, 2000 units per em, -0.02em tracking; wordmark-path.txt, made by
-  outline_wordmark.py, which removes the dot of the "i"). Gold squares end the Q's tail
+  (wght 448 at 72pt optical size, 2000 units per em, -0.02em tracking; wordmark-path.txt, made by
+  outline_wordmark.py with grow=3, which removes the dot of the "i"). Gold squares end the Q's tail
   and dot the "i".
 - The symbol: a pen-written Q. An outer circle minus a tilted inner ellipse gives the
   thick-thin stress of a broad nib; a tapered tail crosses the stroke and ends in the
@@ -20,8 +20,12 @@ HERE = Path(__file__).parent
 OUT = HERE.parents[1] / "assets" / "logo"
 WORD = (HERE / "wordmark-path.txt").read_text().strip()
 MARK = json.loads((HERE / "mark.json").read_text())
-WORD_W, CAP, XH, ASC, DESC = 7027.0, 1340.0, 852.0, 1470.0, 530.0  # WORD_W: "uillmarc"
-I_DOT = (1245.0, -1471.0, 268.0)  # the i dot's box within "uillmarc", from outline_wordmark.py
+WORD_W, CAP, XH, ASC, DESC = 7160.0, 1340.0, 852.0, 1470.0, 530.0  # WORD_W: "uillmarc"
+I_DOT = (1263.0, -1473.0, 280.0)  # the i dot's box within "uillmarc", from outline_wordmark.py
+
+# Every stroke, thin and thick, is 15% heavier than the first cut (BOLD = 1.15): the symbol (mark.json), the
+# wordmark's Q (here) and its letters (Newsreader at wght 448 + 3 units of outline: outline_wordmark.py ... 3).
+BOLD = 1.15
 
 INK, REVERSE, SAPPHIRE, NAVY, BRASS, PAPER = "#102542", "#FAF8F5", "#1E3A5F", "#102542", "#DDB040", "#FAF8F5"
 
@@ -80,9 +84,10 @@ def wordmark_units():
     are the size of Newsreader's own i dot."""
     R = CAP * 0.53
     cx, cy = R + 10, -R + 18          # the bowl overshoots the baseline slightly, like a real O
-    bowl = _ring(cx, cy, R, R * 0.885, R * 0.80, -40, R * 0.025, R * 0.02)
+    rx, ry = R - (R - R * 0.885) * BOLD, R - (R - R * 0.80) * BOLD
+    bowl = _ring(cx, cy, R, rx, ry, -40, R * 0.025, R * 0.02)
     t0, t1 = R * 0.27, R * 0.98
-    tail = _tail(cx + t0, cy + t0, cx + t1, cy + t1, R * 0.25, R * 0.135)
+    tail = _tail(cx + t0, cy + t0, cx + t1, cy + t1, R * 0.25 * BOLD, R * 0.135 * BOLD)
     q = I_DOT[2]
     q_square = (cx + t1 - q * 0.18, cy + t1 - q * 0.18, q)
     ux = 2 * R + 10 + CAP * 0.055     # a little air between the Q and the u
