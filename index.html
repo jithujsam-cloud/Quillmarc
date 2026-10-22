@@ -112,100 +112,67 @@
       </div>
 
       <div class="wrap">
-        <div class="stage rise" role="img" aria-label="The Quillmarc update composer, with sample data">
-          <div class="stage__canvas" aria-hidden="true">
-            <div class="win">
-              <div class="win__bar">
-                <div class="win__crumbs">
-                  <span class="ws">L</span><b>Ledgerlane</b><span class="slash">/</span>Updates<span class="slash">/</span><b>September 2026</b>
+        <div class="stage rise" role="group" aria-label="The Quillmarc dashboard and an update's read tracking, with sample data">
+          <div class="stage__canvas">
+            <div class="qa qa-win">
+              <aside class="qa-side" aria-hidden="true">
+                <div class="qa-brand"><svg viewBox="0 0 40 40"><use href="#qm-mark"/></svg></div>
+                                <nav class="qa-nav"><span class="qa-nav__a" aria-current="page"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M2.5 2.5h4.5v6h-4.5zM9 2.5h4.5v3.5H9zM9 8h4.5v5.5H9zM2.5 10.5h4.5v3h-4.5z" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="qa-sr">Dashboard</span></span><span class="qa-nav__a"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 3.5h10v9H3zM3 6l5 3 5-3" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="qa-sr">Updates</span></span><span class="qa-nav__a"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M6 7.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM1.5 13.5c.6-2.3 2.4-3.5 4.5-3.5s3.9 1.2 4.5 3.5M10.5 3.8a2.3 2.3 0 0 1 0 4.4M12.2 10.3c1.1.5 1.9 1.6 2.3 3.2" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="qa-sr">Investors</span></span><span class="qa-nav__a"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 4.5l1.5 1.5L7 3.5M9 5h4.5M3 10l1.5 1.5L7 9M9 10.5h4.5" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="qa-sr">Asks</span></span><span class="qa-nav__a"><svg viewBox="0 0 16 16" aria-hidden="true"><path d="M8 10.2a2.2 2.2 0 1 0 0-4.4 2.2 2.2 0 0 0 0 4.4ZM8 1.8v2M8 12.2v2M1.8 8h2M12.2 8h2M3.6 3.6l1.4 1.4M11 11l1.4 1.4M3.6 12.4 5 11M11 5l1.4-1.4" fill="none" stroke="currentColor" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/></svg><span class="qa-sr">Settings</span></span></nav>
+                <div class="qa-foot"><span class="qa-acct"><span class="qa-avatar" title="morgan@ledgerlane.example">M</span></span></div>
+              </aside>
+              <div class="qa-canvas">
+                <div class="qa-title">
+                  <div><h3>Dashboard</h3><p>$4,608 collected so far in October, −25.1% against the same days of September. MRR is $7,735.</p></div>
+                  <span class="qa-btn" aria-hidden="true">New update</span>
                 </div>
-                <div class="win__actions">
-                  <span class="saved"><span class="saved__dot"></span>Draft saved</span>
-                  <span class="ui-btn ui-btn--ghost">Preview</span>
-                  <span class="ui-btn">Send to 14 investors</span>
-                </div>
-              </div>
-              <div class="win__body">
-                <aside class="side">
-                  <span class="side__item is-on"><svg><use href="#i-doc"/></svg>Updates</span>
-                  <span class="side__item"><svg><use href="#i-users"/></svg>Investors<em>14</em></span>
-                  <span class="side__item"><svg><use href="#i-chart"/></svg>Metrics</span>
-                  <span class="side__item"><svg><use href="#i-globe"/></svg>Domain</span>
-                  <span class="side__item"><svg><use href="#i-cog"/></svg>Settings</span>
-                  <div class="side__foot">
-                    <span class="side__stripe"><span class="live"></span>Stripe connected</span>
-                    <span class="side__note">Read-only</span>
-                  </div>
-                </aside>
-
-                <div class="compose">
-                  <section class="card">
-                    <header class="card__head"><span>From Stripe, September</span><span class="tag">Pulled Oct 1</span></header>
-                    <div class="kpis">
-                      <div class="kpi"><span>MRR</span><b class="num" data-count="48200" data-prefix="$">$48,200</b><i class="up">+6.1%</i></div>
-                      <div class="kpi"><span>Net new MRR</span><b class="num" data-count="2780" data-prefix="$">$2,780</b><i>Aug $2,360</i></div>
-                      <div class="kpi"><span>Customers</span><b class="num" data-count="412">412</b><i class="up">+19</i></div>
-                      <div class="kpi"><span>Revenue churn</span><b class="num">1.9%</b><i>Aug 1.4%</i></div>
+                <p class="qa-notice"><strong>Sample data.</strong> These figures are fictional. Connect your own Stripe in Settings to see yours.</p>
+                <section class="qa-headline" aria-label="The numbers that matter most">
+                  <div class="qa-hcard qa-t-money "><p class="qa-hcard__l"><i class="qa-dot"></i>Collected in October</p><p class="qa-hcard__v">$4,608</p><p class="qa-hcard__f"><span class="qa-badge" data-tone="bad">−25.1%</span><span>against the same days of September</span></p></div>
+                  <div class="qa-hcard qa-t-money "><p class="qa-hcard__l"><i class="qa-dot"></i>MRR</p><p class="qa-hcard__v">$7,735</p><p class="qa-hcard__f"><span class="qa-badge" data-tone="good">+2.0%</span><span>against September</span></p></div>
+                  <div class="qa-hcard qa-t-customers qa-hide-xs"><p class="qa-hcard__l"><i class="qa-dot"></i>Customers</p><p class="qa-hcard__v">54</p><p class="qa-hcard__f"><span class="qa-badge" data-tone="good">+1</span><span>2 new, 1 churned</span></p></div>
+                  <div class="qa-hcard qa-t-investors qa-hide-xs"><p class="qa-hcard__l"><i class="qa-dot"></i>Investors gone quiet</p><p class="qa-hcard__v">1</p><p class="qa-hcard__f"><span class="qa-badge" data-tone="warn">Needs a look</span><span>Theo: not read the last 2</span></p></div>
+                </section>
+                <div class="qa-trio">
+                  <section class="qa-panel qa-t-money">
+                    <div class="qa-panel__h"><h4><i class="qa-dot"></i>Revenue</h4></div>
+                    <p class="qa-meta qa-note">Payments received, by UTC day</p>
+                    <dl class="qa-rows"><div><dt>Today<span class="qa-hint">Yesterday $49</span></dt><dd>$0</dd></div><div><dt>2026<span class="qa-hint">+543.7% on the same days of 2025</span></dt><dd>$59,337</dd></div><div><dt>Average per day<span class="qa-hint">Last 30 days</span></dt><dd>$226</dd></div><div><dt>ARR<span class="qa-hint">MRR times 12</span></dt><dd>$92,823</dd></div><div><dt>Net new MRR<span class="qa-hint">Estimated</span></dt><dd>+$149</dd></div></dl>
+                  </section>
+                  <section class="qa-panel qa-t-customers qa-hide-sm">
+                    <div class="qa-panel__h"><h4><i class="qa-dot"></i>Customers</h4></div>
+                    <p class="qa-meta qa-note">From your Stripe subscriptions</p>
+                    <dl class="qa-rows"><div><dt>New this month</dt><dd>2</dd></div><div><dt>Churned this month</dt><dd>1</dd></div><div><dt>Churn rate, September<span class="qa-hint">Of customers at the start</span></dt><dd>3.9%</dd></div><div><dt>Revenue per customer<span class="qa-hint">A month</span></dt><dd>$143</dd></div><div><dt>Net revenue retention, September<span class="qa-hint">Estimated</span></dt><dd>98.7%</dd></div></dl>
+                  </section>
+                  <section class="qa-panel qa-t-money qa-hide-sm qa-recent">
+                    <div class="qa-panel__h"><h4><i class="qa-dot"></i>Recent</h4></div>
+                    <div class="qa-tabs" role="tablist" aria-label="Recent">
+                      <button type="button" role="tab" aria-selected="true" data-qa-tab="updates">Updates</button>
+                      <button type="button" role="tab" aria-selected="false" data-qa-tab="investors">Investors</button>
                     </div>
-                    <div class="mini-chart" data-chart="hero"></div>
-                  </section>
-                  <section class="card">
-                    <header class="card__head"><span>Your five bullets</span><span class="count">5 of 5</span></header>
-                    <ol class="bullets">
-                      <li data-type>closed 2 annual plans, both from referrals</li>
-                      <li data-type>churn up a bit, lost 1 agency to budget cuts</li>
-                      <li data-type>shipped team workspaces, early users like it</li>
-                      <li data-type>hired senior eng, starts nov 3</li>
-                      <li data-type>ask: intros to ops leads at 20–200 person agencies</li>
-                    </ol>
+                    <ul class="qa-list" data-qa-panel="updates"><li><span class="qa-trow"><span class="qa-trow__t"><span>October 2026</span><span class="qa-hint">Monthly</span></span><span class="qa-pill qa-pill--quiet">Draft</span></span></li><li><span class="qa-trow"><span class="qa-trow__t"><span>September 2026</span><span class="qa-hint">Monthly, sent Oct 2</span></span><span class="qa-fig">6 of 6</span></span></li><li><span class="qa-trow"><span class="qa-trow__t"><span>August 2026</span><span class="qa-hint">Monthly, sent Sep 4</span></span><span class="qa-fig">6 of 6</span></span></li><li><span class="qa-trow"><span class="qa-trow__t"><span>July 2026</span><span class="qa-hint">Monthly, sent Aug 4</span></span><span class="qa-fig">5 of 6</span></span></li></ul>
+                    <ul class="qa-list" data-qa-panel="investors" hidden><li><span class="qa-trow"><span class="qa-trow__t"><span>Theo Marchetti</span><span class="qa-hint">theo@marchetti.example</span></span><span class="qa-pill qa-pill--warn">Gone quiet</span></span></li><li><span class="qa-trow"><span class="qa-trow__t"><span>Alex Kim</span><span class="qa-hint">alex@seedwell.example</span></span><span class="qa-fig">3 of 3 read</span></span></li><li><span class="qa-trow"><span class="qa-trow__t"><span>Jordan Okafor</span><span class="qa-hint">jordan@okafor-angels.example</span></span><span class="qa-fig">3 of 3 read</span></span></li><li><span class="qa-trow"><span class="qa-trow__t"><span>Priya Raman</span><span class="qa-hint">priya@ramancapital.example</span></span><span class="qa-fig">2 of 3 read</span></span></li><li><span class="qa-trow"><span class="qa-trow__t"><span>Riley Moss</span><span class="qa-hint">riley@harbourline.example</span></span><span class="qa-fig">3 of 3 read</span></span></li></ul>
+                    <div class="qa-links" data-qa-links="updates"><span>All updates</span><span>Add update</span></div>
+                    <div class="qa-links" data-qa-links="investors" hidden><span>All investors</span><span>1 open ask</span></div>
                   </section>
                 </div>
-
-                <article class="preview">
-                  <header class="preview__head">
-                    <span class="preview__label">Preview</span>
-                    <dl>
-                      <div><dt>From</dt><dd>Maya Okafor &lt;maya@ledgerlane.com&gt;</dd></div>
-                      <div><dt>Subject</dt><dd>Ledgerlane, September update</dd></div>
-                    </dl>
-                  </header>
-                  <div class="preview__body">
-                    <p class="w">Hi all,</p>
-                    <p class="w">September was a strong month. MRR grew <mark>6.1%</mark> to <mark>$48,200</mark>, adding <mark>$2,780</mark> in net new MRR, and we ended with <mark>412</mark> customers.</p>
-                    <h4 class="w">Highlights</h4>
-                    <ul>
-                      <li class="w">We closed two annual plans, both through referrals, now our most efficient channel.</li>
-                      <li class="w">Team workspaces shipped, and early accounts are positive.</li>
-                      <li class="w">A senior engineer joins on November 3.</li>
-                    </ul>
-                    <h4 class="w">Lowlights</h4>
-                    <ul><li class="w">Churn rose to <mark>1.9%</mark> after one agency cancelled over budget cuts.</li></ul>
-                    <h4 class="w">How you can help</h4>
-                    <ul><li class="w">Intros to operations leads at agencies with 20 to 200 people.</li></ul>
-                  </div>
-                </article>
               </div>
             </div>
-
-            <div class="float float--opens">
-              <header><span><svg><use href="#i-eye"/></svg>Opens</span><b class="num">9 of 14</b></header>
-              <div class="bar"><span style="width:64%"></span></div>
-              <ul>
-                <li><span class="av">PR</span>Priya Raman<time>9:14 am</time></li>
-                <li><span class="av av--b">TA</span>Tomás Albrecht<time>11:40 am</time></li>
-                <li><span class="av av--c">HO</span>Hannah Osei<time>4:02 pm</time></li>
-                <li class="is-wait"><span class="av av--d">ML</span>Mei Lin Ota<time>Not yet</time></li>
-              </ul>
-            </div>
-
-            <div class="float float--domain">
-              <span class="float__k">Sending from</span>
-              <b>updates.ledgerlane.com</b>
-              <div class="dns"><span><svg><use href="#i-check"/></svg>SPF</span><span><svg><use href="#i-check"/></svg>DKIM</span><span><svg><use href="#i-check"/></svg>DMARC</span></div>
+            <div class="qa qa-float" aria-label="Read tracking for the August update">
+              <p class="qa-float__h"><b>August 2026 update</b><span class="qa-meta">Sent Sep 4</span></p>
+              <dl class="qa-kpis">
+                <div><dt>Read</dt><dd class="qa-kpi-lead">2 <small>of 6</small></dd><dd class="qa-sub">Opened the update page</dd></div>
+                <div><dt>Opened</dt><dd>4</dd><dd class="qa-sub">2 possibly automatic</dd></div>
+                <div><dt>Delivered</dt><dd>6</dd><dd class="qa-sub">Reached the inbox</dd></div>
+                <div><dt>Recipients</dt><dd>6</dd><dd class="qa-sub">One email each</dd></div>
+              </dl>
+              <div class="qa-strip-wrap">
+                <div class="qa-strip" role="img" aria-label="2 read, 2 opened, 2 delivered"><i data-k="opened"></i><i data-k="read"></i><i data-k="delivered"></i><i data-k="opened"></i><i data-k="read"></i><i data-k="delivered"></i></div>
+                <p class="qa-legend" aria-hidden="true"><span><i data-k="read"></i>Read 2</span><span><i data-k="opened"></i>Opened 2</span><span><i data-k="delivered"></i>Delivered 2</span></p>
+              </div>
             </div>
           </div>
         </div>
-                <p class="stage__note">Product preview with sample data. Ledgerlane and the people shown are fictional.</p>
+        <p class="stage__note">Screenshots of the Quillmarc app with sample data. Ledgerlane and the people shown are fictional.</p>
       </div>
     </section>
 
