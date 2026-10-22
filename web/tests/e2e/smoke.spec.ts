@@ -13,7 +13,12 @@ test("founder sends an update and sees statuses", async ({ page, context }) => {
   await page.goto("/dashboard");
   await expect(page.getByRole("heading", { name: "Dashboard", exact: true })).toBeVisible();
   await expect(page.getByText("Investors gone quiet", { exact: true })).toBeVisible();
-  await expect(page.getByRole("heading", { name: "Investors", exact: true })).toBeVisible();
+  // A short list with tabs: recent updates first, then investors with the quiet ones on top.
+  await expect(page.getByRole("tab", { name: "Updates" })).toHaveAttribute("aria-selected", "true");
+  await expect(page.getByRole("tabpanel").getByRole("link", { name: /^August 2026/ })).toBeVisible();
+  await page.getByRole("tab", { name: "Investors" }).click();
+  await expect(page.getByRole("tabpanel").getByText("Gone quiet").first()).toBeVisible();
+  await expect(page.getByRole("tabpanel").getByRole("link", { name: "All investors" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Revenue", exact: true })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Month by month" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Revenue by day" })).toBeVisible();

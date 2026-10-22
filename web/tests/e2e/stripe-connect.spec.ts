@@ -8,12 +8,12 @@ test("founder connects Stripe with one click and gets real numbers", async ({ pa
   const saved = await signIn(context);
   const admin = createClient(saved.supabaseUrl, saved.serviceKey, { auth: { persistSession: false } });
 
-  await page.goto("/settings");
+  await page.goto("/settings/stripe");
   await page.getByText("Connect a different Stripe account").click();
   await page.getByRole("link", { name: "Connect with Stripe" }).click();
 
   // Back from "Stripe": connected, read only, with the account's name.
-  await expect(page).toHaveURL(/\/settings\?stripe=connected/);
+  await expect(page).toHaveURL(/\/settings\/stripe\?stripe=connected/);
   await expect(page.getByText("Stripe is connected with read-only access.")).toBeVisible();
   await expect(page.getByText(/Connected with Stripe Connect to Fake Stripe Co \(test mode\)\. Read only\./)).toBeVisible();
 
@@ -41,7 +41,7 @@ test("founder connects Stripe with one click and gets real numbers", async ({ pa
   await expect(page).toHaveURL(/stripe=expired/);
 
   // Disconnect revokes and deletes.
-  await page.goto("/settings");
+  await page.goto("/settings/stripe");
   await page.getByRole("button", { name: "Disconnect Stripe" }).click();
   await expect(page.getByText("Stripe is disconnected and the key is deleted.")).toBeVisible();
   const { data: gone } = await admin.from("stripe_connections").select("id");

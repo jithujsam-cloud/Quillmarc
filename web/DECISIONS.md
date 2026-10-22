@@ -157,3 +157,7 @@ The marketing site's decisions live in `../DECISIONS.md`.
 - **Topic colour is a small dot only.** Money is sapphire, customers teal, investors gold. A first version put a thick coloured edge on top of each card; it curved at the rounded corners and looked wrong, so it was removed.
 - **A loading screen for full reloads.** The page's HTML carries the wordmark and a ring; `BootDone` hides it once the page is ready. Moving between pages never brings it back. With no JavaScript it is hidden, and it hides itself after 8 seconds in any case so it can never block the page.
 - **Every page's loading placeholder says "Loading your data"**, so it is clear something is happening.
+
+## Dashboard list with tabs; Settings in four pages (October 23)
+- **The third dashboard column is a short list with two tabs: Updates and Investors.** Up to six rows each, with a plain figure or a pill on the right ("6 of 6", "Draft", "Gone quiet"), every row a link, and "All updates" or "All investors" under it (plus a count of open asks). It replaced the investors stat rows, so the grid has no empty slot and the same information is one click away.
+- **Settings are four short pages with tabs: Account, Stripe, Plan, Your data.** Account holds sender details, time zone and theme. Old links keep working: `/settings?stripe=...` (the way back from Stripe) and `?done=disconnected` forward to `/settings/stripe`, and the plan and Stripe links in the sidebar go straight to their tabs.

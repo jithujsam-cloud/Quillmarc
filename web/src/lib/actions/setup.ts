@@ -92,7 +92,7 @@ export async function disconnectStripe(): Promise<void> {
   // Deletes the row, and with it the encrypted key or the account id.
   await adminClient().from("stripe_connections").delete().eq("user_id", user.id);
   revalidatePath("/", "layout");
-  redirect("/settings?done=disconnected");
+  redirect("/settings/stripe?done=disconnected");
 }
 
 export async function addInvestors(_prev: FormState, form: FormData): Promise<FormState> {

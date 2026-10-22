@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { BarChart, LineChart, type ChartPoint } from "@/components/charts";
+import { ActivityTabs, type Tab } from "@/components/activity-tabs";
 import { DashboardRefresher } from "@/components/dashboard-refresher";
 import { SetupPanel } from "@/components/setup-panel";
 import { TitleRow } from "@/components/title-row";
@@ -13,6 +14,8 @@ import { formatCount, formatMoney, formatPercent } from "@/lib/metrics/present";
 import { compactMoney, dayShort, formatDate, monthName, monthShort, signedPercent } from "@/lib/format";
 import { loadDailyRevenue } from "@/lib/revenue";
 import { loadInvestorOverview } from "@/lib/investor-data";
+import { periodFromRow, periodLabel, typeLabel } from "@/lib/periods";
+import type { UpdateRow } from "@/lib/db-types";
 import { getSetupState } from "@/lib/setup";
 import { getTimeZone } from "@/lib/timezone-server";
 import { accessFor } from "@/lib/trial";
@@ -46,6 +49,16 @@ export default async function Dashboard() {
     supabase.from("asks").select("id", { count: "exact", head: true }).eq("user_id", user.id).neq("status", "done"),
   ]);
   const last = overview.last;
+  const { data: recentData } = await supabase.from("updates").select("id, period_type, period_start, period_end, status, sent_at, investor_total").eq("user_id", user.id).order("period_end", { ascending: false }).order("created_at", { ascending: false }).limit(6);
+  const recent = (recentData ?? []) as Pick<UpdateRow, "id" | "period_type" | "period_start" | "period_end" | "status" | "sent_at" | "investor_total">[];
+  const { data: recentSends } = recent.length ? await supabase.from("sends").select("update_id, status").in("update_id", recent.map((u) => u.id)) : { data: [] };
+  const sentCount = new Map<string, { delivered: number; all: number }>();
+  for (const x of (recentSends ?? []) as { update_id: string; status: string }[]) {
+    const c = sentCount.get(x.update_id) ?? { delivered: 0, all: 0 };
+    c.all += 1;
+    if (x.status === "sent") c.delivered += 1;
+    sentCount.set(x.update_id, c);
+  }
   const { data: snapData } = await supabase.from("metrics_snapshots").select("month, metrics_json").eq("user_id", user.id).order("month");
   const snapshots = (snapData ?? []).map((r) => ({ month: String(r.month).slice(0, 7), metrics: r.metrics_json as MetricsResult }));
   const rows = await loadDailyRevenue(supabase, user.id, `${Number(today.slice(0, 4)) - 1}-01-01`, today);
@@ -83,6 +96,46 @@ export default async function Dashboard() {
   const churn = closed ? churnRate(closed.metrics) : null;
   const retention = closed ? netRetention(closed.metrics) : null;
 
+  const tabs: Tab[] = [
+    {
+      key: "updates",
+      label: "Updates",
+      empty: "No updates yet. Add your first one.",
+      links: [{ href: "/updates", label: "All updates" }, { href: "/updates/new", label: "Add update" }],
+      rows: recent.map((u) => {
+        const p = periodFromRow(u);
+        const c = sentCount.get(u.id) ?? { delivered: 0, all: 0 };
+        return {
+          key: u.id,
+          href: u.status === "draft" ? `/updates/${u.id}/edit` : `/updates/${u.id}`,
+          title: periodLabel(p),
+          sub: `${typeLabel(p.type)}${u.sent_at ? `, sent ${formatDate(u.sent_at, tz.zone)}` : ""}`,
+          ...(u.status === "draft" ? { pill: { label: "Draft", tone: "quiet" as const } } : u.status === "sending" ? { pill: { label: "Sending", tone: "accent" as const } } : { right: `${c.delivered} of ${u.investor_total ?? c.all}` }),
+        };
+      }),
+    },
+    {
+      key: "investors",
+      label: "Investors",
+      empty: "No investors yet. Add your list.",
+      links: [{ href: "/investors", label: "All investors" }, ...((openAsks ?? 0) > 0 ? [{ href: "/asks", label: `${openAsks} open ${openAsks === 1 ? "ask" : "asks"}` }] : [])],
+      rows: [...overview.investors]
+        .sort((a, b) => Number(Boolean(overview.activity.get(b.id)?.quiet)) - Number(Boolean(overview.activity.get(a.id)?.quiet)) || a.name.localeCompare(b.name))
+        .slice(0, 6)
+        .map((i) => {
+          const a = overview.activity.get(i.id);
+          const blocked = i.opted_out ? "Opted out" : i.suppressed ? "Not emailed" : null;
+          return {
+            key: i.id,
+            href: `/investors/${i.id}`,
+            title: i.name,
+            sub: i.email,
+            ...(blocked ? { pill: { label: blocked, tone: "quiet" as const } } : a?.quiet ? { pill: { label: "Gone quiet", tone: "warn" as const } } : { right: a?.received ? `${a.read} of ${a.received} read` : "-" }),
+          };
+        }),
+    },
+  ];
+
   return (
     <AppShell crumbs={[{ label: "Dashboard" }]}>
       <TitleRow
@@ -100,7 +153,7 @@ export default async function Dashboard() {
       <div className="grid gap-4">
         {problem && (
           <p className="notice" role="status">
-            {problem} {setup.connection?.status === "error" && <Link href="/settings#stripe">Open settings</Link>}
+            {problem} {setup.connection?.status === "error" && <Link href="/settings/stripe">Open settings</Link>}
           </p>
         )}
         {access.expired && <TrialEndedPanel access={access} />}
@@ -185,20 +238,7 @@ export default async function Dashboard() {
               ]}
             />
           )}
-          {(last || (openAsks ?? 0) > 0) && (
-            <StatRows
-              topic="investors"
-              id="inv-h"
-              title="Investors"
-              note={last ? `${last.label}, sent ${formatDate(last.sentAt, tz.zone)}` : "Nothing sent yet"}
-              rows={[
-                { label: "Sent to", value: last ? `${last.reached} of ${last.of}` : "-", hint: "Investors on your list" },
-                { label: "Read the last update", value: last ? `${last.read} of ${last.reached}` : "-" },
-                { label: "Gone quiet", value: String(overview.quiet.length), hint: <Link href="/investors">See who</Link> },
-                { label: "Open asks", value: String(openAsks ?? 0), hint: <Link href="/asks">See your asks</Link> },
-              ]}
-            />
-          )}
+          <ActivityTabs title="Recent updates and investors" tabs={tabs} />
         </div>
 
         <div className="grid gap-4 lg:grid-cols-2">

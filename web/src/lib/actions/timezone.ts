@@ -18,5 +18,5 @@ export async function rememberTimeZone(zone: string): Promise<void> {
 export async function setTimeZone(form: FormData): Promise<void> {
   const zone = form.get("tz");
   if (isTimeZone(zone)) await remember(zone);
-  redirect("/settings?done=time#time");
+  redirect("/settings?done=time");
 }
