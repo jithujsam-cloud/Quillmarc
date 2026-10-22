@@ -113,19 +113,6 @@
     });
   });
 
-  // The product stage is drawn at 1088px and scaled to fit, like a screenshot that stays sharp
-  var stage = $(".stage");
-  function fitStage() {
-    // On narrow screens, drop the sidebar out of frame so the composer and letter stay legible
-    var crop = stage.clientWidth < 680;
-    stage.classList.toggle("is-crop", crop);
-    var cs = getComputedStyle(stage);
-    var inner = stage.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
-    stage.style.setProperty("--k", Math.min(1, inner / (crop ? 900 : 1088)).toFixed(4));
-  }
-  window.addEventListener("resize", fitStage);
-  fitStage();
-
   // Charts: one series, a 2px line, a quiet grid, the latest value marked
   var series = [
     ["Oct", 29800], ["Nov", 31200], ["Dec", 32100], ["Jan", 33900], ["Feb", 35000], ["Mar", 36600],
@@ -170,54 +157,14 @@
     });
     show(data.length - 1);
   }
-  var heroChart = $('[data-chart="hero"]');
   var featureChart = $('[data-chart="feature"] .chart__plot');
   function drawAll() {
-    drawChart(heroChart, series.slice(-6), { min: 36000, max: 49500 });
     drawChart(featureChart, series, { min: 26000, max: 50000, axis: true, hover: true });
   }
   drawAll();
   var rt; window.addEventListener("resize", function () { clearTimeout(rt); rt = setTimeout(drawAll, 150); });
   var tbody = $(".chart__table tbody");
   series.forEach(function (d) { var tr = document.createElement("tr"); tr.innerHTML = "<th>" + d[0] + "</th><td>" + money(d[1]) + "</td>"; tbody.appendChild(tr); });
-
-  // Hero product: figures count up, bullets type in, then the letter writes itself
-  var words = $$(".stage .w");
-  var bullets = $$(".stage [data-type]");
-  function finishStage() { words.forEach(function (w) { w.classList.add("on"); }); }
-  if (reduced) { finishStage(); }
-  else {
-    // Each bullet keeps its finished height while it types, so nothing below it jumps
-    var texts = bullets.map(function (b) { var t = b.textContent; b.style.minHeight = b.offsetHeight + "px"; b.textContent = ""; return t; });
-    $$(".stage .num[data-count]").forEach(function (el) {
-      var to = +el.dataset.count, pre = el.dataset.prefix || "", t0 = null;
-      el.textContent = pre + "0";
-      function tick(t) {
-        if (!t0) t0 = t;
-        var p = Math.min(1, (t - t0) / 1400), e = 1 - Math.pow(1 - p, 4);
-        el.textContent = pre + Math.round(to * e).toLocaleString("en-US");
-        if (p < 1) requestAnimationFrame(tick);
-      }
-      setTimeout(function () { requestAnimationFrame(tick); }, 700);
-    });
-    var bi = 0;
-    function typeNext() {
-      if (bi >= bullets.length) { revealWords(0); return; }
-      var el = bullets[bi], text = texts[bi], ci = 0;
-      (function step() {
-        ci += 2;
-        el.textContent = text.slice(0, ci);
-        if (ci < text.length) setTimeout(step, 18);
-        else { bi++; setTimeout(typeNext, 140); }
-      })();
-    }
-    function revealWords(i) {
-      if (i >= words.length) return;
-      words[i].classList.add("on");
-      setTimeout(function () { revealWords(i + 1); }, 160);
-    }
-    setTimeout(typeNext, 1200);
-  }
 
   // Sample updates: Ledgerlane's last three months, and the visitor's own numbers
   var months = {
