@@ -135,17 +135,29 @@
 .nav a[aria-current="page"] svg { color: var(--accent); }
 .nav .count { color: var(--faint); font-size: 12px; }
 .side-group { margin: 20px 12px 6px; font-size: 12px; color: var(--faint); white-space: nowrap; }
-.side-foot { margin-top: auto; display: grid; gap: 2px; padding-top: 12px; border-top: 1px solid var(--border); font-size: 13px; }
-.side-row { display: flex; align-items: center; gap: 10px; width: 100%; height: 36px; padding: 0 12px; border: 0; border-radius: 8px; background: transparent; color: var(--muted); font: inherit; text-align: left; text-decoration: none; white-space: nowrap; overflow: hidden; cursor: pointer; transition: background-color 150ms ease, color 150ms ease, max-width 240ms var(--ease-out, ease); }
-.side-row:hover { background: var(--raised); color: var(--text); }
-.side-row svg { width: 16px; height: 16px; flex: none; }
-.side-panel :is(.nav a, .side-row) { max-width: 208px; }
-.side-theme { padding: 4px 2px; }
-.side-email { padding: 6px 12px; white-space: nowrap; }
+.side-foot { margin-top: auto; padding-top: 12px; border-top: 1px solid var(--border); }
+.side-panel .nav a { max-width: 208px; }
 .side-text { transition: opacity 160ms ease 60ms; }
 
+/* The account row opens a menu that floats above it. The menu is portalled to <body>, so the folded rail never clips it. */
+.acct-btn { display: flex; align-items: center; gap: 10px; width: 100%; height: 48px; padding: 0 4px; border: 0; border-radius: 10px; background: transparent; color: var(--text); font: inherit; font-size: 13px; text-align: left; white-space: nowrap; overflow: hidden; cursor: pointer; transition: background-color 150ms ease; }
+.acct-btn:hover, .acct-btn[aria-expanded="true"] { background: var(--raised); }
+.acct-avatar { position: relative; display: grid; place-items: center; flex: none; width: 32px; height: 32px; border-radius: 999px; background: var(--tint-1); color: var(--accent-ink); font-size: 13px; font-weight: 600; }
+.acct-alert { position: absolute; right: -1px; bottom: -1px; width: 10px; height: 10px; border-radius: 999px; background: var(--negative); box-shadow: 0 0 0 2px var(--ground); }
+.acct-email { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; }
+.acct-chevron { display: grid; flex: none; color: var(--faint); }
+.acct-chevron svg { width: 16px; height: 16px; }
+.acct-menu { position: fixed; left: 12px; bottom: 68px; z-index: 60; width: 208px; padding: 6px; border: 1px solid var(--border); border-radius: 12px; background: var(--surface); box-shadow: 0 12px 32px rgb(0 0 0 / 0.14); font-size: 13px; }
+.acct-head { padding: 8px 10px 6px; color: var(--muted); font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.acct-item { display: flex; align-items: center; gap: 10px; width: 100%; min-height: 34px; padding: 0 10px; border: 0; border-radius: 8px; background: transparent; color: var(--text); font: inherit; text-align: left; text-decoration: none; white-space: nowrap; cursor: pointer; }
+.acct-item:hover { background: var(--raised); }
+.acct-item svg { width: 16px; height: 16px; flex: none; color: var(--muted); }
+.acct-theme { justify-content: space-between; }
+.acct-theme:hover { background: transparent; }
+.acct-sep { height: 1px; margin: 6px 4px; background: var(--border); }
+
 /* Folded: a 64px icon rail. Rows keep their height and place, so nothing moves up or down; labels fade
-   and the theme switch shows only the current choice. Hovering the rail (or tabbing into it) opens it
+   and the account row keeps its avatar. Hovering the rail (or tabbing into it) opens it
    over the canvas without moving the page. data-peek holds the rail shut until the pointer leaves
    after a click on Collapse. */
 @media (min-width: 961px) {
@@ -155,11 +167,7 @@
   :root[data-sidebar="collapsed"] .side-panel:not(:hover, :has(:focus-visible)) .side-text, :root[data-sidebar="collapsed"][data-peek] .side-panel .side-text { opacity: 0; pointer-events: none; transition: opacity 100ms ease; }
   :root[data-sidebar="collapsed"] .side-panel:not(:hover, :has(:focus-visible)) .brand-word, :root[data-sidebar="collapsed"][data-peek] .side-panel .brand-word { opacity: 0; transition: opacity 100ms ease; }
   :root[data-sidebar="collapsed"] .side-panel:not(:hover, :has(:focus-visible)) .brand-mark, :root[data-sidebar="collapsed"][data-peek] .side-panel .brand-mark { opacity: 1; transition: opacity 160ms ease 80ms; }
-  :root[data-sidebar="collapsed"] .side-panel:not(:hover, :has(:focus-visible)) .segmented button, :root[data-sidebar="collapsed"][data-peek] .side-panel .segmented button { display: none; }
-  :root[data-sidebar="collapsed"] .side-panel:not(:hover, :has(:focus-visible)) :is(.nav a, .side-row), :root[data-sidebar="collapsed"][data-peek] .side-panel :is(.nav a, .side-row) { max-width: 40px; }
-  :root:not([data-theme]) .side-panel .segmented button[data-value="system"],
-  :root[data-theme="light"] .side-panel .segmented button[data-value="light"],
-  :root[data-theme="dark"] .side-panel .segmented button[data-value="dark"] { display: inline-flex; }
+  :root[data-sidebar="collapsed"] .side-panel:not(:hover, :has(:focus-visible)) .nav a, :root[data-sidebar="collapsed"][data-peek] .side-panel .nav a { max-width: 40px; }
 }
 
 /* the phone: the sidebar folds into a sheet behind a menu button */

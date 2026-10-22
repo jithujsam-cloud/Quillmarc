@@ -11,6 +11,7 @@ const PATHS = {
   plus: "M8 3v10M3 8h10",
   clock: "M8 14.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM8 4.5V8l2.5 1.5",
   sidebar: "M2.5 3h11v10h-11zM6 3v10",
+  updown: "M4.5 6.5 8 3l3.5 3.5M4.5 9.5 8 13l3.5-3.5",
   signout: "M6 2.5H3v11h3M10 5l3 3-3 3M13 8H6.5",
 } as const;
 

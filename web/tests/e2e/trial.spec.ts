@@ -10,14 +10,17 @@ test("when the trial ends sending stops, and an admin can turn it back on", asyn
   const { data: me } = await admin.from("profiles").select("id").limit(1).single();
   await admin.from("stripe_connections").upsert({ user_id: me!.id, method: "sample", status: "connected" }, { onConflict: "user_id" });
 
-  await page.goto("/settings");
+  await page.goto("/settings/plan");
   await expect(page.getByText(/Free trial, \d+ days left/).first()).toBeVisible();
 
   // The trial runs out.
   await admin.from("profiles").update({ trial_ends_at: new Date(Date.now() - 60_000).toISOString() }).neq("id", "00000000-0000-0000-0000-000000000000");
   await page.goto("/dashboard");
   await expect(page.getByRole("heading", { name: "Your free trial has ended" })).toBeVisible();
+  // The plan now lives in the account menu and the Plan tab, not on every page.
+  await page.goto("/settings/plan");
   await expect(page.getByText("Trial ended").first()).toBeVisible();
+  await page.goto("/dashboard");
   await expect(page.getByRole("link", { name: "Continue with Quillmarc" }).first()).toHaveAttribute("href", "https://pay.example/quillmarc");
   await page.goto("/updates/new");
   await expect(page.getByRole("button", { name: "Calculate the numbers" })).toHaveCount(0);
@@ -27,7 +30,10 @@ test("when the trial ends sending stops, and an admin can turn it back on", asyn
   await page.goto("/admin");
   await expect(page.getByRole("heading", { name: "Accounts" })).toBeVisible();
   await page.getByRole("button", { name: "Add 14 days" }).first().click();
+  await expect.poll(async () => new Date((await admin.from("profiles").select("trial_ends_at").limit(1).single()).data!.trial_ends_at).getTime() > Date.now(), { timeout: 10_000 }).toBe(true);
+  await page.goto("/settings/plan");
   await expect(page.getByText(/Free trial, 14 days left/).first()).toBeVisible();
+  await page.goto("/admin");
   await page.getByRole("button", { name: "Activate" }).first().click();
   await expect(page.locator("tbody").getByText("Active", { exact: true }).first()).toBeVisible();
 
