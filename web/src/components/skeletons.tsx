@@ -1,34 +1,18 @@
 // Loading screens: the final layout with flat grey bars at the size of what will arrive,
 // so nothing jumps when the data lands. No shimmer gradient.
-import { Wordmark } from "./wordmark";
 
 function Bar({ w, h = 12, className = "" }: { w: string; h?: number; className?: string }) {
   return <span className={`skeleton ${className}`} style={{ width: w, height: h }} />;
 }
 
+// Only the page area: the sidebar belongs to app/(app)/layout.tsx and stays on screen while a page loads.
 export function SkeletonShell({ children }: { children: React.ReactNode }) {
   return (
-    <div className="app" aria-busy="true" aria-live="polite">
-      <aside className="app-side" aria-hidden="true">
-        <div className="app-brand">
-          <Wordmark className="h-[22px] w-auto" />
-        </div>
-        <div className="mt-6 grid gap-3 px-2.5">
-          <Bar w="60%" />
-          <Bar w="100%" h={36} />
-          <Bar w="100%" h={36} />
-          <Bar w="100%" h={36} />
-        </div>
-      </aside>
-      <header className="app-top" aria-hidden="true">
-        <Bar w="140px" h={14} />
-      </header>
-      <main className="app-canvas">
-        <p className="sr-only">Loading</p>
-        <div className="app-canvas-inner" aria-hidden="true">
-          {children}
-        </div>
-      </main>
+    <div aria-busy="true" aria-live="polite">
+      <p className="sr-only">Loading</p>
+      <div className="app-canvas-inner" aria-hidden="true">
+        {children}
+      </div>
     </div>
   );
 }

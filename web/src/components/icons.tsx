@@ -7,6 +7,7 @@ const PATHS = {
   close: "M4 4l8 8M12 4l-8 8",
   stripe: "M8 1.5 14 5v6l-6 3.5L2 11V5z",
   plus: "M8 3v10M3 8h10",
+  clock: "M8 14.5a6.5 6.5 0 1 0 0-13 6.5 6.5 0 0 0 0 13ZM8 4.5V8l2.5 1.5",
   sidebar: "M2.5 3h11v10h-11zM6 3v10",
   signout: "M6 2.5H3v11h3M10 5l3 3-3 3M13 8H6.5",
 } as const;
