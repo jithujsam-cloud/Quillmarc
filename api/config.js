@@ -5,6 +5,8 @@ const { env } = require("./_lib");
 module.exports = function handler(req, res) {
   const cfg = {
     siteUrl: env("SITE_URL", "https://quillmarc.vercel.app").replace(/\/$/, ""),
+    // Where the product lives, for the "Open Quillmarc" button. Hidden when unset.
+    appUrl: env("APP_URL"),
     bookingUrl: env("BOOKING_URL"),
     contactEmail: env("CONTACT_EMAIL"),
     founderPhoto: env("FOUNDER_PHOTO_URL"),

@@ -54,6 +54,13 @@
   } else {
     reveals.forEach(function (el) { el.classList.add("is-in"); });
   }
+  // Fallback for anything that never scrolls (screenshots, link previews, crawlers, printing): after a few
+  // seconds with no scroll, wheel, touch or key, show every section instead of leaving blank blocks.
+  var interacted = false;
+  ["scroll", "wheel", "touchstart", "keydown"].forEach(function (ev) { addEventListener(ev, function () { interacted = true; }, { once: true, passive: true }); });
+  function revealAll() { reveals.forEach(function (el) { el.classList.add("is-in"); }); }
+  setTimeout(function () { if (!interacted) revealAll(); }, 3500);
+  addEventListener("beforeprint", revealAll);
 
   // Scroll motion: the hero product drifts slower than the page
   var heroStage = $(".hero .stage");
@@ -288,7 +295,7 @@
   });
   yours.addEventListener("input", function () { render(yourMonth(), true); });
 
-  // Waitlist: one modal. Email, then three short questions, then the thank-you view in the same dialog
+  // Free trial sign-up: one modal. Email, then three short questions, then the thank-you view in the same dialog
   var EMAIL_RE = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
   var modal = $("#join-modal"), form = $(".join__form", modal);
   var stepTwo = $(".join__step--two", modal), status = $(".form__status", form);
@@ -360,7 +367,7 @@
     title: $('[data-done="title"]', doneView), lede: $('[data-done="lede"]', doneView),
     emailed: $('[data-done="emailed"]', doneView), email: $('[data-done="email"]', doneView),
     founding: $('[data-done="founding"]', doneView), questions: $('[data-done="questions"]', doneView),
-    call: $('[data-done="call"]', doneView), callLink: $('[data-done="call-link"]', doneView),
+    start: $('[data-done="start"]', doneView), call: $('[data-done="call"]', doneView), callLink: $('[data-done="call-link"]', doneView),
     shareUrl: $('[data-done="share-url"]', doneView), share: $('[data-done="share"]', doneView)
   };
 
@@ -383,7 +390,7 @@
     form.elements.company.focus({ preventScroll: true });
     requestAnimationFrame(updateFades);
   }
-  function busy(on) { submitTwo.disabled = on; $(".btn__label", submitTwo).textContent = on ? "Sending" : "Join the waitlist"; }
+  function busy(on) { submitTwo.disabled = on; $(".btn__label", submitTwo).textContent = on ? "Sending" : "Start your free trial"; }
   function fail(msg) {
     var contact = cfg.contactEmail ? " If it keeps happening, email " + cfg.contactEmail + "." : "";
     status.textContent = msg + contact;
@@ -414,11 +421,12 @@
     formView.hidden = true;
     doneView.hidden = false;
     if (s.status === "exists") {
-      done.title.textContent = "You are already on the list.";
-      done.lede.textContent = "Good news: this email was already saved, so there is nothing more to do. We will write when your invite is ready.";
+      done.title.textContent = "You already signed up.";
+      done.lede.textContent = "This email already has a free trial. Sign in with it to carry on.";
     }
     if (s.emailed && s.email) { done.email.textContent = s.email; done.emailed.hidden = false; }
     if (s.founding) done.founding.hidden = false;
+    if (cfg.appUrl && done.start) { done.start.href = cfg.appUrl.replace(/\/$/, "") + "/login"; done.start.hidden = false; }
     if (s.token) done.questions.hidden = false;
     if (cfg.bookingUrl) { done.callLink.href = cfg.bookingUrl; done.call.hidden = false; }
     // Share link, with attribution so referrals show up in the signups table.
@@ -506,7 +514,7 @@
     else { done.shareUrl.select(); document.execCommand && document.execCommand("copy"); copied(); }
   });
 
-  // Every "Join the waitlist" opens the modal; the footer field passes its email along
+  // Every "Start your free trial" opens the modal; the footer field passes its email along
   $$("[data-focus]").forEach(function (a) { a.addEventListener("click", function (e) { e.preventDefault(); openModal(); }); });
   $(".cta__form").addEventListener("submit", function (e) { e.preventDefault(); openModal($("#cta-email").value); });
 })();

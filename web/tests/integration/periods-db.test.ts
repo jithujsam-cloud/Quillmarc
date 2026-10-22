@@ -51,6 +51,19 @@ describe.skipIf(!hasDb)("update periods and revenue history", () => {
     await expect(as(db, "authenticated", alice, () => db.query("update updates set investor_total = 99 where user_id = $1", [alice]))).rejects.toThrow(/permission denied/);
   });
 
+  it("freezes a sent update: the founder cannot rewrite its numbers afterwards", async () => {
+    const id = await as(db, "service_role", null, async () => {
+      const r = await db.query("insert into updates (user_id, month, status, metrics_json, sent_at) values ($1, '2026-03-01', 'sent', '{\"mrr\": 1000}', now()) returning id", [alice]);
+      return r.rows[0].id as string;
+    });
+    const changed = await as(db, "authenticated", alice, () => db.query("update updates set metrics_json = '{\"mrr\": 999999}' where id = $1", [id]));
+    expect(changed.rowCount).toBe(0);
+    const removed = await as(db, "authenticated", alice, () => db.query("delete from updates where id = $1", [id]));
+    expect(removed.rowCount).toBe(0);
+    const { rows } = await db.query("select metrics_json->>'mrr' as mrr from updates where id = $1", [id]);
+    expect(rows[0].mrr).toBe("1000");
+  });
+
   it("keeps revenue and snapshots private and read only", async () => {
     await as(db, "service_role", null, async () => {
       await db.query("insert into revenue_daily (user_id, day, currency, gross, payments) values ($1, '2026-10-01', 'usd', 5000, 1)", [alice]);

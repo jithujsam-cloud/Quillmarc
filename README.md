@@ -1,6 +1,6 @@
 # Quillmarc
 
-Waitlist site for Quillmarc: your monthly investor update, written from your Stripe numbers. Said "quill mark", spelled with a c.
+Landing page and free-trial sign-up for Quillmarc: your monthly investor update, written from your Stripe numbers. Said "quill mark", spelled with a c.
 
 Static pages plus three dependency-free Vercel functions. No build step.
 
