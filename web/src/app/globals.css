@@ -376,10 +376,11 @@ textarea.field { min-height: 112px; resize: vertical; }
 .badge-delta[data-tone="good"] { background: var(--pill-pos-bg); color: var(--pill-pos-ink); }
 .badge-delta[data-tone="bad"] { background: var(--pill-neg-bg); color: var(--pill-neg-ink); }
 .badge-delta[data-tone="warn"] { background: var(--pill-warn-bg); color: var(--pill-warn-ink); }
+.topic-panel { display: flex; flex-direction: column; }
 .topic-panel .panel-head { padding-bottom: 4px; }
 .topic-dot { display: inline-block; width: 10px; height: 10px; margin-right: 10px; border-radius: 50%; background: var(--topic); vertical-align: 1px; }
 .stat-note { padding: 0 20px 12px; }
-.stat-rows > div { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; padding: 11px 20px; border-top: 1px solid var(--rule); }
+.stat-rows > div { display: flex; align-items: center; justify-content: space-between; gap: 16px; min-height: 54px; padding: 8px 20px; border-top: 1px solid var(--rule); }
 .stat-rows dt { min-width: 0; color: var(--text); }
 .stat-rows dd { flex: none; font: 400 15px/20px var(--font-figures); letter-spacing: -0.01em; }
 .stat-hint { display: block; font-size: 12px; line-height: 16px; color: var(--faint); }
@@ -392,7 +393,9 @@ textarea.field { min-height: 112px; resize: vertical; }
 .tabs button:hover { color: var(--text); }
 .tabs button[aria-selected="true"] { color: var(--text); font-weight: 500; }
 .tabs button[aria-selected="true"]::after { content: ""; position: absolute; left: 0; right: 0; bottom: -1px; height: 2px; background: var(--accent); }
-.tab-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding: 11px 20px; color: var(--text); text-decoration: none; transition: background-color 150ms ease; }
+.tab-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; min-height: 54px; padding: 8px 20px; color: var(--text); text-decoration: none; transition: background-color 150ms ease; }
+.tab-figure { flex: none; font: 400 15px/20px var(--font-figures); letter-spacing: -0.01em; }
+.panel .tabs { margin-top: 4px; }
 .tab-row:hover { background: var(--raised); }
 
 /* ---------- motion: feedback first, all of it off for reduced motion ---------- */
@@ -441,3 +444,11 @@ html[data-ready] .boot { display: none; }
 @keyframes boot-spin { to { transform: rotate(360deg); } }
 @keyframes boot-give-up { to { visibility: hidden; pointer-events: none; } }
 @media (prefers-reduced-motion: reduce) { .boot-spin { animation: none; border-top-color: var(--control); } }
+
+/* The three panels under the headline cards are one fixed height, so switching tabs never changes them.
+   The tab list scrolls inside its panel; the two stat panels share their rows out evenly. */
+@media (min-width: 1024px) { .dash-trio > section { height: 400px; min-height: 0; } }
+.tab-scroll { flex: 1 1 0; min-height: 0; max-height: 360px; overflow-y: auto; overscroll-behavior: contain; }
+@media (min-width: 1024px) { .tab-scroll { max-height: none; } }
+.dash-trio .stat-rows { flex: 1; display: flex; flex-direction: column; }
+.dash-trio .stat-rows > div { flex: 1; }

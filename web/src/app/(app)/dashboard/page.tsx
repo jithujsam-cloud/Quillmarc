@@ -49,7 +49,7 @@ export default async function Dashboard() {
     supabase.from("asks").select("id", { count: "exact", head: true }).eq("user_id", user.id).neq("status", "done"),
   ]);
   const last = overview.last;
-  const { data: recentData } = await supabase.from("updates").select("id, period_type, period_start, period_end, status, sent_at, investor_total").eq("user_id", user.id).order("period_end", { ascending: false }).order("created_at", { ascending: false }).limit(6);
+  const { data: recentData } = await supabase.from("updates").select("id, period_type, period_start, period_end, status, sent_at, investor_total").eq("user_id", user.id).order("period_end", { ascending: false }).order("created_at", { ascending: false }).limit(8);
   const recent = (recentData ?? []) as Pick<UpdateRow, "id" | "period_type" | "period_start" | "period_end" | "status" | "sent_at" | "investor_total">[];
   const { data: recentSends } = recent.length ? await supabase.from("sends").select("update_id, status").in("update_id", recent.map((u) => u.id)) : { data: [] };
   const sentCount = new Map<string, { delivered: number; all: number }>();
@@ -121,7 +121,7 @@ export default async function Dashboard() {
       links: [{ href: "/investors", label: "All investors" }, ...((openAsks ?? 0) > 0 ? [{ href: "/asks", label: `${openAsks} open ${openAsks === 1 ? "ask" : "asks"}` }] : [])],
       rows: [...overview.investors]
         .sort((a, b) => Number(Boolean(overview.activity.get(b.id)?.quiet)) - Number(Boolean(overview.activity.get(a.id)?.quiet)) || a.name.localeCompare(b.name))
-        .slice(0, 6)
+        .slice(0, 8)
         .map((i) => {
           const a = overview.activity.get(i.id);
           const blocked = i.opted_out ? "Opted out" : i.suppressed ? "Not emailed" : null;
@@ -205,7 +205,7 @@ export default async function Dashboard() {
           />
         </section>
 
-        <div className="grid items-start gap-4 lg:grid-cols-3">
+        <div className="dash-trio grid items-stretch gap-4 lg:grid-cols-3">
           <StatRows
             topic="money"
             id="rev-h"
@@ -238,7 +238,7 @@ export default async function Dashboard() {
               ]}
             />
           )}
-          <ActivityTabs title="Recent updates and investors" tabs={tabs} />
+          <ActivityTabs title="Recent" tabs={tabs} />
         </div>
 
         <div className="grid gap-4 lg:grid-cols-2">

@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { createUserClient } from "@/lib/supabase/server";
+import { getAuth } from "@/lib/auth";
 import { getSetupState } from "@/lib/setup";
 import { Mark, Wordmark } from "./wordmark";
 import { SideNav, SidebarToggle } from "./nav-links";
@@ -22,19 +22,18 @@ export interface Crumb {
 // to a 64px icon rail and opens over the canvas on hover. Every row keeps its height when it folds,
 // so nothing moves up or down; labels only fade. On the phone a bar with the menu button replaces it.
 export async function AppFrame({ children }: { children: React.ReactNode }) {
-  const supabase = await createUserClient();
-  const { data } = await supabase.auth.getUser();
+  const { supabase, user } = await getAuth();
   const tz = await getTimeZone();
-  const setup = data.user ? await getSetupState(supabase, data.user.id) : null;
+  const setup = user ? await getSetupState(supabase, user.id) : null;
   const conn = setup?.connection;
   const company = setup?.profile?.company_name ?? null;
   const access = setup?.profile ? accessFor(setup.profile) : null;
-  const isAdmin = Boolean(data.user?.email && env.adminEmails().includes(data.user.email.toLowerCase()));
+  const isAdmin = Boolean(user?.email && env.adminEmails().includes(user.email.toLowerCase()));
   const stripeLabel = !conn ? null : conn.status === "error" ? "Stripe needs attention" : conn.method === "sample" ? "Sample Stripe data" : conn.key_mode === "test" ? "Stripe connected, test mode" : "Stripe connected";
 
   return (
     <div className="app">
-      {data.user && <TimeZoneSync known={tz.known} />}
+      {user && <TimeZoneSync known={tz.known} />}
       <aside className="app-side" aria-label="Sidebar">
         <div className="side-panel">
           <Link href="/dashboard" className="app-brand" aria-label="Quillmarc, your updates">
@@ -67,8 +66,8 @@ export async function AppFrame({ children }: { children: React.ReactNode }) {
             <div className="side-theme">
               <ThemeToggle />
             </div>
-            <p className="side-email side-text meta truncate" title={data.user?.email}>
-              {data.user?.email}
+            <p className="side-email side-text meta truncate" title={user?.email}>
+              {user?.email}
             </p>
             <form action="/auth/signout" method="post">
               <button className="side-row w-full" title="Sign out">
@@ -82,7 +81,7 @@ export async function AppFrame({ children }: { children: React.ReactNode }) {
       </aside>
 
       <header className="app-phonebar">
-        <MobileMenu isAdmin={isAdmin} investorCount={setup?.investorCount ?? 0} email={data.user?.email ?? ""} company={company} />
+        <MobileMenu isAdmin={isAdmin} investorCount={setup?.investorCount ?? 0} email={user?.email ?? ""} company={company} />
         <Link href="/dashboard" className="text-ink" aria-label="Quillmarc, your updates">
           <Wordmark className="h-5 w-auto" />
         </Link>
