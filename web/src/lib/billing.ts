@@ -3,7 +3,7 @@ import { decrypt } from "./crypto";
 import { env } from "./env";
 import { calculateMetrics, calculatePeriodMetrics, type MetricsResult } from "./metrics";
 import { monthPeriod, periodBounds, periodLabel, previousPeriod, type Period } from "./periods";
-import { loadDailyRevenue, syncRevenue } from "./revenue";
+import { describeDbError, loadDailyRevenue, syncRevenue } from "./revenue";
 import type { BillingSource } from "./stripe/adapter";
 import { StripeChargeSource, type ChargeSource } from "./stripe/charges";
 import { RestrictedKeySource, StripeFetchError } from "./stripe/restricted-key";
@@ -126,7 +126,8 @@ export async function ensureSnapshots(userId: string, opts: { force?: boolean } 
   const admin = adminClient();
   const months = historyMonths();
   if (opts.force) await admin.from("metrics_snapshots").delete().eq("user_id", userId);
-  const { data } = await admin.from("metrics_snapshots").select("month, computed_at").eq("user_id", userId);
+  const { data, error: readError } = await admin.from("metrics_snapshots").select("month, computed_at").eq("user_id", userId);
+  if (readError) throw new Error(describeDbError(readError));
   const have = new Map((data ?? []).map((r) => [String(r.month).slice(0, 7), Date.parse(r.computed_at) / 1000]));
   const now = nowSeconds();
   const current = months[months.length - 1];
@@ -135,5 +136,5 @@ export async function ensureSnapshots(userId: string, opts: { force?: boolean } 
   const billing = await fetchBilling(userId);
   const rows = todo.map((m) => ({ user_id: userId, month: `${m}-01`, metrics_json: calculateMetrics(billing, { month: m, now }), computed_at: new Date().toISOString() }));
   const { error } = await admin.from("metrics_snapshots").upsert(rows, { onConflict: "user_id,month" });
-  if (error) throw new Error("Could not save the monthly numbers.");
+  if (error) throw new Error(describeDbError(error));
 }

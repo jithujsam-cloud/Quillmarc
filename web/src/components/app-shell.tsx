@@ -9,6 +9,8 @@ import { Icon } from "./icons";
 import { SiteFooter } from "./site-footer";
 import { accessFor, trialLabel } from "@/lib/trial";
 import { env } from "@/lib/env";
+import { getTimeZone } from "@/lib/timezone-server";
+import { TimeZoneSync } from "./timezone-sync";
 
 export interface Crumb {
   label: string;
@@ -22,6 +24,7 @@ export interface Crumb {
 export async function AppFrame({ children }: { children: React.ReactNode }) {
   const supabase = await createUserClient();
   const { data } = await supabase.auth.getUser();
+  const tz = await getTimeZone();
   const setup = data.user ? await getSetupState(supabase, data.user.id) : null;
   const conn = setup?.connection;
   const company = setup?.profile?.company_name ?? null;
@@ -31,6 +34,7 @@ export async function AppFrame({ children }: { children: React.ReactNode }) {
 
   return (
     <div className="app">
+      {data.user && <TimeZoneSync known={tz.known} />}
       <aside className="app-side" aria-label="Sidebar">
         <div className="side-panel">
           <Link href="/dashboard" className="app-brand" aria-label="Quillmarc, your updates">
