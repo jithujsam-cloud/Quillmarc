@@ -120,3 +120,7 @@ The marketing site's decisions live in `../DECISIONS.md`.
 - **`npm run stripe:sandbox` fills a test-mode account with fixtures; `--month` adds a month of joins, cancellations and an upgrade.** Stripe cannot backdate cancellations, so churn history accumulates for real. Live keys are refused; every fixture is tagged and `--reset` removes them.
 - **With a sandbox key, Quillmarc also reads subscriptions on Stripe test clocks.** Stripe hides them from the normal list. Live keys never look for clocks (live accounts have none). If the key cannot read test clocks, the numbers screen says so instead of quietly showing less.
 - **Sandbox history uses test clocks; Stripe still dates payments with the real date.** Past-dated payments are impossible in a sandbox. Quillmarc uses subscription dates, which test clocks set correctly.
+
+## Database hardening (October 22)
+- **Applied the Supabase advisors' fixes in `20261022140000_hardening.sql`.** Outside callers can no longer run the template's `rls_auto_enable()` event trigger. Row rules call `auth.uid()` once per query, not once per row. The foreign keys that deletes cascade through are now indexed. Who can see what is unchanged; the RLS tests prove it.
+- **Kept as is:** `rate_limits` and `waitlist` have no policies on purpose (server only). The leaked-password check does not apply, because sign-in is by magic link only.
