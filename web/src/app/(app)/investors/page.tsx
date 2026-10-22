@@ -6,6 +6,7 @@ import { requireUser } from "@/lib/auth";
 import { removeInvestor } from "@/lib/actions/setup";
 import type { InvestorRow } from "@/lib/db-types";
 import { formatDate } from "@/lib/format";
+import { getTimeZone } from "@/lib/timezone-server";
 import { SubmitButton } from "@/components/submit-button";
 
 export const metadata: Metadata = { title: "Investors" };
@@ -19,6 +20,7 @@ function state(i: InvestorRow): { label: string; cls: string } | null {
 // The screen's question: "Who gets my update?"
 export default async function InvestorsPage() {
   const { supabase, user } = await requireUser();
+  const tz = await getTimeZone();
   const [{ data }, { data: sendData }, { data: readData }] = await Promise.all([
     supabase.from("investors").select("*").eq("user_id", user.id).order("name"),
     supabase.from("sends").select("id, investor_id, status").eq("user_id", user.id),
@@ -91,7 +93,7 @@ export default async function InvestorsPage() {
                       <td className="n line2 !text-left">{s ? <span className={s.cls}>{s.label}</span> : <span className="text-faint">Receives updates</span>}</td>
                       <td className="n hidden num sm:table-cell">{st.received}</td>
                       <td className="n hidden num sm:table-cell">{st.received ? `${st.read.size} of ${st.received}` : <span className="text-faint">-</span>}</td>
-                      <td className="n hidden sm:table-cell">{st.last ? formatDate(st.last) : <span className="text-faint">-</span>}</td>
+                      <td className="n hidden sm:table-cell">{st.last ? formatDate(st.last, tz.zone) : <span className="text-faint">-</span>}</td>
                       <td className="n row-start-1 col-start-2">
                         <form action={removeInvestor}>
                           <input type="hidden" name="id" value={i.id} />

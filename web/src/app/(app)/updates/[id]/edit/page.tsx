@@ -8,6 +8,7 @@ import type { InvestorRow, ProfileRow, StripeConnectionRow, UpdateRow } from "@/
 import { renderUpdateEmail } from "@/lib/email/render";
 import { env } from "@/lib/env";
 import { formatDateTime } from "@/lib/format";
+import { getTimeZone } from "@/lib/timezone-server";
 import { EDITABLE_KEYS, figures, MONEY_KEYS, minorUnitFactor, type EditableKey } from "@/lib/metrics/present";
 import { contentFor } from "@/lib/sending/queue";
 import { isUuid } from "@/lib/validate";
@@ -39,6 +40,7 @@ export default async function EditUpdatePage({ params, searchParams }: { params:
   const sp = await searchParams;
   if (!isUuid(id)) notFound();
   const { supabase, user } = await requireUser();
+  const tz = await getTimeZone();
   const [{ data: update }, { data: profile }, { data: inv }, { data: conn }] = await Promise.all([
     supabase.from("updates").select("*").eq("id", id).maybeSingle<UpdateRow>(),
     supabase.from("profiles").select("*").eq("id", user.id).single<ProfileRow>(),
@@ -131,7 +133,7 @@ export default async function EditUpdatePage({ params, searchParams }: { params:
                   </h2>
                   <p className="meta mt-1">
                     From {m.sample ? "sample data" : "your Stripe subscriptions"}
-                    {conn?.last_checked_at ? `, read ${formatDateTime(conn.last_checked_at)}` : ""}. {m.currency.toUpperCase()} only.
+                    {conn?.last_checked_at ? `, read ${formatDateTime(conn.last_checked_at, tz.zone)}` : ""}. {m.currency.toUpperCase()} only.
                   </p>
                 </div>
                 <form action={recalculate}>

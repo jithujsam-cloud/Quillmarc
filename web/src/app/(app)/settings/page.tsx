@@ -8,12 +8,15 @@ import { requireUser } from "@/lib/auth";
 import { disconnectStripe } from "@/lib/actions/setup";
 import { env } from "@/lib/env";
 import { formatDate, formatDateTime } from "@/lib/format";
+import { getTimeZone } from "@/lib/timezone-server";
 import { getSetupState } from "@/lib/setup";
 import { connectMessage } from "@/lib/stripe/connect-messages";
 import { DeleteForm } from "./delete-form";
 import { accessFor, trialLabel } from "@/lib/trial";
 import { continueHref } from "@/components/trial-notice";
 import { SubmitButton } from "@/components/submit-button";
+import { setTimeZone } from "@/lib/actions/timezone";
+import { timeZoneOptions } from "@/lib/timezone";
 
 export const metadata: Metadata = { title: "Settings" };
 
@@ -31,6 +34,7 @@ function Setting({ id, title, desc, children }: { id: string; title: string; des
 
 export default async function SettingsPage({ searchParams }: { searchParams: Promise<{ done?: string; stripe?: string }> }) {
   const { supabase, user } = await requireUser();
+  const tz = await getTimeZone();
   const { profile, connection } = await getSetupState(supabase, user.id);
   const { done, stripe } = await searchParams;
   const connectAvailable = Boolean(env.stripeConnect());
@@ -51,7 +55,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
             <div className="grid gap-4">
               <div className="flex flex-wrap items-center gap-3">
                 <span className={`pill ${a.expired ? "pill-warn" : a.plan === "active" ? "pill-pos" : "pill-accent"}`}>{trialLabel(a)}</span>
-                {a.plan === "trial" && profile?.trial_ends_at && <span className="text-muted">{a.expired ? "Ended" : "Ends"} {formatDate(profile.trial_ends_at)}</span>}
+                {a.plan === "trial" && profile?.trial_ends_at && <span className="text-muted">{a.expired ? "Ended" : "Ends"} {formatDate(profile.trial_ends_at, tz.zone)}</span>}
               </div>
               {a.plan !== "active" && (
                 <div>
@@ -76,7 +80,7 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
           connection ? (
             <>
               {connectionLabel(connection)}
-              {connection.last_checked_at && <span className="mt-2 block">Last read {formatDateTime(connection.last_checked_at)}.</span>}
+              {connection.last_checked_at && <span className="mt-2 block">Last read {formatDateTime(connection.last_checked_at, tz.zone)}.</span>}
             </>
           ) : (
             "Not connected. Quillmarc reads subscriptions to calculate your numbers. Read only."
@@ -114,6 +118,28 @@ export default async function SettingsPage({ searchParams }: { searchParams: Pro
         ) : (
           <StripeConnectPanel from="settings" connectAvailable={connectAvailable} code={stripe} next="/settings" />
         )}
+      </Setting>
+
+      <Setting id="time" title="Time zone" desc="Times in Quillmarc are shown in this time zone. Your data is kept in UTC, so changing it never changes a number.">
+        <form action={setTimeZone} className="grid gap-3">
+          <label htmlFor="tz" className="label !mb-0">
+            Show times in
+          </label>
+          <div className="flex flex-wrap items-center gap-3">
+            <select id="tz" name="tz" defaultValue={tz.zone} className="field max-w-80">
+              {timeZoneOptions().map((z) => (
+                <option key={z} value={z}>
+                  {z.replace(/_/g, " ")}
+                </option>
+              ))}
+            </select>
+            <SubmitButton className="btn btn-secondary" pendingLabel="Saving">
+              Save
+            </SubmitButton>
+            {done === "time" && <span className="ok">Saved.</span>}
+          </div>
+          <p className="hint">{tz.known ? "" : "Not set yet, so times show in UTC. "}Revenue by day and the period of an update still follow UTC days.</p>
+        </form>
       </Setting>
 
       <Setting id="appearance" title="Appearance" desc="Light, dark, or match your computer. Saved on this device.">

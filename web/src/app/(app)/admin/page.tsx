@@ -5,6 +5,7 @@ import { TitleRow } from "@/components/title-row";
 import { requireAdmin } from "@/lib/admin";
 import type { ProfileRow } from "@/lib/db-types";
 import { formatDate } from "@/lib/format";
+import { getTimeZone } from "@/lib/timezone-server";
 import { adminClient } from "@/lib/supabase/admin";
 import { accessFor, trialLabel } from "@/lib/trial";
 import { setAccess } from "./actions";
@@ -14,6 +15,7 @@ export const dynamic = "force-dynamic";
 
 // The owner's view of every account: who is on a trial, who is active, and how far each got.
 export default async function AdminPage() {
+  const tz = await getTimeZone();
   await requireAdmin();
   const admin = adminClient();
   const [{ data: profiles }, { data: conns }, { data: inv }, { data: ups }] = await Promise.all([
@@ -60,7 +62,7 @@ export default async function AdminPage() {
                       {p.founder_name ? `${p.founder_name}, ` : ""}
                       {p.email}
                     </span>
-                    <span className="sub">Joined {formatDate(p.created_at)}</span>
+                    <span className="sub">Joined {formatDate(p.created_at, tz.zone)}</span>
                   </td>
                   <td className="n !text-right sm:!text-left">
                     <span className={`pill ${a.expired ? "pill-warn" : a.plan === "active" ? "pill-pos" : "pill-accent"}`}>{trialLabel(a)}</span>

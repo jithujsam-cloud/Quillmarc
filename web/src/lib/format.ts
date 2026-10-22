@@ -1,12 +1,13 @@
-/** "Oct 2, 2026, 9:00 AM" in UTC, so the server and browser agree. */
-export function formatDateTime(iso: string | null): string {
+/** "Oct 2, 2026, 9:00 AM IST" in the founder's time zone (UTC when none is set), with the zone named. */
+export function formatDateTime(iso: string | null, timeZone = "UTC"): string {
   if (!iso) return "";
-  return new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", timeZone: "UTC", timeZoneName: "short" });
+  return new Date(iso).toLocaleString("en-US", { month: "short", day: "numeric", year: "numeric", hour: "numeric", minute: "2-digit", timeZone, timeZoneName: "short" });
 }
 
-export function formatDate(iso: string | null): string {
+/** "Oct 2, 2026" on the day it was in the founder's time zone. */
+export function formatDate(iso: string | null, timeZone = "UTC"): string {
   if (!iso) return "";
-  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone: "UTC" });
+  return new Date(iso).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric", timeZone });
 }
 
 const MONTH_SHORT = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];

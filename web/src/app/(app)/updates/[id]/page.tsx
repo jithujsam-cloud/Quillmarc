@@ -8,6 +8,7 @@ import { requireUser } from "@/lib/auth";
 import type { UpdateRow } from "@/lib/db-types";
 import { env } from "@/lib/env";
 import { formatDateTime } from "@/lib/format";
+import { getTimeZone } from "@/lib/timezone-server";
 import { PeriodChip } from "@/components/period-chip";
 import { periodFromRow, periodLabel } from "@/lib/periods";
 import { STATUS_LABELS, type DisplayStatus } from "@/lib/sending/status";
@@ -33,6 +34,7 @@ export default async function UpdateStatusPage({ params }: { params: Promise<{ i
   const { id } = await params;
   if (!isUuid(id)) notFound();
   const { supabase } = await requireUser();
+  const tz = await getTimeZone();
   const { data: update } = await supabase.from("updates").select("*").eq("id", id).maybeSingle<UpdateRow>();
   if (!update) notFound();
   if (update.status === "draft") redirect(`/updates/${id}/edit`);
@@ -51,7 +53,7 @@ export default async function UpdateStatusPage({ params }: { params: Promise<{ i
 
   const sub = pending
     ? `Sending. ${t.queued} still in the queue. You can leave this page; sending continues when you come back.`
-    : `${t.read} of ${t.recipients} read it.${problems.length ? ` ${problems.join(", ")}.` : ""} Sent ${formatDateTime(update.sent_at)}.`;
+    : `${t.read} of ${t.recipients} read it.${problems.length ? ` ${problems.join(", ")}.` : ""} Sent ${formatDateTime(update.sent_at, tz.zone)}.`;
 
   return (
     <AppShell
@@ -158,7 +160,7 @@ export default async function UpdateStatusPage({ params }: { params: Promise<{ i
                   {derived.delayed && <span className="sub">Delivery delayed</span>}
                   {send.status === "failed" && send.last_error && <span className="sub">{send.last_error}</span>}
                 </td>
-                <td className="n line2 sm:!text-right">{formatDateTime(derived.lastEventAt)}</td>
+                <td className="n line2 sm:!text-right">{formatDateTime(derived.lastEventAt, tz.zone)}</td>
               </tr>
             ))}
           </tbody>

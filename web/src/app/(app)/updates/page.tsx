@@ -7,6 +7,7 @@ import { TrialEndedPanel } from "@/components/trial-notice";
 import { requireUser } from "@/lib/auth";
 import type { UpdateRow } from "@/lib/db-types";
 import { formatDate } from "@/lib/format";
+import { getTimeZone } from "@/lib/timezone-server";
 import { defaultPeriod, overlaps, periodFromRow, periodLabel, periodRange, typeLabel } from "@/lib/periods";
 import { getSetupState } from "@/lib/setup";
 import { accessFor } from "@/lib/trial";
@@ -16,6 +17,7 @@ export const metadata: Metadata = { title: "Updates" };
 // The screen's question: "What have I sent, and what is due next?"
 export default async function UpdatesPage() {
   const { supabase, user } = await requireUser();
+  const tz = await getTimeZone();
   const [setup, { data }, { data: sendData }] = await Promise.all([
     getSetupState(supabase, user.id),
     supabase.from("updates").select("*").eq("user_id", user.id).order("period_end", { ascending: false }).order("created_at", { ascending: false }),
@@ -46,7 +48,7 @@ export default async function UpdatesPage() {
       : !dueCovered
         ? `Your ${periodLabel(due)} update is not started.`
         : lastSent
-          ? `${periodLabel(periodFromRow(lastSent))} went to ${reach(lastSent).delivered} of ${reach(lastSent).of} investors on ${formatDate(lastSent.sent_at)}.`
+          ? `${periodLabel(periodFromRow(lastSent))} went to ${reach(lastSent).delivered} of ${reach(lastSent).of} investors on ${formatDate(lastSent.sent_at, tz.zone)}.`
           : "Your update is a draft. Review the numbers, write a few bullets and send it.";
 
   const add = access.expired ? (
@@ -120,7 +122,7 @@ export default async function UpdatesPage() {
                     <td className="n sm:text-left">
                       <span className={u.status === "draft" ? "pill pill-quiet" : "pill pill-accent"}>{u.status === "draft" ? "Draft" : u.status === "sending" ? "Sending" : "Sent"}</span>
                     </td>
-                    <td className="line2 sm:!text-left">{u.sent_at ? formatDate(u.sent_at) : <span className="text-faint" aria-label="Not sent">-</span>}</td>
+                    <td className="line2 sm:!text-left">{u.sent_at ? formatDate(u.sent_at, tz.zone) : <span className="text-faint" aria-label="Not sent">-</span>}</td>
                     <td className="n num">
                       {u.status === "draft" ? (
                         <span className="text-faint" aria-label="Not sent">

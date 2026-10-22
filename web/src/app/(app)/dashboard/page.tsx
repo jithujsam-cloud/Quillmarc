@@ -118,7 +118,7 @@ export default async function Dashboard() {
           </div>
           <div className="kpis border-t border-line">
             <Kpi label="Today" value={money(revenue.today)} sub={`Yesterday ${money(revenue.yesterday)}`} />
-            <Kpi lead label={monthName(thisMonthKey)} value={money(revenue.monthToDate)} sub={deltaText(monthChange, `the same days of ${lastMonthKey ? monthName(lastMonthKey) : "last month"}`)} tone={monthChange} />
+            <Kpi label={monthName(thisMonthKey)} value={money(revenue.monthToDate)} sub={deltaText(monthChange, `the same days of ${lastMonthKey ? monthName(lastMonthKey) : "last month"}`)} tone={monthChange} />
             <Kpi label={today.slice(0, 4)} value={money(revenue.yearToDate)} sub={deltaText(yearChange, `the same days of ${Number(today.slice(0, 4)) - 1}`)} tone={yearChange} />
             <Kpi label="Average per day" value={money(avgDay)} sub="Last 30 days" />
           </div>
@@ -131,7 +131,7 @@ export default async function Dashboard() {
               <span className="meta">From your Stripe subscriptions, {monthName(thisMonthKey)} so far</span>
             </div>
             <div className="kpis border-t border-line">
-              <Kpi lead label="MRR" value={formatMoney(latest.mrr, latest.currency)} sub={deltaText(mrrGrowth, `${closed ? monthName(closed.month) : "last month"}`)} tone={mrrGrowth} />
+              <Kpi label="MRR" value={formatMoney(latest.mrr, latest.currency)} sub={deltaText(mrrGrowth, `${closed ? monthName(closed.month) : "last month"}`)} tone={mrrGrowth} />
               <Kpi label="ARR" value={formatMoney(latest.mrr * 12, latest.currency)} sub="MRR times 12" />
               <Kpi label="Customers" value={formatCount(latest.customers)} sub={`${formatCount(latest.newCustomers)} new, ${formatCount(latest.churnedCustomers)} churned`} />
               <Kpi label="Net new MRR" value={formatMoney(latest.netNewMrr, latest.currency, { signed: true })} sub={`Estimated, against ${closed ? monthName(closed.month) : "last month"}`} />
@@ -235,9 +235,9 @@ function deltaText(p: number | null, against: string): string {
   return s ? `${s} against ${against}` : `Nothing to compare with in ${against}`;
 }
 
-function Kpi({ label, value, sub, lead = false, tone }: { label: string; value: string; sub: string; lead?: boolean; tone?: number | null }) {
+function Kpi({ label, value, sub, tone }: { label: string; value: string; sub: string; tone?: number | null }) {
   return (
-    <div className={`kpi ${lead ? "kpi-lead" : ""}`}>
+    <div className="kpi">
       <p className="kpi-label">{label}</p>
       <p className="kpi-value">{value}</p>
       <p className="delta" data-tone={tone === undefined || tone === null || tone === 0 ? undefined : tone > 0 ? "good" : "bad"}>
