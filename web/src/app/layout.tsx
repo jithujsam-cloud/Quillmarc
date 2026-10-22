@@ -1,6 +1,5 @@
 import type { Metadata, Viewport } from "next";
 import { Geist_Mono, Hanken_Grotesk, Newsreader } from "next/font/google";
-import { THEME_SCRIPT } from "@/components/theme-toggle";
 import "./globals.css";
 
 // The landing page's three faces: Newsreader for headings and the letter, Hanken Grotesk for text,
@@ -22,11 +21,16 @@ export const viewport: Viewport = {
   ],
 };
 
+// Restores the saved theme (qm-theme, see theme-toggle.tsx) and sidebar state (qm-sidebar, see nav-links.tsx)
+// before first paint, so neither flashes. Kept here: a string exported from a client module reaches the
+// server as a client reference, not as the string.
+const PREPAINT_SCRIPT = `try{var d=document.documentElement,t=localStorage.getItem("qm-theme");if(t==="light"||t==="dark")d.setAttribute("data-theme",t);if(localStorage.getItem("qm-sidebar")==="collapsed")d.setAttribute("data-sidebar","collapsed")}catch(e){}`;
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${hanken.variable} ${newsreader.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
-        <script dangerouslySetInnerHTML={{ __html: THEME_SCRIPT }} />
+        <script dangerouslySetInnerHTML={{ __html: PREPAINT_SCRIPT }} />
       </head>
       <body className="min-h-dvh">
         <a className="skip" href="#main">

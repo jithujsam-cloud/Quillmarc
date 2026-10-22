@@ -110,19 +110,19 @@
 .skip { position: absolute; left: 16px; top: -60px; z-index: 50; background: var(--accent); color: var(--on-accent); padding: 8px 12px; border-radius: 6px; }
 .skip:focus { top: 12px; }
 
-/* ---------- shell: ruled T-frame. Sidebar 232px and top bar 64px on one ground, 1px rules. ---------- */
-.app { display: grid; grid-template-columns: 232px minmax(0, 1fr); grid-template-rows: 64px minmax(0, 1fr); min-height: 100dvh; }
-.app-side { grid-row: 1 / -1; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 0 12px 16px; position: sticky; top: 0; height: 100dvh; }
-.app-brand { height: 64px; display: flex; align-items: center; padding: 0 8px; color: var(--text); flex: none; }
-.app-top { grid-column: 2; display: flex; align-items: center; gap: 12px; padding: 0 29px; border-bottom: 1px solid var(--border); min-width: 0; position: sticky; top: 0; z-index: 10; background: var(--ground); }
-.app-canvas { grid-column: 2; min-width: 0; padding: 32px 29px 64px; }
+/* ---------- shell: a sidebar and the canvas on one ground, divided by a 1px rule. ---------- */
+.app { display: grid; grid-template-columns: 232px minmax(0, 1fr); grid-template-rows: auto minmax(0, 1fr); min-height: 100dvh; transition: grid-template-columns 200ms ease; }
+.app-side { grid-row: 1 / -1; border-right: 1px solid var(--border); display: flex; flex-direction: column; padding: 0 12px 16px; position: sticky; top: 0; height: 100dvh; overflow: hidden auto; }
+.app-brand { height: 64px; display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 0 0 0 8px; color: var(--text); flex: none; }
+.app-top { grid-column: 2; display: flex; align-items: center; gap: 12px; padding: 24px 29px 0; min-width: 0; }
+.app-top-bare { display: none; }
+.app-canvas { grid-column: 2; min-width: 0; padding: 24px 29px 64px; }
 .app-canvas-inner { max-width: 1152px; }
 .crumbs { display: flex; align-items: center; gap: 8px; min-width: 0; color: var(--muted); }
 .crumbs a { color: var(--muted); text-decoration: none; }
 .crumbs a:hover { color: var(--text); }
 .crumbs [aria-current] { color: var(--text); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .top-actions { margin-left: auto; display: flex; align-items: center; gap: 8px; flex: none; }
-.top-divider { width: 1px; align-self: stretch; background: var(--border); margin: 0 4px; }
 
 .nav { display: grid; gap: 2px; }
 .nav a { display: flex; align-items: center; gap: 10px; height: 36px; padding: 0 10px; border-radius: 8px; color: var(--muted); text-decoration: none; transition: background-color 150ms ease, color 150ms ease; }
@@ -133,6 +133,20 @@
 .nav .count { color: var(--faint); font-size: 12px; }
 .side-group { margin: 20px 10px 6px; font-size: 12px; color: var(--faint); }
 .side-foot { margin-top: auto; display: grid; gap: 12px; padding: 12px 10px 0; border-top: 1px solid var(--border); font-size: 13px; }
+.side-item svg { width: 16px; height: 16px; flex: none; }
+.side-foot .segmented { justify-self: start; }
+
+/* collapsed: the sidebar folds to a 64px icon rail; labels hide, the theme switch stacks */
+@media (min-width: 961px) {
+  :root[data-sidebar="collapsed"] .app { grid-template-columns: 64px minmax(0, 1fr); }
+  :root[data-sidebar="collapsed"] .app-side { padding: 0 10px 16px; }
+  :root[data-sidebar="collapsed"] .side-text { display: none !important; }
+  :root[data-sidebar="collapsed"] .app-brand { justify-content: center; padding: 0; }
+  :root[data-sidebar="collapsed"] .nav { margin-top: 16px; }
+  :root[data-sidebar="collapsed"] .nav a { justify-content: center; padding: 0; }
+  :root[data-sidebar="collapsed"] .side-foot { padding: 12px 0 0; justify-items: center; }
+  :root[data-sidebar="collapsed"] .side-foot .segmented { flex-direction: column; }
+}
 
 /* the phone: the sidebar folds into a sheet behind a menu button */
 .menu-btn, .menu-btn.btn { display: none; }
@@ -140,7 +154,7 @@
   .app { grid-template-columns: minmax(0, 1fr); grid-template-rows: 56px minmax(0, 1fr); }
   .app-side { display: none; }
   .app-top, .app-canvas { grid-column: 1; }
-  .app-top { padding: 0 16px; }
+  .app-top, .app-top-bare { display: flex; padding: 0 16px; border-bottom: 1px solid var(--border); position: sticky; top: 0; z-index: 10; background: var(--ground); }
   .app-canvas { padding: 24px 16px 48px; }
   .menu-btn, .menu-btn.btn { display: inline-flex; }
   .hide-phone { display: none !important; }
