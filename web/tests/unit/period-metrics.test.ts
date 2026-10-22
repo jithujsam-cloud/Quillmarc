@@ -104,3 +104,31 @@ describe("labels follow the period", () => {
     expect(figures(m).find((f) => f.key === "revenue")?.display).toBe("$1,234");
   });
 });
+
+describe("a past period never uses what happened later", () => {
+  const later = () => [
+    sub({ customerId: "early", startDate: t("2026-01-10T00:00:00Z"), items: [{ price: price({ unitAmount: 10000 }), quantity: 1 }] }),
+    // Joined after the period ended, and a plan upgrade-sized price: none of it may leak into the past.
+    sub({ customerId: "late", startDate: t("2026-10-05T00:00:00Z"), items: [{ price: price({ unitAmount: 90000 }), quantity: 1 }] }),
+  ];
+
+  it("leaves out a customer who joined after the period", () => {
+    const m = calculatePeriodMetrics(data(later()), { start: "2026-08-01", end: "2026-08-31", type: "month", now });
+    expect(m.mrr).toBe(10000);
+    expect(m.customers).toBe(1);
+    expect(m.newCustomers).toBe(0);
+  });
+
+  it("gives the same answer with or without the later customer", () => {
+    const withLater = calculatePeriodMetrics(data(later()), { start: "2026-08-01", end: "2026-08-31", type: "month", now });
+    const without = calculatePeriodMetrics(data(later().slice(0, 1)), { start: "2026-08-01", end: "2026-08-31", type: "month", now });
+    expect(withLater).toEqual(without);
+  });
+
+  it("gives the same answer whenever it is asked, as long as the period has finished", () => {
+    const first = calculatePeriodMetrics(data(later()), { start: "2026-08-01", end: "2026-08-31", type: "month", now: t("2026-09-02T00:00:00Z") });
+    const second = calculatePeriodMetrics(data(later()), { start: "2026-08-01", end: "2026-08-31", type: "month", now: t("2026-10-22T00:00:00Z") });
+    expect(second.mrr).toBe(first.mrr);
+    expect(second.customers).toBe(first.customers);
+  });
+});

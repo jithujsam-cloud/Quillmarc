@@ -1,4 +1,4 @@
-// Thank-you page: confirm the spot, ask two optional questions, offer a call and a share link.
+// Thank-you page: confirm the trial, ask two optional questions, offer a call and a share link.
 (function () {
   "use strict";
   var cfg = window.QUILLMARC_CONFIG || {};
@@ -11,17 +11,18 @@
 
   var title = $("#thanks-title");
   if (!signup) {
-    title.textContent = "Join the Quillmarc waitlist.";
-    part("lede").innerHTML = 'This page confirms a signup. <a href="/#join">Join the waitlist</a> to save your spot.';
+    title.textContent = "Start your Quillmarc free trial.";
+    part("lede").innerHTML = 'This page confirms a signup. <a href="/#join">Start your free trial</a> to get 14 days, no card needed.';
   } else if (signup.status === "exists") {
-    title.textContent = "You are already on the list.";
-    part("lede").textContent = "Good news: this email was already saved, so there is nothing more to do. We will write when your invite is ready.";
+    title.textContent = "You already signed up.";
+    part("lede").textContent = "This email already has a free trial. Sign in with it to carry on.";
   }
   if (signup && signup.emailed && signup.email) {
     part("email").textContent = signup.email;
     part("emailed").hidden = false;
   }
   if (signup && signup.founding) part("founding").hidden = false;
+  if (signup && cfg.appUrl) { var start = part("start"); start.href = cfg.appUrl.replace(/\/$/, "") + "/login"; start.hidden = false; }
   title.focus({ preventScroll: true });
 
   function postAnswers(body) {

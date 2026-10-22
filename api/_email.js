@@ -9,13 +9,19 @@ function esc(s) {
 
 function welcome({ founding }) {
   const site = env("SITE_URL", "https://quillmarc.vercel.app").replace(/\/$/, "");
+  const appUrl = (env("APP_URL") || "").replace(/\/$/, "");
+  const signIn = appUrl ? appUrl + "/login" : "";
   const offer = founding
-    ? "You are one of the first 100 founders on the list, so your price is locked: $29 a month for as long as you stay subscribed."
-    : "The first 100 founders on the list keep $29 a month for as long as they stay subscribed. The planned price for everyone else is $29 a month too, and we will confirm it before anyone is charged.";
-  const subject = "You are on the Quillmarc waitlist";
+    ? "You are one of the first 100 founders to sign up, so your price is locked: $29 a month for as long as you stay subscribed."
+    : "The first 100 founders to sign up keep $29 a month for as long as they stay subscribed. The planned price for everyone else is $29 a month too, and we will confirm it before anyone is charged.";
+  const subject = "Your Quillmarc 14-day free trial";
+  const trial = "Your 14-day free trial is ready. No card needed. Your 14 days start when you first sign in.";
 
   const text = [
-    "You are on the Quillmarc waitlist.",
+    "Your Quillmarc free trial is ready.",
+    "",
+    trial,
+    signIn ? "Sign in: " + signIn : "Reply to this email and I will send your sign-in link.",
     "",
     "Quillmarc writes your monthly investor update from live Stripe data. You type five rough bullets. It adds your numbers, writes the update, sends it from your own domain and shows who opened it.",
     "",
@@ -48,7 +54,9 @@ function welcome({ founding }) {
 <table role="presentation" width="100%" cellpadding="0" cellspacing="0" style="max-width:560px;">
   <tr><td style="padding:0 4px 24px;font-family:Georgia,'Times New Roman',serif;font-size:26px;color:${INK};">Quillmarc<span style="color:${GOLD};">.</span></td></tr>
   <tr><td style="background:#FFFFFF;border:1px solid ${LINE};border-radius:14px;padding:28px;font-family:Helvetica,Arial,sans-serif;color:${INK};font-size:16px;line-height:1.6;">
-    <h1 style="margin:0 0 12px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;font-size:26px;line-height:1.2;">You are on the waitlist.</h1>
+    <h1 style="margin:0 0 12px;font-family:Georgia,'Times New Roman',serif;font-weight:normal;font-size:26px;line-height:1.2;">Your free trial is ready.</h1>
+    <p style="margin:0 0 16px;">${esc(trial)}</p>
+    ${signIn ? `<p style="margin:0 0 20px;"><a href="${esc(signIn)}" style="display:inline-block;background:${NAVY};color:${IVORY};padding:12px 20px;border-radius:6px;text-decoration:none;font-weight:600;">Open Quillmarc</a></p>` : `<p style="margin:0 0 20px;">Reply to this email and I will send your sign-in link.</p>`}
     <p style="margin:0 0 16px;">Quillmarc writes your monthly investor update from live Stripe data. You type five rough bullets. It adds your numbers, writes the update, sends it from your own domain and shows who opened it.</p>
     <p style="margin:0 0 20px;padding:14px 16px;background:${TINT};border-left:3px solid ${GOLD};border-radius:6px;">${esc(offer)}</p>
     <p style="margin:0 0 10px;font-size:13px;color:${MUTED};">Here is what an update looks like. Sample data, fictional company.</p>
@@ -68,7 +76,7 @@ function welcome({ founding }) {
     <p style="margin:22px 0 0;"><strong>One question:</strong> what is the most annoying part of your investor update today? Just reply to this email. I read every reply.</p>
     <p style="margin:16px 0 0;">Jithu<br><span style="color:${MUTED};">Quillmarc</span></p>
   </td></tr>
-  <tr><td style="padding:18px 4px 0;font-family:Helvetica,Arial,sans-serif;font-size:12px;color:${MUTED};line-height:1.5;">You are getting this because you joined the waitlist at <a href="${site}" style="color:${NAVY};">${site.replace(/^https?:\/\//, "")}</a>. Reply "remove" and we will delete your details. <a href="${site}/privacy" style="color:${NAVY};">Privacy</a></td></tr>
+  <tr><td style="padding:18px 4px 0;font-family:Helvetica,Arial,sans-serif;font-size:12px;color:${MUTED};line-height:1.5;">You are getting this because you signed up for a free trial at <a href="${site}" style="color:${NAVY};">${site.replace(/^https?:\/\//, "")}</a>. Reply "remove" and we will delete your details. <a href="${site}/privacy" style="color:${NAVY};">Privacy</a></td></tr>
 </table></td></tr></table></body></html>`;
 
   return { subject, text, html };

@@ -66,7 +66,11 @@ async function main() {
   const { data: prior } = await admin.from("updates").select("id").eq("user_id", userId).eq("month", `${month}-01`).maybeSingle();
   if (!prior) {
     const endOfMonth = Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 1) / 1000;
-    const metrics = calculateMetrics(sampleBillingData(endOfMonth + 3 * 86400), { month, now: endOfMonth + 3 * 86400 });
+    // Calculated the way a founder's past-month update is: from the same data the dashboard uses today.
+    // (The sample data is laid out relative to "now", so building it as of a past date would make that
+    // month look just like today.)
+    const nowSeconds = Math.floor(Date.now() / 1000);
+    const metrics = calculateMetrics(sampleBillingData(nowSeconds), { month, now: nowSeconds });
     const sentAt = new Date((endOfMonth + 3 * 86400) * 1000);
     const { data: update, error } = await admin
       .from("updates")

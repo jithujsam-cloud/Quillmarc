@@ -58,3 +58,11 @@ Every judgment call made during the October 21, 2026 audit and rebuild, with a o
 - **Added a 404 page that mentions the spelling.** Some visitors will type "quillmark".
 - **OG image and PNG icons are rendered from `brand/tools/og.html` by `brand/tools/render_images.js`.** They stay on-brand and can be regenerated after any copy change.
 - **The "raw markdown leaking" finding did not reproduce.** The live HTML has no `==`, `**` or `###`; the strings came from a markdown converter reading the page. Rendered text was re-checked after the rebuild.
+
+## Free trial instead of a waitlist (October 23)
+- **The landing page now sells the 14-day free trial, with no waitlist wording.** The app already lets anyone sign up and gets 14 days, so the page, the thank-you view, the welcome email, the FAQ, the privacy page and the terms all say the same thing. One CTA label everywhere: "Start your free trial".
+- **The sign-up form and its questions stay.** It still saves the email, company and answers, which tell the owner who is trying the product. Only what it promises changed. The database table is still called `waitlist` internally.
+- **`APP_URL` adds the way in.** When set, the thank-you view shows "Open Quillmarc" and the welcome email has a sign-in button, both pointing to `<APP_URL>/login`. When unset, the email says to reply for a sign-in link.
+- **The founding price is now for the first 100 founders to sign up** (was: first 100 on the waitlist). Same promise, new words. The terms page was reworded to match; have it read by whoever reviews legal text.
+- **Blank blocks on the landing page.** Sections fade in as they scroll into view. If nobody scrolls, touches or presses a key for 3.5 seconds, or the page is printed, every section is shown. Screenshots, link previews and crawlers no longer see empty blocks.
+- **The demo seed's past update is calculated from today's sample data**, as a founder creating a past-month update would. It used to be built "as of" that month, which made August look like today because the sample data is laid out relative to now. Real accounts were never affected: a past period is calculated from fixed subscription dates, and a sent update cannot be changed (a test now proves both).
