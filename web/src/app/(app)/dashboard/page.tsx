@@ -2,21 +2,19 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { BarChart, LineChart, type ChartPoint } from "@/components/charts";
-import { RevenueImporter } from "@/components/revenue-importer";
+import { DashboardRefresher } from "@/components/dashboard-refresher";
 import { SetupPanel } from "@/components/setup-panel";
 import { TitleRow } from "@/components/title-row";
 import { TrialEndedPanel } from "@/components/trial-notice";
 import { arpa, churnRate, monthRows, netRetention, percentChange, summarizeRevenue, mainRevenueCurrency } from "@/lib/analytics";
 import { requireUser } from "@/lib/auth";
-import { chargeSourceFor, ensureSnapshots } from "@/lib/billing";
 import type { MetricsResult } from "@/lib/metrics";
 import { formatCount, formatMoney, formatPercent } from "@/lib/metrics/present";
 import { compactMoney, dayShort, formatDate, monthName, monthShort, signedPercent } from "@/lib/format";
-import { loadDailyRevenue, syncRevenue } from "@/lib/revenue";
+import { loadDailyRevenue } from "@/lib/revenue";
 import { loadInvestorOverview } from "@/lib/investor-data";
 import { getSetupState } from "@/lib/setup";
 import { getTimeZone } from "@/lib/timezone-server";
-import { adminClient } from "@/lib/supabase/admin";
 import { accessFor } from "@/lib/trial";
 
 export const metadata: Metadata = { title: "Dashboard" };
@@ -38,17 +36,10 @@ export default async function Dashboard() {
   }
 
   const today = new Date().toISOString().slice(0, 10);
-  // Both reads are best effort: the saved figures still show if Stripe cannot be reached right now.
-  const admin = adminClient();
-  const [snapshotResult, syncResult] = await Promise.allSettled([
-    ensureSnapshots(user.id),
-    chargeSourceFor(user.id).then((source) => syncRevenue(admin, user.id, source, { budgetMs: 2500 })),
-  ]);
-  const stripeError = setup.connection?.status === "error" ? setup.connection.last_error : snapshotResult.status === "rejected" ? (snapshotResult.reason as Error).message : null;
-  const syncError = syncResult.status === "fulfilled" ? syncResult.value.error : null;
-  const importing = syncResult.status === "fulfilled" ? !syncResult.value.complete && !syncResult.value.error : false;
-  const problem = stripeError ?? syncError;
-
+  // Show what is saved straight away. DashboardRefresher brings it up to date from Stripe in the background.
+  const { data: syncRow } = await supabase.from("revenue_sync").select("backfill_complete").eq("user_id", user.id).maybeSingle();
+  const importing = !syncRow?.backfill_complete;
+  const problem = setup.connection?.status === "error" ? setup.connection.last_error : null;
   const tz = await getTimeZone();
   const [overview, { count: openAsks }] = await Promise.all([
     loadInvestorOverview(supabase, user.id),
@@ -112,7 +103,7 @@ export default async function Dashboard() {
           </p>
         )}
         {access.expired && <TrialEndedPanel access={access} />}
-        {importing && <RevenueImporter />}
+        <DashboardRefresher hasData={snapshots.length > 0} importing={importing} />
         {sample && (
           <p className="notice" role="status">
             <strong>Sample data.</strong> These figures are fictional. Connect your own Stripe in Settings to see yours.
