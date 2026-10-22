@@ -98,6 +98,7 @@ Set `PLAYWRIGHT_CHROMIUM_PATH` if Playwright should use an existing Chromium.
 | --- | --- |
 | `src/lib/metrics/` | Metric calculation (pure) and how figures are labelled |
 | `src/lib/stripe/` | Stripe adapter: interface, restricted-key source, sample source, normaliser, payments (`charges.ts`) |
+| `src/lib/investor-activity.ts`, `investor-data.ts` | Who is reading and who has gone quiet |
 | `src/lib/periods.ts`, `analytics.ts`, `revenue.ts` | Update periods, dashboard figures, the saved revenue history and its live refresh |
 | `src/lib/sending/` | Send queue, status derivation, mock event simulator |
 | `src/lib/webhooks/` | Svix verification and Resend event ingest |

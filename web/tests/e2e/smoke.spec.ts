@@ -12,12 +12,24 @@ test("founder sends an update and sees statuses", async ({ page, context }) => {
   // The dashboard shows revenue and monthly numbers from the sample account's payments and subscriptions.
   await page.goto("/dashboard");
   await expect(page.getByRole("heading", { name: "Dashboard", exact: true })).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Your investors" })).toBeVisible();
+  await expect(page.getByText("Gone quiet", { exact: true }).first()).toBeVisible();
   await expect(page.getByRole("heading", { name: "Revenue collected" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Month by month" })).toBeVisible();
   await expect(page.getByRole("heading", { name: "Revenue by day" })).toBeVisible();
 
   await page.goto("/updates");
   await expect(page.getByRole("heading", { name: "Updates", exact: true })).toBeVisible();
+
+  // An ask added now is waiting in the next draft.
+  await page.goto("/asks");
+  await expect(page.getByRole("heading", { name: "Asks", exact: true })).toBeVisible();
+  await page.getByLabel("What are you asking for?").fill("Intro to a finance lead at a Series A company");
+  await page.getByRole("button", { name: "Add ask" }).click();
+  await expect(page.getByText("Added.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Open", exact: true })).toBeVisible();
+  await expect(page.getByText("Intro to a finance lead at a Series A company")).toBeVisible();
+  await page.goto("/updates");
 
   // Add an update for the last finished quarter. The dates it covers are on screen before anything is calculated.
   await page.getByRole("link", { name: "Add update" }).first().click();
@@ -36,8 +48,9 @@ test("founder sends an update and sees statuses", async ({ page, context }) => {
   await page.getByLabel("Your figure for Customers").fill("61");
   await page.getByRole("button", { name: "Save and continue" }).click();
 
-  // Bullets.
+  // Bullets. The open ask came along.
   await expect(page.getByLabel("Wins")).toBeVisible();
+  await expect(page.getByLabel("Asks")).toHaveValue(/Intro to a finance lead/);
   await page.getByLabel("Wins").fill("Closed our largest annual plan\nShipped team billing");
   await page.getByLabel("Problems").fill("Sales cycle is getting longer");
   await page.getByLabel("Asks").fill("Intros to finance leads");
@@ -83,8 +96,18 @@ test("founder sends an update and sees statuses", async ({ page, context }) => {
   await expect(page.getByText("Investors reached", { exact: true })).toBeVisible();
   await expect(page.locator("tbody tr").first()).toContainText(/\d+ of \d+/);
 
+  // The investor's own page shows every update sent to them.
+  await page.goto("/investors");
+  await expect(page.getByText("Theo Marchetti has not read your last 2 updates.")).toBeVisible();
+  await expect(page.getByText("Gone quiet", { exact: true }).first()).toBeVisible();
+  await page.getByRole("link", { name: "Theo Marchetti" }).first().click();
+  await expect(page.getByText("Theo has not read your last 2 updates.")).toBeVisible();
+  await expect(page.getByRole("heading", { name: "Updates sent to them" })).toBeVisible();
+  await expect(page.getByRole("heading", { name: /^Asks for / })).toBeVisible();
+  await page.goto("/updates");
+
   // Hosted page logs a read, then the investor opts out.
-  await page.goBack();
+  await page.getByRole("link", { name: /^Q\d \d{4}$/ }).first().click();
   await page.getByRole("link", { name: "See the update" }).click();
   await expect(page.getByText("No read is logged")).toBeVisible();
 });

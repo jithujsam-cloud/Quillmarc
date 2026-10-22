@@ -43,11 +43,15 @@ test("every page passes axe and fits small screens", async ({ page, context }) =
     .select("id")
     .single();
   const { data: send } = await admin.from("sends").select("token").eq("update_id", sent.id).limit(1).single();
+  const { data: anInvestor } = await admin.from("investors").select("id").limit(1).single();
+  const investorId = anInvestor!.id;
 
   const pages: [string, string][] = [
     ["dashboard", "/dashboard"],
     ["updates", "/updates"],
     ["investors", "/investors"],
+    ["investor", `/investors/${investorId}`],
+    ["asks", "/asks"],
     ["settings", "/settings"],
     ["admin", "/admin"],
     ["onboarding", "/onboarding?step=1"],

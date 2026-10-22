@@ -89,3 +89,19 @@ export interface EventRow {
 
 /** "2026-09-01" -> "2026-09" */
 export const monthKey = (date: string) => date.slice(0, 7);
+
+export type AskStatus = "open" | "intro_made" | "done";
+
+export interface AskRow {
+  id: string;
+  user_id: string;
+  investor_id: string | null;
+  text: string;
+  owner: string | null;
+  status: AskStatus;
+  created_at: string;
+  updated_at: string;
+  resolved_at: string | null;
+}
+
+export const ASK_STATUS_LABELS: Record<AskStatus, string> = { open: "Open", intro_made: "Intro made", done: "Done" };

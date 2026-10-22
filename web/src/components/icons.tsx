@@ -1,5 +1,6 @@
 // One outline icon set, 16px, 1.4px stroke.
 const PATHS = {
+  asks: "M3 4.5l1.5 1.5L7 3.5M9 5h4.5M3 10l1.5 1.5L7 9M9 10.5h4.5",
   dashboard: "M2.5 2.5h4.5v6h-4.5zM9 2.5h4.5v3.5H9zM9 8h4.5v5.5H9zM2.5 10.5h4.5v3h-4.5z",
   updates: "M3 3.5h10v9H3zM3 6l5 3 5-3",
   investors: "M6 7.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5ZM1.5 13.5c.6-2.3 2.4-3.5 4.5-3.5s3.9 1.2 4.5 3.5M10.5 3.8a2.3 2.3 0 0 1 0 4.4M12.2 10.3c1.1.5 1.9 1.6 2.3 3.2",

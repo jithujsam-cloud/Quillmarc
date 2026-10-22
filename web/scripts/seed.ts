@@ -61,8 +61,10 @@ async function main() {
   if (fresh.length) await admin.from("investors").insert(fresh);
   const { data: investors } = await admin.from("investors").select("id, name, email").eq("user_id", userId).order("name");
 
-  // One earlier update, already sent, with sample delivery events.
-  const month = monthOffset(2);
+  // Two earlier updates, already sent, with sample delivery events. Some investors read both, some read
+  // only the older one, and some read neither, so "gone quiet" has something to show.
+  for (const offset of [3, 2]) {
+  const month = monthOffset(offset);
   const { data: prior } = await admin.from("updates").select("id").eq("user_id", userId).eq("month", `${month}-01`).maybeSingle();
   if (!prior) {
     const endOfMonth = Date.UTC(Number(month.slice(0, 4)), Number(month.slice(5, 7)), 1) / 1000;
@@ -107,9 +109,11 @@ async function main() {
       if (!send) continue;
       const events: [string, number][] = [["sent", 1], ["delivered", 3]];
       if (i % 3 === 0) events.push(["opened", 5]);
-      if (i % 3 === 1) events.push(["opened", 3600], ["read", 3700]);
+      const reads = i % 3 === 1 || (i % 3 === 0 && offset === 3);
+      if (reads) events.push(["opened", 3600], ["read", 3700]);
       await admin.from("events").insert(events.map(([type, s]) => ({ user_id: userId, send_id: send.id, type, occurred_at: at(s), raw: { sample: true } })));
     }
+  }
   }
   console.log(`Seeded ${email} (user ${userId}). Sign in with a magic link to that address.`);
   return userId;

@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { AppShell } from "@/components/app-shell";
 import { InvestorPasteForm } from "@/components/forms/investor-paste-form";
 import { TitleRow } from "@/components/title-row";
@@ -6,6 +7,8 @@ import { requireUser } from "@/lib/auth";
 import { removeInvestor } from "@/lib/actions/setup";
 import type { InvestorRow } from "@/lib/db-types";
 import { formatDate } from "@/lib/format";
+import { loadInvestorOverview } from "@/lib/investor-data";
+import { quietLine } from "@/lib/investor-activity";
 import { getTimeZone } from "@/lib/timezone-server";
 import { SubmitButton } from "@/components/submit-button";
 
@@ -17,31 +20,11 @@ function state(i: InvestorRow): { label: string; cls: string } | null {
   return null;
 }
 
-// The screen's question: "Who gets my update?"
+// The screen's question: "Who gets my update, and who has stopped reading?"
 export default async function InvestorsPage() {
   const { supabase, user } = await requireUser();
   const tz = await getTimeZone();
-  const [{ data }, { data: sendData }, { data: readData }] = await Promise.all([
-    supabase.from("investors").select("*").eq("user_id", user.id).order("name"),
-    supabase.from("sends").select("id, investor_id, status").eq("user_id", user.id),
-    supabase.from("events").select("send_id, occurred_at").eq("user_id", user.id).eq("type", "read"),
-  ]);
-  const investors = (data ?? []) as InvestorRow[];
-  // Per investor: updates received, updates read, and when they last read one.
-  const sendOwner = new Map<string, string>();
-  const stats = new Map<string, { received: number; read: Set<string>; last: string | null }>();
-  for (const s of (sendData ?? []) as { id: string; investor_id: string; status: string }[]) {
-    sendOwner.set(s.id, s.investor_id);
-    const c = stats.get(s.investor_id) ?? { received: 0, read: new Set<string>(), last: null };
-    if (s.status === "sent") c.received += 1;
-    stats.set(s.investor_id, c);
-  }
-  for (const e of (readData ?? []) as { send_id: string; occurred_at: string }[]) {
-    const c = stats.get(sendOwner.get(e.send_id) ?? "");
-    if (!c) continue;
-    c.read.add(e.send_id);
-    if (!c.last || e.occurred_at > c.last) c.last = e.occurred_at;
-  }
+  const { investors, activity, quiet } = await loadInvestorOverview(supabase, user.id);
   const blocked = investors.filter((i) => i.opted_out || i.suppressed).length;
   const active = investors.length - blocked;
 
@@ -51,10 +34,25 @@ export default async function InvestorsPage() {
         title="Investors"
         sub={
           investors.length
-            ? `${active} ${active === 1 ? "investor gets" : "investors get"} your updates, one email each.${blocked ? ` ${blocked} will not be emailed.` : ""}`
+            ? `${active} ${active === 1 ? "investor gets" : "investors get"} your updates, one email each.${blocked ? ` ${blocked} will not be emailed.` : ""}${quiet.length ? ` ${quiet.length} ${quiet.length === 1 ? "has" : "have"} gone quiet.` : ""}`
             : "Nobody yet. Paste your list to start."
         }
       />
+
+      {quiet.length > 0 && (
+        <section className="notice mb-4" aria-labelledby="quiet-h">
+          <h2 id="quiet-h" className="sr-only">
+            Gone quiet
+          </h2>
+          <ul className="grid gap-1">
+            {quiet.map((q) => (
+              <li key={q.id}>
+                {quietLine(q.name, q.missed)} <Link href={`/investors/${q.id}`}>See their history</Link>
+              </li>
+            ))}
+          </ul>
+        </section>
+      )}
 
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(0,1fr)_340px]">
         <section className="panel" aria-labelledby="list-h">
@@ -83,17 +81,19 @@ export default async function InvestorsPage() {
               <tbody>
                 {investors.map((i) => {
                   const s = state(i);
-                  const st = stats.get(i.id) ?? { received: 0, read: new Set<string>(), last: null };
+                  const st = activity.get(i.id);
                   return (
                     <tr key={i.id}>
                       <td className="min-w-0">
-                        <span className="font-medium">{i.name}</span>
+                        <Link href={`/investors/${i.id}`} className="row-link">
+                          {i.name}
+                        </Link>
                         <span className="sub truncate" title={i.email}>{i.email}</span>
                       </td>
-                      <td className="n line2 !text-left">{s ? <span className={s.cls}>{s.label}</span> : <span className="text-faint">Receives updates</span>}</td>
-                      <td className="n hidden num sm:table-cell">{st.received}</td>
-                      <td className="n hidden num sm:table-cell">{st.received ? `${st.read.size} of ${st.received}` : <span className="text-faint">-</span>}</td>
-                      <td className="n hidden sm:table-cell">{st.last ? formatDate(st.last, tz.zone) : <span className="text-faint">-</span>}</td>
+                      <td className="n line2 !text-left">{s ? <span className={s.cls}>{s.label}</span> : st?.quiet ? <span className="pill pill-warn">Gone quiet</span> : <span className="text-faint">Receives updates</span>}</td>
+                      <td className="n hidden num sm:table-cell">{st?.received ?? 0}</td>
+                      <td className="n hidden num sm:table-cell">{st?.received ? `${st.read} of ${st.received}` : <span className="text-faint">-</span>}</td>
+                      <td className="n hidden sm:table-cell">{st?.lastReadAt ? formatDate(st.lastReadAt, tz.zone) : <span className="text-faint">-</span>}</td>
                       <td className="n row-start-1 col-start-2">
                         <form action={removeInvestor}>
                           <input type="hidden" name="id" value={i.id} />

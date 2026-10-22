@@ -185,3 +185,55 @@ describe.skipIf(!hasDb)("the revenue sync", () => {
     expect(rows[0].last_error).toMatch(/Try again/);
   });
 });
+
+describe.skipIf(!hasDb)("asks", () => {
+  let db: pg.Client;
+  let alice: string;
+  let bob: string;
+  let aliceInvestor: string;
+  let bobInvestor: string;
+
+  beforeAll(async () => {
+    db = await connect();
+    alice = await createUser(db, `asks-a-${Date.now()}@example.com`);
+    bob = await createUser(db, `asks-b-${Date.now()}@example.com`);
+    await as(db, "service_role", null, async () => {
+      aliceInvestor = (await db.query("insert into investors (user_id, name, email) values ($1, 'Priya Shah', 'priya@example.com') returning id", [alice])).rows[0].id;
+      bobInvestor = (await db.query("insert into investors (user_id, name, email) values ($1, 'Bo Investor', 'bo@example.com') returning id", [bob])).rows[0].id;
+    });
+  });
+  afterAll(async () => {
+    await db.end();
+  });
+
+  it("lets a founder add, move along and remove their own ask", async () => {
+    const id = await as(db, "authenticated", alice, async () => (await db.query("insert into asks (user_id, investor_id, text, owner) values ($1, $2, 'Intro to a finance lead', 'Morgan') returning id", [alice, aliceInvestor])).rows[0].id as string);
+    const moved = await as(db, "authenticated", alice, () => db.query("update asks set status = 'done', resolved_at = now() where id = $1", [id]));
+    expect(moved.rowCount).toBe(1);
+    const { rows } = await db.query("select status, investor_id from asks where id = $1", [id]);
+    expect(rows[0]).toEqual({ status: "done", investor_id: aliceInvestor });
+    const gone = await as(db, "authenticated", alice, () => db.query("delete from asks where id = $1", [id]));
+    expect(gone.rowCount).toBe(1);
+  });
+
+  it("refuses an ask that names someone else's investor, a blank ask and a made-up status", async () => {
+    await expect(as(db, "authenticated", alice, () => db.query("insert into asks (user_id, investor_id, text) values ($1, $2, 'x')", [alice, bobInvestor]))).rejects.toThrow(/row-level security/);
+    await expect(as(db, "authenticated", alice, () => db.query("insert into asks (user_id, text) values ($1, '')", [alice]))).rejects.toThrow(/check constraint/);
+    await expect(as(db, "authenticated", alice, () => db.query("insert into asks (user_id, text, status) values ($1, 'x', 'done')", [alice]))).rejects.toThrow(/permission denied/);
+  });
+
+  it("keeps one founder's asks away from another", async () => {
+    await as(db, "authenticated", alice, () => db.query("insert into asks (user_id, text) values ($1, 'Private ask')", [alice]));
+    expect((await as(db, "authenticated", bob, () => db.query("select * from asks"))).rowCount).toBe(0);
+    expect((await as(db, "authenticated", bob, () => db.query("update asks set text = 'hijack' where user_id = $1", [alice]))).rowCount).toBe(0);
+    expect((await as(db, "authenticated", bob, () => db.query("delete from asks where user_id = $1", [alice]))).rowCount).toBe(0);
+  });
+
+  it("keeps the ask when its investor is removed, and removes asks with the account", async () => {
+    const id = (await as(db, "service_role", null, () => db.query("insert into asks (user_id, investor_id, text) values ($1, $2, 'Keep me') returning id", [alice, aliceInvestor]))).rows[0].id;
+    await db.query("delete from investors where id = $1", [aliceInvestor]);
+    expect((await db.query("select investor_id from asks where id = $1", [id])).rows[0].investor_id).toBeNull();
+    await db.query("delete from auth.users where id = $1", [alice]);
+    expect((await db.query("select 1 from asks where user_id = $1", [alice])).rowCount).toBe(0);
+  });
+});

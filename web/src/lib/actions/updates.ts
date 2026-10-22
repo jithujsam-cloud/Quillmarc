@@ -75,6 +75,9 @@ export async function createUpdate(_prev: FormState, form: FormData): Promise<Fo
     .select("id")
     .single();
   if (error || !data) return { error: "Could not create the update. Try again." };
+  // Open asks go into the new draft, so nothing the founder is still waiting on is forgotten.
+  const { data: open } = await supabase.from("asks").select("text").eq("user_id", user.id).in("status", ["open", "intro_made"]).order("created_at").limit(MAX_BULLETS);
+  if (open?.length) await supabase.from("updates").update({ bullets_json: { wins: [], problems: [], asks: open.map((a) => String(a.text).slice(0, MAX_BULLET_LENGTH)) } }).eq("id", data.id);
   revalidatePath("/updates");
   redirect(`/updates/${data.id}/edit`);
 }
