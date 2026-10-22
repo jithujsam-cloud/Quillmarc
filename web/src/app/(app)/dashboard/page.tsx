@@ -43,7 +43,9 @@ export default async function Dashboard() {
     chargeSourceFor(user.id).then((source) => syncRevenue(admin, user.id, source, { budgetMs: 2500 })),
   ]);
   const stripeError = setup.connection?.status === "error" ? setup.connection.last_error : snapshotResult.status === "rejected" ? (snapshotResult.reason as Error).message : null;
+  const syncError = syncResult.status === "fulfilled" ? syncResult.value.error : null;
   const importing = syncResult.status === "fulfilled" ? !syncResult.value.complete && !syncResult.value.error : false;
+  const problem = stripeError ?? syncError;
 
   const { data: snapData } = await supabase.from("metrics_snapshots").select("month, metrics_json").eq("user_id", user.id).order("month");
   const snapshots = (snapData ?? []).map((r) => ({ month: String(r.month).slice(0, 7), metrics: r.metrics_json as MetricsResult }));
@@ -96,9 +98,9 @@ export default async function Dashboard() {
       />
 
       <div className="grid gap-4">
-        {stripeError && (
+        {problem && (
           <p className="notice" role="status">
-            Stripe: {stripeError} <Link href="/settings#stripe">Open settings</Link>
+            {problem} {setup.connection?.status === "error" && <Link href="/settings#stripe">Open settings</Link>}
           </p>
         )}
         {access.expired && <TrialEndedPanel access={access} />}

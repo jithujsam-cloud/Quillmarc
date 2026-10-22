@@ -39,6 +39,12 @@ export interface SyncResult {
   error: string | null;
 }
 
+/** A database error as a sentence a founder or the owner can act on. */
+export function describeDbError(error: { code?: string; message?: string }): string {
+  const missing = error.code === "42P01" || error.code === "PGRST205" || /does not exist|schema cache/i.test(error.message ?? "");
+  return missing ? "The database is missing its latest update. Run the newest migration in Supabase (20261023100000_periods_and_revenue.sql), then reload." : "Could not save to the database. Try again in a minute.";
+}
+
 async function save(admin: SupabaseClient, userId: string, rows: DailyRow[]) {
   for (let i = 0; i < rows.length; i += 500) {
     const chunk = rows.slice(i, i + 500).map((r) => ({ user_id: userId, ...r }));
@@ -47,8 +53,11 @@ async function save(admin: SupabaseClient, userId: string, rows: DailyRow[]) {
   }
 }
 
+class DbError extends Error {}
+
 async function takeLock(admin: SupabaseClient, userId: string, nowIso: string): Promise<SyncState | null> {
-  await admin.from("revenue_sync").upsert({ user_id: userId }, { onConflict: "user_id", ignoreDuplicates: true });
+  const made = await admin.from("revenue_sync").upsert({ user_id: userId }, { onConflict: "user_id", ignoreDuplicates: true });
+  if (made.error) throw new DbError(describeDbError(made.error));
   const until = new Date(Date.parse(nowIso) + LOCK_SECONDS * 1000).toISOString();
   // Two conditional updates, each atomic: take a free lock, or take over one that has run out.
   const columns = "last_synced_at, last_deep_at, backfill_before, backfill_complete, locked_until";
@@ -76,7 +85,12 @@ export async function syncRevenue(
   const fresh = current?.last_synced_at && now - Date.parse(current.last_synced_at) / 1000 < REVENUE_TTL_SECONDS;
   if (!opts.force && fresh && current?.backfill_complete) return { complete: true, synced: false, busy: false, error: null };
 
-  const state = await takeLock(admin, userId, nowIso);
+  let state: SyncState | null;
+  try {
+    state = await takeLock(admin, userId, nowIso);
+  } catch (e) {
+    return { complete: false, synced: false, busy: false, error: e instanceof DbError ? e.message : "Could not save to the database." };
+  }
   if (!state) return { complete: Boolean(current?.backfill_complete), synced: false, busy: true, error: null };
 
   const started = Date.now();
