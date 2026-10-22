@@ -3,6 +3,7 @@
 //
 //   STRIPE_SANDBOX_SECRET_KEY=sk_test_... npm run stripe:history            build it (takes a few minutes)
 //   STRIPE_SANDBOX_SECRET_KEY=sk_test_... npm run stripe:history -- --reset delete it
+//   npm run stripe:history -- --plan    no key, no Stripe: print the numbers Quillmarc should show
 //
 // How it works: a test clock starts at a customer's signup date in the past, then moves forward in
 // steps of up to 28 days to today, while the script cancels, upgrades and adds seats at the right
@@ -17,7 +18,8 @@
 const API = "https://api.stripe.com/v1";
 const key = process.env.STRIPE_SANDBOX_SECRET_KEY ?? "";
 const reset = process.argv.includes("--reset");
-if (!/^sk_test_/.test(key)) {
+const planOnly = process.argv.includes("--plan");
+if (!planOnly && !/^sk_test_/.test(key)) {
   console.error("Set STRIPE_SANDBOX_SECRET_KEY to a sandbox secret key (sk_test_). Live keys are refused.");
   process.exit(1);
 }
@@ -275,7 +277,42 @@ async function build() {
   console.log("Done. In Quillmarc, start a new update (or Recalculate) to read the history.");
 }
 
-(reset ? removeHistory() : build()).catch((e) => {
+/** The numbers Quillmarc should show for this history, from the app's own calculation. */
+async function printPlan() {
+  const { calculateMetrics } = await import("../src/lib/metrics");
+  const { figures } = await import("../src/lib/metrics/present");
+  const amount = { starter: 4900, growth: 14900, scale: 39900, annual: 149000, seats: 2500 } as const;
+  const subs = planHistory().flatMap((g) =>
+    g.people.map((p, i) => {
+      const final = p.events.reduce((acc, e) => (e.kind === "upgrade" ? { ...acc, plan: "growth" as const } : e.kind === "seats" ? { ...acc, qty: e.quantity ?? acc.qty } : acc), { plan: p.plan.key, qty: p.quantity });
+      const cancel = p.events.find((e) => e.kind === "cancel");
+      const eur = p.currency === "eur";
+      return {
+        id: `plan_${g.startAt}_${i}`,
+        customerId: p.email,
+        status: cancel ? "canceled" : "active",
+        currency: eur ? "eur" : "usd",
+        startDate: p.joinAt,
+        endedAt: cancel ? cancel.at : null,
+        trialEnd: p.trialDays ? p.joinAt + p.trialDays * DAY : null,
+        pauseCollection: false,
+        items: [{ price: { id: final.plan, currency: eur ? "eur" : "usd", unitAmount: eur ? 13900 : amount[final.plan], interval: final.plan === "annual" ? ("year" as const) : ("month" as const), intervalCount: 1, usageType: "licensed" as const, billingScheme: "per_unit" as const }, quantity: final.qty }],
+        discounts: p.coupon && !eur ? [{ percentOff: 20, amountOff: null, currency: null, duration: "forever" as const, durationInMonths: null, start: p.joinAt, end: null }] : [],
+      };
+    }),
+  );
+  console.log(`${subs.length} customers in the plan.\n`);
+  console.log("Month            MRR       Growth   Customers  New  Churned");
+  for (let k = 11; k >= 0; k--) {
+    const d = new Date();
+    const m = new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth() - k, 1)).toISOString().slice(0, 7);
+    const r = calculateMetrics({ subscriptions: subs, sample: false }, { month: m, now });
+    const f = Object.fromEntries(figures(r).map((x) => [x.key, x.display]));
+    console.log(`${(m + (r.monthToDate ? " so far" : "")).padEnd(15)}  ${f.mrr.padStart(8)}  ${f.growthPercent.padStart(7)}  ${String(r.customers).padStart(9)}  ${String(r.newCustomers).padStart(3)}  ${String(r.churnedCustomers).padStart(7)}`);
+  }
+}
+
+(planOnly ? printPlan() : reset ? removeHistory() : build()).catch((e) => {
   console.error(`Stopped: ${(e as Error).message}`);
   process.exit(1);
 });
