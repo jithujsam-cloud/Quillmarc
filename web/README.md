@@ -49,6 +49,12 @@ read-only restricted key, and a sandbox behaves exactly like live.
    `npm run stripe:sandbox -- --month` once a month (or a few times to fast-forward): some customers
    leave, one upgrades, a few join.
 4. `npm run stripe:sandbox -- --reset` removes everything the script made.
+5. For a realistic company with real history, run `npm run stripe:history` with the same key. It uses
+   Stripe test clocks to live through 18 months: about 100 customers join at a growing pace, change
+   plans, add seats, keep early discounts, take trials, and cancel at about 3% a month, each change
+   recorded in the month it happened. It takes a few minutes. Stripe deletes test clocks and their
+   customers after 30 days, so run it again to rebuild (`--reset` first). It only ever deletes clocks
+   named "quillmarc history".
 
 A founder with no key to hand can choose **Explore with sample data** during setup. Every screen
 and email then says "Sample data", and they switch to their own Stripe in Settings.

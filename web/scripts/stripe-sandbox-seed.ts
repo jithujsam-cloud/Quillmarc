@@ -241,3 +241,5 @@ async function monthlyTick() {
   console.error(`Stopped: ${(e as Error).message}`);
   process.exit(1);
 });
+
+export {}; // a module, so its names stay local to this file
