@@ -918,7 +918,21 @@ html.modal-open { overflow: hidden; }
   .yours .field:nth-child(3) { grid-column: 1 / -1; }
   .join__row input { flex: none; }
   .badge { font-size: 13px; }
+  .join__legal { text-align: center; text-wrap: pretty; }
 }
+
+@media (max-width: 900px) {
+  .nav__links { display: none; }
+  .nav__end { margin-left: auto; }
+}
+
+@media (max-width: 480px) {
+  .nav__inner { gap: 12px; }
+  .nav__logo svg { width: 96px; height: 22px; }
+  .nav .btn--sm { padding: 0 12px; font-size: 13px; white-space: nowrap; }
+  .nav__end { gap: 2px; }
+}
+@media (max-width: 340px) { .nav__logo svg { width: 84px; height: 19px; } .nav__inner { gap: 6px; } }
 
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
